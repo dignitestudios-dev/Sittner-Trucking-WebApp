@@ -14,10 +14,11 @@ const Layout = ({ pages }) => {
   const toggleModal = () => {
     setisOpen(!isOpen);
   };
+console.log(token,"test");
 
   const navigate=useNavigate("");
   useEffect(()=>{
-      if(token=="logout") {
+      if(token=="logout"||!token) {
        navigate("/login")
       }
   },[token])
