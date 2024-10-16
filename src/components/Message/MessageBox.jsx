@@ -61,7 +61,7 @@ export default function MessageBox() {
           </div>
           <div className='w-full py-2' >
             <div className='bg-[#F4F4F4] w-full flex justify-center rounded-2xl px-2 py-3  text-xs font-normal' >
-              <img src="/chat-sms.png" onClick={()=>setIviewImage(true)} alt="" srcset="" />
+              <img src="/chat-sms.png" className='cursor-pointer' onClick={()=>setIviewImage(true)} alt="" srcset="" />
             </div>
           </div>
           <div className='flex items-center gap-1 justify-end' >
