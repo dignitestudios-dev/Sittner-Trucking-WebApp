@@ -52,7 +52,7 @@ export default function Sidebar() {
                         }
                     >
                         <span className='' ><IoExitOutline /></span>
-                        <span className='ml-2' >LogOut</span>
+                        <span className='ml-2' >Log Out</span>
                     </button>
                 </nav>
             </div>
