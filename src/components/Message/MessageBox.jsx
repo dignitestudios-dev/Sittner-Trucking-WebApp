@@ -125,7 +125,7 @@ export default function MessageBox() {
           </div>
         )}
           <div className='w-full py-2' >
-            <div className='bg-[#F4F4F4] w-full rounded-2xl px-2 py-3 text-xs font-normal text-[#007AFF] ' >https://maps.google.com/</div>
+            <div className={` ${token=="admin"?"bg-[#0A8A33] text-white":"bg-[#F4F4F4]"}   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`} >https://maps.google.com/</div>
           </div>
           <div className='flex items-center gap-1 justify-end' >
             {token=="admin"&&(
