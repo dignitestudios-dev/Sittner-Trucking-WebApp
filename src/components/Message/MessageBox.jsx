@@ -29,7 +29,7 @@ export default function MessageBox() {
         </div>
         {/* Messages */}
         <div className={`left-side ${token=="admin"&&"ms-auto"} mb-3 px-3 py-3 w-auto lg:max-w-[30%]`} >
-        {token=="admin"&&(
+        {token=="user"&&(
           <div className="username mb-3">
             <h2 className='font-semibold text-sm leading-[14px] ' >Admin</h2>
           </div>
@@ -56,9 +56,11 @@ export default function MessageBox() {
           </div>
         </div>
         <div className={`left-side ${token=="admin"&&"ms-auto"} mb-3 px-3 py-3 w-auto lg:max-w-[30%]`} >
+        {token=="user"&&(
           <div className="username mb-3">
             <h2 className='font-semibold text-sm leading-[14px] ' >Admin</h2>
           </div>
+        )}
           <div className='w-full py-2' >
             <div className='bg-[#F4F4F4] w-full flex justify-center rounded-2xl px-2 py-3  text-xs font-normal' >
               <img src="/chat-sms.png" className='cursor-pointer' onClick={()=>setIviewImage(true)} alt="" srcset="" />
@@ -84,9 +86,11 @@ export default function MessageBox() {
         
         </div>
         <div className={`left-side ${token=="admin"&&"ms-auto"} mb-3 px-3 py-3 w-auto lg:max-w-[30%]`} >
+        {token=="user"&&(
           <div className="username mb-3">
             <h2 className='font-semibold text-sm leading-[14px] ' >Admin</h2>
           </div>
+        )}
           <div className='w-full py-3 grid grid-cols-2  gap-2' >
             <div className='w-full rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4]   text-xs font-normal' >
               <img src="/xl.png" alt="" className='w-[50px] h-[50px]' srcset="" />
@@ -115,9 +119,11 @@ export default function MessageBox() {
           </div>
         </div>
         <div className={`left-side ${token=="admin"&&"ms-auto"} mb-3 px-3 py-3 w-auto lg:max-w-[30%]`} >
+        {token=="user"&&(
           <div className="username mb-3">
             <h2 className='font-semibold text-sm leading-[14px] ' >Admin</h2>
           </div>
+        )}
           <div className='w-full py-2' >
             <div className='bg-[#F4F4F4] w-full rounded-2xl px-2 py-3 text-xs font-normal text-[#007AFF] ' >https://maps.google.com/</div>
           </div>
