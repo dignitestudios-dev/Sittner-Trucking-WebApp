@@ -17,13 +17,13 @@ export default function Message() {
         window.scroll(0, 0);
     }, []);
     return (
-        <div class='bg-[#F7F7F7]  py-2 px-2 lg:px-10 lg:py-10 ' >
+        <div class='bg-[#F7F7F7] h-[100%]  py-2 px-2 lg:px-10 lg:py-10 ' >
             {
                 LookScreen && (
                     <NavLink onClick={() => setLookScreen(false)} className='font-semibold text-[24px] hidden lg:flex mb-5 leading-[29px]  items-center' > <IoMdArrowBack size={25} className='mr-2' /> Message Board</NavLink>
                 )
             }
-            <div className='grid gap-5  grid-cols-1 lg:grid-cols-3 ' >
+            <div className='grid gap-5 h-[100%] grid-cols-1 lg:grid-cols-3 ' >
                 {
                     hideLookAhed ?
                         !LookScreen && (<div className={`${!LookScreen ? "col-span-2" : "col-span-1"}  `}  ><MessageBox /></div>)
