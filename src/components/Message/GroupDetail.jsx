@@ -7,7 +7,7 @@ import { MdOutlineClose } from "react-icons/md";
 export default function GroupDetail() {
   const { isEditGroup, setEditGroup,LookScreen,setLookScreen,setSideDraw } = useContext(MyContext);
   return (
-    <div className='bg-[#FFFFFF] h-[550px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5'>
+    <div className='bg-[#FFFFFF] h-[630px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5'>
       <div className="flex items-center w-full mt-2 justify-between" >
         <div className='flex lg:hidden' >
          <button className='bg-transparent ' onClick={() => setSideDraw(false)}  ><MdOutlineClose size={20} /> </button>

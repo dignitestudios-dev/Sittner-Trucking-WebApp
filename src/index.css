@@ -44,7 +44,26 @@ input:focus{
 
 
 
-.scroll-box::-webkit-scrollbar {
+*::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  background: #D1D1D1; 
+}
+ 
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  background: #484848; 
+  transition: 0.4s;
+}
+
+/* Handle on hover */
+*::-webkit-scrollbar-thumb:hover {
+  background: #676767; 
+}
+*::-webkit-scrollbar {
   width: 5px;
 }
 

@@ -5,7 +5,7 @@ import { MyContext } from '../../context/GlobalContext';
 export default function LookAhead() {
     const {token} = useContext(MyContext);
   return (
-    <div className=' mt-3 h-[470px] scroll-box px-3 overflow-auto' >
+    <div className=' mt-3 h-[100%] scroll-box  px-3 overflow-auto' >
              {token=="admin"&&<NavLink to={"/createlook"} className={`flex text-sm w-[203px] font-semibold text-center bg-[#0A8A33] text-white h-[44px] flex items-center justify-center rounded-[8px] font-semibold mt-3 px-4 mx-5 py-2 `}> <FaPlus className='mr-2 text-sm'  /> Create New Message</NavLink>}
                 <div className="look-ahead   px-3 py-5 w-[100%]" >
                     <div className="username mb-3 flex items-center justify-between">

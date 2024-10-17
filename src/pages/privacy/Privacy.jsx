@@ -1,4 +1,5 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 export default function Privacy() {
     return (
@@ -575,9 +576,10 @@ export default function Privacy() {
                     Don't hesitate to contact us if you have any questions.
                 </p>
                 <ul className='list-disc px-10' >
-                    <li>Via Email: office@jbsittner.com</li>
-                    <li>Via Phone Number: 9708972640</li>
-                    <li>Via this Link: https://www.jbsittnertruckingllc.com/</li>
+                    <li>Via Email:<a href={'mailto:office@jbsittner.com'} >office@jbsittner.com</a></li>
+                    <li>Via Phone Number:<a href={'tel:9708972640'} >9708972640</a> </li>
+                    <li>Via this Link:<a href={'https://www.jbsittnertruckingllc.com/'} >https://www.jbsittnertruckingllc.com/ </a></li>
+                    <li>Via this Address: 49600 CR 29.5 Nunn, Co, 80648</li>
                 </ul>
             </div>
         </div>

@@ -43,7 +43,7 @@ export default function Member() {
             <div
                 id="accordion-collapse"
                 data-accordion="collapse"
-                className={`${LookScreen?"w-[40%]":"w-full"}  mt-2 mx-auto`}
+                className={`${LookScreen?"w-[40%]":"w-full"}   mt-2 mx-auto`}
             >
                 <div
                     type="button"

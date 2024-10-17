@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function LookBehind() {
   return (
-    <div className=' mt-3 h-[470px] scroll-box px-3  overflow-auto' >
+    <div className=' mt-3 h-[80%] scroll-box px-3  overflow-auto' >
                 <div className="look-behind   px-3 py-5 w-[100%]" >
                     <div className="username mb-3">
                         <h2 className='font-semibold text-sm leading-[14px] ' >Monday</h2>
@@ -36,7 +36,7 @@ export default function LookBehind() {
                         <span className='text-[12px] ml-2 font-normal text-[#5C5C5C]' >09:00 AM</span>                    
                     </div>
                 </div>
-                <div className="look-behind   px-3 py-2 w-[100%]" >
+                <div className="look-behind   px-3  w-[100%]" >
                     <div className="username mb-3">
                         <h2 className='font-semibold text-sm leading-[14px] ' >Monday</h2>
                     </div>
