@@ -1,6 +1,7 @@
 import React, { useContext} from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { useNavigate } from "react-router-dom";
+import { IoExit } from "react-icons/io5";
 export default function LogOut() {
     const {LogOut,setIsLogOut}=useContext(MyContext);
     const navigate=useNavigate("");
@@ -22,7 +23,7 @@ export default function LogOut() {
                             <div className="border-0  rounded-[16px] shadow-lg  flex flex-col w-full bg-white outline-none focus:outline-none">                                
                                 {/*body*/}
                                 <div className="px-6 py-6 flex flex-col items-center">
-                                    <img src="/logout.png" className="mb-3" width={50} alt="" />
+                                    <IoExit size={40} color="#EE3131"/>
                                     <h3 className="font-semibold text-[20px] leading-[29px] mb-3 capitalize" >Logout</h3>
                                     <p className="text-[#565656] text-[13px] text-center font-medium leading-[13px] " >Are you sure you want to logout your account?</p>
                                     <div className="flex items-center w-full mt-2 justify-between" >
