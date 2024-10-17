@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { IoMdArrowBack } from 'react-icons/io'
 import { IoMdPerson } from "react-icons/io";
 import { NavLink, useNavigate } from 'react-router-dom'
 
 export default function AddMember() {
     const navigate = useNavigate("")
+    const [contact, setContact] = useState({ value: '' });
+    const re = /^[0-9\b]+$/;
+    const handleChange = (e) => {
+        const { value } = e.target;
+        if (value === '' || re.test(value)) {
+            setContact({ value });
+        }
+    };
     return (
         <div class='bg-[#F7F7F7] h-[80vh] py-5 px-5 ' >
             <NavLink to={'/'} className='font-semibold text-[24px] leading-[29px] flex items-center' > <IoMdArrowBack size={25} className='mr-2' /> Add New Member</NavLink>
@@ -45,6 +53,8 @@ export default function AddMember() {
                                 <input
                                     type="tel"
                                     id="contact-input"
+                                    onChange={handleChange}
+                                    value={contact.value}
                                     className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                                     required
                                     placeholder='Contact No'
