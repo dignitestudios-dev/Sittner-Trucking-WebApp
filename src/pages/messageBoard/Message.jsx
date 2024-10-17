@@ -34,7 +34,7 @@ export default function Message() {
                             <div
                                 ref={sidebarRef}
                                 className={`fixed top-0 right-0 transition-all duration-200 ${sideDraw ? "lg:translate-x-0":"translate-x-full lg:translate-x-0"
-                                    } lg:static w-[60%] z-[9999999] lg:z-auto lg:w-60 xl:w-72 flex flex-col gap-3 items-center justify-start py-0 h-full bg-white`}
+                                    } lg:static w-[80%] z-[9999999] lg:z-auto lg:w-60 xl:w-72 flex flex-col gap-3 items-center justify-start py-0 h-full bg-white`}
                             >
                                 <GroupDetail />
                             </div>
