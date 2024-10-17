@@ -7,7 +7,7 @@ export default function MessageBox() {
   const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw,hideLookAhed,setLookAhedDraw } = useContext(MyContext);
 
   return (
-    <div className='bg-[#FFFFFF] w-full h-[80%] lg:h-[550px] relative rounded-[24px]' >
+    <div className='bg-[#FFFFFF] w-full  h-[80%] lg:h-[550px] relative rounded-[24px]' >
       {/* Message Head */}
       <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
         <div className='flex justify-between items-center ' >
@@ -15,7 +15,7 @@ export default function MessageBox() {
             <div>
               <img src="/messageprofile.jfif" class='rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]' alt="" />
             </div>
-            <div className='ml-2 cursor-pointer ' onClick={() => token == "admin"||!hideLookAhed && (hideLookAhed?setLookScreen(!LookScreen):setLookAhedDraw(true))}>
+            <div className='ml-2 cursor-pointer ' onClick={() => (token == "admin"||!hideLookAhed) && (hideLookAhed?setLookScreen(!LookScreen):setLookAhedDraw(true))}>
               <h2 className='font-semibold text-base  lg:text-2xl leading-[29px]'  >JB Sittner Trucking LLC</h2>
               <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
             </div>
@@ -35,7 +35,7 @@ export default function MessageBox() {
         </div>
       </div>
       {/* Message Body */}
-      <div className={`chat-body ${token == "admin"?"h-[80%] lg:h-[340px]":"h-[80%] lg:h-[440px]"}  scroll-box  overflow-auto`}>
+      <div className={`chat-body ${token == "admin"?"h-[70%] lg:h-[340px]":"h-[70%] lg:h-[440px]"}  scroll-box  overflow-auto`}>
         {/* Day Timer */}
         <div className='flex justify-center py-2' >
           <span className='bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal' >Today</span>

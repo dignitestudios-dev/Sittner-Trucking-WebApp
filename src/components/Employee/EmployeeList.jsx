@@ -5,7 +5,7 @@ import DeleteEmpProfile from '../Profile/DeleteProfile'
 
 export default function EmployeeList() {
   return (
-    <div className='bg-[#FFFFFF] border rounded-[10px] h-[70vh] border-[#E4E4E4] mt-6 lg:py-5 lg:px-5' >
+    <div className='bg-[#FFFFFF] border rounded-[10px] h-[70vh] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-5 lg:px-5' >
     <div className="relative scroll-box overflow-x-auto h-full ">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-[#787F8C] uppercase bg-[#F3F5F7]">
@@ -16,13 +16,13 @@ export default function EmployeeList() {
                     <th scope="col" className="px-6 py-3">
                     Email
                     </th>
-                    <th scope="col" className="px-6 py-3 rounded-e-lg">
+                    <th scope="col" className="px-6 py-3 ">
                     Contact
                     </th>
-                    <th scope="col" className="px-6 py-3 rounded-e-lg">
+                    <th scope="col" className="px-6 py-3 ">
                     Address
                     </th>
-                    <th scope="col" className="px-6 py-3 rounded-e-lg">
+                    <th scope="col" className="px-6 py-3 ">
                         Action
                     </th>
                 </tr>

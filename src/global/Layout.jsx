@@ -24,7 +24,7 @@ const Layout = ({ pages }) => {
    
 
   return (
-    <div className="w-screen h-[85vh] md:h-screen flex justify-start items-start">
+    <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
       <div
         onClick={toggleModal}
         className={`w-screen h-screen fixed top-0 left-0 transition-all duration-500  ${
@@ -41,7 +41,7 @@ const Layout = ({ pages }) => {
         </div>
       </div>
 
-      <div className="w-full relative lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)] h-full  overflow-y-auto overflow-x-hidden">
+      <div className="w-full relative lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)] h-full  overflow-hidden overflow-x-hidden">
         <div className="sticky top-0 left-0 w-full h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99999]">
           <button
             onClick={() => setisOpen((prev) => !prev)}
