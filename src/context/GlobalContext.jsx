@@ -18,9 +18,16 @@ export const MyContextProvider = ({ children }) => {
   const [token,setToken]=useState("");
   const user=localStorage.getItem("token");
 
-console.log(PasswordSuccessFullChange,"modal");
 
-
+  const [hideMsgGroup,setHideMsgGroup]=useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+        setHideMsgGroup(window.innerWidth>1023?true:false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
   useEffect(()=>{
     if(user=="admin") {
      setToken("admin");
@@ -61,7 +68,9 @@ console.log(PasswordSuccessFullChange,"modal");
         setIsMessageInfo,
         MessageInfo,
         viewImage,
-        setIviewImage
+        setIviewImage,
+        hideMsgGroup,
+        setHideMsgGroup
       }}
     >
       {children}

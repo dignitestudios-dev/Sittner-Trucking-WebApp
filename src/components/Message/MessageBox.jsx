@@ -3,7 +3,7 @@ import { GrAttachment } from "react-icons/gr";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { MyContext } from '../../context/GlobalContext';
 export default function MessageBox() {
-  const {LookScreen,setLookScreen,token,setIsMessageInfo,MessageInfo,viewImage,setIviewImage}=useContext(MyContext);
+  const {LookScreen,setLookScreen,token,setIsMessageInfo,MessageInfo,viewImage,setIviewImage,setHideMsgGroup,hideMsgGroup}=useContext(MyContext);
 
   return (
     <div className='bg-[#FFFFFF] w-full h-[550px] relative rounded-[24px]' >
@@ -16,6 +16,9 @@ export default function MessageBox() {
           <div className='ml-2 cursor-pointer '  onClick={()=>token=="admin"&&setLookScreen(!LookScreen)}>
             <h2 className='font-semibold text-base  lg:text-2xl leading-[29px]'  >JB Sittner Trucking LLC</h2>
             <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
+          </div>
+          <div>
+            <button className='' >Attachments</button>
           </div>
           <div>
           </div>
