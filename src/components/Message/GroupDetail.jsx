@@ -8,7 +8,7 @@ export default function GroupDetail() {
   const { isEditGroup, setEditGroup } = useContext(MyContext);
   const {LookScreen,setLookScreen}=useContext(MyContext);
   return (
-    <div className='bg-[#FFFFFF] h-[550px] scroll-box  overflow-auto rounded-[24px] px-5 py-5'>
+    <div className='bg-[#FFFFFF] h-[550px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5'>
       <div className="flex items-center w-full mt-2 justify-end" >
         {
           !LookScreen&&(

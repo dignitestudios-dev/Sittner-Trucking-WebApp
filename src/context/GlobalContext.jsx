@@ -17,16 +17,20 @@ export const MyContextProvider = ({ children }) => {
   const [viewImage, setIviewImage] = useState(false);
   const [token,setToken]=useState("");
   const user=localStorage.getItem("token");
+  const [sideDraw, setSideDraw] = useState(false);
 
 
+
+  const [displaySize,setDisplaySize]=useState(window.innerWidth);
   const [hideMsgGroup,setHideMsgGroup]=useState(false);
   useEffect(() => {
     const handleResize = () => {
-        setHideMsgGroup(window.innerWidth>1023?true:false);
+      setDisplaySize(window.innerWidth)       
     };
+    setHideMsgGroup(displaySize>1023?true:false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [displaySize]);
   
   useEffect(()=>{
     if(user=="admin") {
@@ -70,7 +74,9 @@ export const MyContextProvider = ({ children }) => {
         viewImage,
         setIviewImage,
         hideMsgGroup,
-        setHideMsgGroup
+        setHideMsgGroup,
+        setSideDraw,
+        sideDraw
       }}
     >
       {children}

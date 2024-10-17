@@ -24,7 +24,7 @@ export default function Profile() {
   </div>
           </div>
           <div>
-            <img src="/person.webp" className='rounded-[50%] mt-2 cursor-pointer w-[50px] h-[50px]' alt="" />
+            <img src="/person.webp" className='rounded-full cursor-pointer w-[50px] h-[50px] object-cover' alt="" />
           </div>
           <div className='mt-5 grid grid-cols-1 gap-5  lg:grid-cols-3' >
             <div>
