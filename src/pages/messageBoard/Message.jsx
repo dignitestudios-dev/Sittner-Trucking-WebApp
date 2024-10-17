@@ -13,9 +13,11 @@ import { MdOutlineClose } from 'react-icons/md';
 export default function Message() {
     const sidebarRef = useRef(null);
     const { LookScreen, setLookScreen, token, setHideMsgGroup, hideMsgGroup, setSideDraw, sideDraw, LookAhedDraw, hideLookAhed, setLookAhedDraw } = useContext(MyContext);
-
+    useEffect(() => {
+        window.scroll(0, 0);
+    }, []);
     return (
-        <div class='bg-[#F7F7F7]  py-2 px-4 lg:px-10 lg:py-10 ' >
+        <div class='bg-[#F7F7F7]  py-2 px-2 lg:px-10 lg:py-10 ' >
             {
                 LookScreen && (
                     <NavLink onClick={() => setLookScreen(false)} className='font-semibold text-[24px] hidden lg:flex mb-5 leading-[29px]  items-center' > <IoMdArrowBack size={25} className='mr-2' /> Message Board</NavLink>

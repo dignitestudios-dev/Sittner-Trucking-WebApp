@@ -15,7 +15,7 @@ export default function UpdatePassword() {
     </div>
     <div class=''>
         <div class='flex items-center flex-col' >
-            <img src="/logo.webp" class='mb-3' alt="" />
+            <img src="/logo.webp" class='mb-3 w-[150px]' alt="" />
             <h2 class='mb-5 font-bold text-[32px] leading-[38px]' >Update Password</h2>           
         </div>
         <form class="max-w-sm mx-auto mt-3  ">

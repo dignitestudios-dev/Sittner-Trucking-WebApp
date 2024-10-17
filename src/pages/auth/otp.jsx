@@ -11,7 +11,7 @@ export default function Otp() {
     </div>
     <div className=''>
         <div className='flex items-center flex-col mb-4' >
-            <img src="/logo.webp" className='mb-3' alt="" />
+            <img src="/logo.webp" className='mb-3 w-[150px]' alt="" />
             <h2 className='mb-3 font-bold text-[32px] leading-[38px]' >Verification</h2>
             <p className='mb-3 font-medium text-base leading-[19px] text-center' >Please enter the code that we sent to your email <br /> <span className='font-bold' > mike.smith@gmail.com,</span> to reset your password.</p>
         </div>

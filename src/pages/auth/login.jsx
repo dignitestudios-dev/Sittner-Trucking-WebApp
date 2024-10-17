@@ -25,7 +25,7 @@ export default function Login() {
             </div>
             <div className=''>
                 <div className='flex items-center flex-col ' >
-                    <img src="/logo.webp" className='mb-3' alt="" />
+                    <img src="/logo.webp" className='mb-3 w-[150px]  ' alt="" />
                     <h2 className='mb-3 font-bold text-[32px] leading-[38px]' >Welcome Back</h2>
                     <p className='mb-3 font-medium text-base leading-[19px]' >Please enter the details below to continue</p>
                 </div>

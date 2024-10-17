@@ -7,7 +7,7 @@ export default function MessageBox() {
   const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw,hideLookAhed,setLookAhedDraw } = useContext(MyContext);
 
   return (
-    <div className='bg-[#FFFFFF] w-full h-[550px] relative rounded-[24px]' >
+    <div className='bg-[#FFFFFF] w-full  lg:h-[550px] relative rounded-[24px]' >
       {/* Message Head */}
       <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
         <div className='flex justify-between items-center ' >
@@ -15,7 +15,7 @@ export default function MessageBox() {
             <div>
               <img src="/messageprofile.jfif" class='rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]' alt="" />
             </div>
-            <div className='ml-2 cursor-pointer ' onClick={() => token == "admin" && (hideLookAhed?setLookScreen(!LookScreen):setLookAhedDraw(true))}>
+            <div className='ml-2 cursor-pointer ' onClick={() => token == "admin"||!hideLookAhed && (hideLookAhed?setLookScreen(!LookScreen):setLookAhedDraw(true))}>
               <h2 className='font-semibold text-base  lg:text-2xl leading-[29px]'  >JB Sittner Trucking LLC</h2>
               <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
             </div>
@@ -162,7 +162,7 @@ export default function MessageBox() {
       {/* Send Message */}
       {
         token == "admin"&&(
-      <form className="w-100 bg-white lg:px-5 py-5 flex items-center absolute bottom-0 w-full  justify-center gap-8 ">
+      <form className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center absolute bottom-0 w-full  justify-center gap-8 ">
         <div className="relative w-[85%] h-[40px]">
           <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">
             <label htmlFor="attach"  >
