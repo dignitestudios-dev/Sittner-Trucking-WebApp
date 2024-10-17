@@ -7,7 +7,7 @@ export default function MessageBox() {
   const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw,hideLookAhed,setLookAhedDraw } = useContext(MyContext);
 
   return (
-    <div className='bg-[#FFFFFF] w-full  h-[80%] lg:h-[90%] border border-red-500 relative rounded-[24px]' >
+    <div className='bg-[#FFFFFF] w-full  h-[80%] lg:h-[90%]  relative rounded-[24px]' >
       {/* Message Head */}
       <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
         <div className='flex justify-between items-center ' >
