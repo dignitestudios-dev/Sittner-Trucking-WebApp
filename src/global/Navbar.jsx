@@ -17,6 +17,9 @@ export default function Navbar() {
             </div>
           )
         }
+
+{
+          token == "user" ? (
         <NavLink to={'/profile'} className='flex items-center' >
           <img src={token=="admin"?"/admin.png":"/person.webp"} className='rounded-full cursor-pointer w-[40px] h-[40px] object-cover' alt="" />
           <div>
@@ -26,6 +29,17 @@ export default function Navbar() {
             </h2>
           </div>
         </NavLink>
+          ):(
+            <button className='flex items-center' >
+          <img src={token=="admin"?"/admin.png":"/person.webp"} className='rounded-full cursor-pointer w-[40px] h-[40px] object-cover' alt="" />
+          <div>
+            <h2 className='font-medium ml-2 text-[13px] leading-[15px]' > {token=="admin"?"Chris Tom":"Mike Smith"}
+              <br />
+              <span className='text-[#9E9E9E]'>{token=="admin"?"Admin":"Employee"}</span>
+            </h2>
+          </div>
+        </button>
+          )}
       </div>
 
     </div>

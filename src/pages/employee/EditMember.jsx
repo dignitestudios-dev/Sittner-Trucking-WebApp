@@ -40,8 +40,9 @@ export default function EditMember() {
                                 <input
                                     type="email"
                                     id="email-input"
-                                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
+                                    className={`bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33] ${token=="admin"?"":"cursor-not-allowed"} `}
                                     required
+                                    disabled={token=="admin"?false:true}
                                     placeholder='Email Address'
                                 />
                             </div>

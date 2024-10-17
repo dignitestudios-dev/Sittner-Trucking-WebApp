@@ -20,7 +20,7 @@ export default function LogOut() {
                     >
                         <div className="relative w-[350px]  my-6 mx-auto max-w-4xl">
                             {/*content*/}
-                            <div className="border-0  rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                            <div className="border-0 h-[250px] rounded-[16px] shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 
                                 {/*body*/}
                                 <div className="relative p-6  flex flex-col items-center">
