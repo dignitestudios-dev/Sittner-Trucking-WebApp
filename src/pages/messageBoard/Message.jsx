@@ -25,7 +25,7 @@ export default function Message() {
             <div className='grid gap-5  grid-cols-1 lg:grid-cols-3 ' >
                 {!LookScreen && (<div className={`${!LookScreen ? "col-span-2" : "col-span-1"}  `}  ><MessageBox /></div>)}
                 {
-                    !hideMsgGroup && (
+                    !hideMsgGroup && token == "admin" && (
                         <div                          
                             className={`w-screen h-screen fixed top-0 right-0 transition-all duration-500  ${
                                 sideDraw ? "lg:translate-x-0" : "translate-x-full lg:translate-x-0"

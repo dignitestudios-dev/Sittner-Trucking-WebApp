@@ -20,12 +20,16 @@ export default function MessageBox() {
               <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
             </div>
           </div>
+          {
+             token == "admin"&&(
           <div className='ms-auto'>
             <button className='text-white bg-[#0A8A33] hover:bg-green-800  rounded-full text-sm p-2.5 text-center flex lg:hidden items-center' onClick={() => {              
               setSideDraw(true)
             }
               } ><MdOutlineFilePresent className='text-2xl' /></button>
           </div>
+          )
+        }
           <div>
           </div>
         </div>
