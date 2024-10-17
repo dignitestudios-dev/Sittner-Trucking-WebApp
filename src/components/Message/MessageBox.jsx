@@ -7,7 +7,7 @@ export default function MessageBox() {
   const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw,hideLookAhed,setLookAhedDraw } = useContext(MyContext);
 
   return (
-    <div className='bg-[#FFFFFF] w-full h-[90%] lg:h-[550px] relative rounded-[24px]' >
+    <div className='bg-[#FFFFFF] w-full h-[85%] lg:h-[550px] relative rounded-[24px]' >
       {/* Message Head */}
       <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
         <div className='flex justify-between items-center ' >
@@ -35,7 +35,7 @@ export default function MessageBox() {
         </div>
       </div>
       {/* Message Body */}
-      <div className={`chat-body ${token == "admin"?"h-[340px]":"h-[440px]"}  scroll-box  overflow-auto`}>
+      <div className={`chat-body ${token == "admin"?"h-[85%] lg:h-[340px]":"h-[85%] lg:h-[440px]"}  scroll-box  overflow-auto`}>
         {/* Day Timer */}
         <div className='flex justify-center py-2' >
           <span className='bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal' >Today</span>
