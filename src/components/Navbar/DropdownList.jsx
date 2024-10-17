@@ -36,7 +36,7 @@ export default function DropdownList() {
                                         </div>
                                         <div className='flex flex-col items-end'>
                                             <p className='text-xs text-[#717171] font-medium' >7:30 PM</p>
-                                            <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900 dark:text-white">
+                                            <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900 ">
                                                 <span className="">
                                                     <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
                                                         6
