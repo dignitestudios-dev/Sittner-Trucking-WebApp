@@ -43,7 +43,7 @@ export default function AddMember() {
                             <div className='mb-3'>
                                 <label className='text-[13px] mb-1 font-semibold leading-[16.94px]'>Contact No</label>
                                 <input
-                                    type="number"
+                                    type="tel"
                                     id="contact-input"
                                     className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                                     required
