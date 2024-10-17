@@ -17,9 +17,9 @@ export default function MessageBox() {
             <h2 className='font-semibold text-base  lg:text-2xl leading-[29px]'  >JB Sittner Trucking LLC</h2>
             <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
           </div>
-          <div>
+          {/* <div>
             <button className='' >Attachments</button>
-          </div>
+          </div> */}
           <div>
           </div>
         </div>
