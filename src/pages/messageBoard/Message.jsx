@@ -26,8 +26,7 @@ export default function Message() {
                 {!LookScreen && (<div className={`${!LookScreen ? "col-span-2" : "col-span-1"}  `}  ><MessageBox /></div>)}
                 {
                     !hideMsgGroup && (
-                        <div           
-                        onClick={toggleModal}                 
+                        <div                          
                             className={`w-screen h-screen fixed top-0 right-0 transition-all duration-500  ${
                                 sideDraw ? "lg:translate-x-0" : "translate-x-full lg:translate-x-0"
                                 } lg:static  z-[9999999] lg:z-auto px-3 lg:w-60 xl:w-72 flex flex-col gap-3 items-center justify-start py-0 lg:h-full `}
