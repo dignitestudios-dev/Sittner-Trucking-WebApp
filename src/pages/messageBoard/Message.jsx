@@ -10,7 +10,7 @@ import MessageInfo from '../../components/Message/MessageInfo';
 import ViewImage from '../../components/Message/LargeImageModal';
 
 export default function Message() {
-    const { LookScreen, setLookScreen,token,setHideMsgGroup,hideMsgGroup} = useContext(MyContext);
+    const { LookScreen, setLookScreen,token} = useContext(MyContext);
 
 
     
@@ -23,7 +23,7 @@ export default function Message() {
             <div className='grid gap-5  grid-cols-1 lg:grid-cols-3 ' >
                 {!LookScreen && (<div className={`${!LookScreen ? "col-span-2" : "col-span-1"}  `}  ><MessageBox /></div>)}
                 {
-                   hideMsgGroup&&token == "admin" && (
+                   token == "admin" && (
                         <div className={`${LookScreen ? "col-span-2" : "col-span-1"}  `}  >
                             <NavLink onClick={() => setLookScreen(false)} className='font-semibold text-[24px] flex lg:hidden mb-5 leading-[29px]  items-center' > <IoMdArrowBack size={25} className='mr-2' /> Back</NavLink>                            
                             <GroupDetail />
