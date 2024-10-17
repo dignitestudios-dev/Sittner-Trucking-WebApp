@@ -34,7 +34,7 @@ export default function Login() {
                         <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white border border-gray-300  text-gray-900 text-sm rounded-lg   block w-full p-2.5  dark:placeholder-gray-400 dark:text-white focus:outline-[#0A8A33] " placeholder="mikesmith@gmail.c" required />
                     </div>
                     <div className="relative mb-2">
-                        <input type={!showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} id="password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] " placeholder='Password' required />
+                        <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} id="password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] " placeholder='Password' required />
                         <div className="absolute inset-y-0 end-0 flex items-center pe-3.5 ">
                             {
                                 showPassword ? (

@@ -20,7 +20,7 @@ export default function UpdatePassword() {
         </div>
         <form class="max-w-sm mx-auto mt-3  ">
         <div class="relative mb-3">
-                        <input type={!currentPass?"text":"password"} id="password" class="bg-gray-50 border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"  placeholder='Enter New Password' required />
+                        <input type={currentPass?"text":"password"} id="password" class="bg-gray-50 border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"  placeholder='Enter New Password' required />
                         <div class="absolute inset-y-0 end-0 flex items-center pe-3.5 ">
                         {
                                 currentPass?(
@@ -32,7 +32,7 @@ export default function UpdatePassword() {
                         </div>
                     </div>    
                     <div class="relative mb-2">
-                        <input type={!NewPass?"text":"password"} id="password" class="bg-gray-50 border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"  placeholder='Re-enter New Password'  required />
+                        <input type={NewPass?"text":"password"} id="password" class="bg-gray-50 border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"  placeholder='Re-enter New Password'  required />
                         <div class="absolute inset-y-0 end-0 flex items-center pe-3.5 ">
                         {
                                 NewPass?(
