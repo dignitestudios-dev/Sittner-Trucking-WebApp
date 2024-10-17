@@ -22,7 +22,7 @@ export default function Sidebar() {
 
     return (
         <div className="w-full px-2">
-            <div className="flex items-center justify-start mt-3 mb-3 h-16 ">
+            <div className="flex items-center justify-start mt-[80px] lg:mt-3 mb-3 h-16 ">
                 <img src="/whitebglogo.webp" width={120} alt="" srcset="" />
             </div>
             <div className="flex flex-col flex-1 overflow-y-auto">
