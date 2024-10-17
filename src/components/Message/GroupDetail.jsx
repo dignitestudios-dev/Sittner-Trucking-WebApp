@@ -5,8 +5,7 @@ import EditGroup from './EditGroup';
 import { MyContext } from '../../context/GlobalContext';
 import { MdOutlineClose } from "react-icons/md";
 export default function GroupDetail() {
-  const { isEditGroup, setEditGroup } = useContext(MyContext);
-  const {LookScreen,setLookScreen}=useContext(MyContext);
+  const { isEditGroup, setEditGroup,LookScreen,setLookScreen,setSideDraw } = useContext(MyContext);
   return (
     <div className='bg-[#FFFFFF] h-[550px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5'>
       <div className="flex items-center w-full mt-2 justify-between" >
