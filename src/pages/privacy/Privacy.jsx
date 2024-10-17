@@ -511,21 +511,74 @@ export default function Privacy() {
                     under California law. You may exercise the following rights:
                 </p>
                 <ul className='list-disc px-10' >
-                    <li>Personal data collected must be processed in a fair, legal, and transparent way and
-                        should only be used in a way that a person would reasonably expect.</li>
-                    <li>Personal data should only be collected to fulfil a specific purpose and it should only
-                        be used for that purpose. Organizations must specify why they need the personal data
-                        when they collect it.
+                    <li>Right to Know and Access. You may submit a verifiable request for information
+                        regarding the: (1) categories of Personal Information we collect, use, or share; (2)
+                        purposes for which categories of Personal Information are collected or used by us; (3)
+                        categories of sources from which we collect Personal Information; and (4) specific
+                        pieces of Personal Information we have collected about you</li>
+                    <li>Right to Equal Service. We will not discriminate against you if you exercise your
+                        privacy rights.
                     </li>
-                    <li>Personal data should be held no longer than necessary to fulfil its purpose.
-                    </li>
-                    <li>People covered by the GDPR have the right to access their own personal data. They
-                        can also request a copy of their data, and that their data be updated, deleted, restricted,
-                        or moved to another organization.
+                    <li>Request that a business that sells a consumer's personal data, not sell the consumer's
+                        personal data.
                     </li>
                 </ul>
 
+                <p className='mt-4 mb-3'>
+                    If you make a request, we have one month to respond to you. If you would like to exercise
+                    any of these rights, please contact us.
+                </p>
+                <p className='mt-4 mb-3'>
+                    We do not sell the Personal Information of our users
+                </p>
+                <p className='mt-4 mb-3'>
+                    For more information about these rights, please contact us.
+                </p>
+                <h3 className='text-2xl leading-[29px] font-semibold mt-5 text-[#222222]' >California Online Privacy Protection Act (CalOPPA)</h3>
+                <p className='mt-4 mb-3'>
+                    CalOPPA requires us to disclose categories of Personal Information we collect and how we
+                    use it, the categories of sources from whom we collect Personal Information, and the third
+                    parties with whom we share it, which we have explained above.
 
+                </p>
+                <p className='mt-4 mb-3'>
+                    CalOPPA users have the following rights:
+                </p>
+                <ul className='list-disc px-10' >
+                    <li>Right to Know and Access. You may submit a verifiable request for information
+                        regarding the: (1) categories of Personal Information we collect, use, or share; (2)
+                        purposes for which categories of Personal Information are collected or used by us; (3)
+                        categories of sources from which we collect Personal Information; and (4) specific
+                        pieces of Personal Information we have collected about you.</li>
+                    <li>Right to Equal Service. We will not discriminate against you if you exercise your
+                        privacy rights.
+                    </li>
+                    <li>Right to Delete. You may submit a verifiable request to close your account and we
+                        will delete Personal Information about you that we have collected.
+                    </li>
+                    <li>Right to request that a business that sells a consumer's personal data, not sell the
+                        consumer's personal data.
+                    </li>
+                </ul>
+                <p className='mt-4 mb-3'>
+                    If you make a request, we have one month to respond to you. If you would like to exercise
+                    any of these rights, please contact us.
+                </p>
+                <p className='mt-4 mb-3'>
+                    We do not sell the Personal Information of our users.
+                </p>
+                <p className='mt-4 mb-3'>
+                    For more information about these rights, please contact us.
+                </p>
+                <h3 className='text-2xl leading-[29px] font-semibold mt-5 text-[#222222]' >Contact Us</h3>
+                <p className='mt-4 mb-3'>
+                    Don't hesitate to contact us if you have any questions.
+                </p>
+                <ul className='list-disc px-10' >
+                    <li>Via Email: office@jbsittner.com</li>
+                    <li>Via Phone Number: 9708972640</li>
+                    <li>Via this Link: https://www.jbsittnertruckingllc.com/</li>
+                </ul>
             </div>
         </div>
     )
