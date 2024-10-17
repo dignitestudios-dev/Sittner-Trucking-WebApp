@@ -18,16 +18,19 @@ export const MyContextProvider = ({ children }) => {
   const [token,setToken]=useState("");
   const user=localStorage.getItem("token");
   const [sideDraw, setSideDraw] = useState(false);
+  const [LookAhedDraw, setLookAhedDraw] = useState(false);
 
 
 
   const [displaySize,setDisplaySize]=useState(window.innerWidth);
   const [hideMsgGroup,setHideMsgGroup]=useState(false);
+  const [hideLookAhed,sethideLookAhed]=useState(false);
   useEffect(() => {
     const handleResize = () => {
       setDisplaySize(window.innerWidth)       
     };
     setHideMsgGroup(displaySize>1023?true:false);
+    sethideLookAhed(displaySize>1023?true:false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [displaySize]);
@@ -76,7 +79,11 @@ export const MyContextProvider = ({ children }) => {
         hideMsgGroup,
         setHideMsgGroup,
         setSideDraw,
-        sideDraw
+        sideDraw,
+        hideLookAhed,
+        LookAhedDraw,
+        setLookAhedDraw,
+        sethideLookAhed
       }}
     >
       {children}

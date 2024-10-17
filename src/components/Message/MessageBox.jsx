@@ -4,7 +4,7 @@ import { RiSendPlaneFill } from "react-icons/ri";
 import { MdOutlineFilePresent } from "react-icons/md";
 import { MyContext } from '../../context/GlobalContext';
 export default function MessageBox() {
-  const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw } = useContext(MyContext);
+  const { LookScreen, setLookScreen, token, setIsMessageInfo, MessageInfo, viewImage, setIviewImage, setHideMsgGroup, setSideDraw,hideLookAhed,setLookAhedDraw } = useContext(MyContext);
 
   return (
     <div className='bg-[#FFFFFF] w-full h-[550px] relative rounded-[24px]' >
@@ -15,7 +15,7 @@ export default function MessageBox() {
             <div>
               <img src="/messageprofile.jfif" class='rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]' alt="" />
             </div>
-            <div className='ml-2 cursor-pointer ' onClick={() => token == "admin" && setLookScreen(!LookScreen)}>
+            <div className='ml-2 cursor-pointer ' onClick={() => token == "admin" && (hideLookAhed?setLookScreen(!LookScreen):setLookAhedDraw(true))}>
               <h2 className='font-semibold text-base  lg:text-2xl leading-[29px]'  >JB Sittner Trucking LLC</h2>
               <p className='text-[#8A8A8A] text-[13px] font-normal' >50 members</p>
             </div>
