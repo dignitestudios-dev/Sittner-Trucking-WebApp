@@ -8,8 +8,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Your App Name',
-        short_name: 'App',
+        name: 'Sittner Trucking LLC',
+        short_name: 'Sittner Trucking LLC',
         theme_color: '#ffffff',
         icons: [
           {
