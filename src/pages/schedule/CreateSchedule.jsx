@@ -12,7 +12,7 @@ export default function CreateSchedule() {
             <NavLink to={'/schedule'} className='font-semibold text-[24px] leading-[29px] flex items-center' > <IoMdArrowBack size={25} className='mr-2' /> Create Message</NavLink>
 
             <div class='bg-[#FFFFFF] mb-3 h-[70%] border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10' >
-                <form>
+                <form onSubmit={(e)=>e.preventDefault()} >
                     <div className='mt-5 grid grid-cols-1 gap-5  lg:grid-cols-2' >
                         <div className='mb-1 col-span-2' >
                             <textarea type="text" id="base-input" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-[12px] h-[127px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]  " placeholder='Type Here....' ></textarea>

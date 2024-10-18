@@ -11,7 +11,7 @@ export default function EditNotification() {
             <NavLink to={'/notification'} className='font-semibold text-[24px] leading-[29px] flex items-center' > <IoMdArrowBack size={25} className='mr-2' /> Edit Notification</NavLink>
 
             <div class='bg-[#FFFFFF] mb-3 h-full border rounded-[10px] border-[#E4E4E4] mt-6 lg:py-5 lg:px-10' >
-                <form>
+                <form onSubmit={(e)=>e.preventDefault()}>
                     <div className='mt-5 grid grid-cols-1 gap-5  lg:grid-cols-2' >
                         <div className='mb-1 col-span-2' >
                             <label htmlFor="" className='text-xs font-normal' >Title of Notification</label>

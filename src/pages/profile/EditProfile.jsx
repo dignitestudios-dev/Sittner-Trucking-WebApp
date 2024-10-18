@@ -16,7 +16,7 @@ export default function EditProfile() {
                     <label htmlFor="changeprofile" className='ml-3 font-semibold text-base underline cursor-pointer'>  Change</label>
                     <input type="file" className='hidden' id='changeprofile' />
                 </div>
-                <form>
+                <form onSubmit={(e)=>e.preventDefault()} >
 
                     <div class='mt-5 grid grid-cols-1 gap-5  lg:grid-cols-2' >
                         <div className='mb-3' >

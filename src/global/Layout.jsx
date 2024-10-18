@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
@@ -10,18 +10,17 @@ import { useNavigate } from "react-router-dom";
 const Layout = ({ pages }) => {
   const sidebarRef = useRef(null);
   const [isOpen, setisOpen] = useState(false);
-  const {token}=useContext(MyContext);
+  const { token } = useContext(MyContext);
   const toggleModal = () => {
     setisOpen(!isOpen);
   };
 
-  const navigate=useNavigate("");
-  useEffect(()=>{
-      if(token=="logout"||!token) {
-       navigate("/login")
-      }
-  },[token])
-   
+  const navigate = useNavigate("");
+  useEffect(() => {
+    if (token == "logout" || !token) {
+      navigate("/login");
+    }
+  }, [token]);
 
   return (
     <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
@@ -49,17 +48,12 @@ const Layout = ({ pages }) => {
           >
             <HiOutlineMenuAlt2 className="text-2xl" />
           </button>
-           <Navbar/>
+          <Navbar />
         </div>
-          {pages}
-      <DropdownList/>
-        <LogOut/>
+        {pages}
+        <DropdownList />
+        <LogOut />
       </div>
-
-
-     
-
-
     </div>
   );
 };
