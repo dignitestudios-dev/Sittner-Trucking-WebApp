@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite preview",
     "build": "vite build",
     "lint": "eslint .",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal public/logo.webp",
