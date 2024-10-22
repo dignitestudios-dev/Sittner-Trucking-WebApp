@@ -20,11 +20,9 @@ export default function Login() {
   },[Employee])
 
   const Login = async (e) => {
-    e.preventDefault();   
+    e.preventDefault();
     try {
         const employeesRef = collection(db, "employee");
-
-        // Create an array of conditions for the query
         const employeeQuery = query(
             employeesRef,
             where("email", "==", email),
@@ -34,13 +32,16 @@ export default function Login() {
         const querySnapshot = await getDocs(employeeQuery);
         const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log(employeeData, "employeeData");
+
         if (employeeData.length > 0) {
             setEmployee(employeeData[0]);          
             Cookies.set('employe', JSON.stringify(employeeData[0]));    
         } else {
+            toast.error("Invalid email or password.");
             console.log("No employee found with the provided credentials.");
         }
     } catch (error) {
+        toast.error("Error fetching employee data."); // Show toast for general errors
         console.error("Error fetching employee data:", error);             
     } 
 };
