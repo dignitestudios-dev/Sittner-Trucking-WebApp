@@ -1,22 +1,80 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LeftImage from "../../components/Auth/LeftImage";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
+import { auth,collection,db,getDocs,onAuthStateChanged,query,signInWithEmailAndPassword, where } from "../../firbase/FirebaseInit";
+import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
 export default function Login() {
-  const { setToken } = useContext(MyContext);
+  const { Employee,setEmployee } = useContext(MyContext);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate("");
 
-  const Login = (e) => {
-    e.preventDefault();
-    const userType = email.includes("admin@gmail.com");
-    localStorage.setItem("token", userType ? "admin" : "user");
-    userType ? setToken("admin") : setToken("user");
-    navigate("/");
-  };
+  useEffect(()=>{
+   if(Employee?.role){
+      navigate("/")
+   }
+  },[Employee])
+
+  const Login = async (e) => {
+    e.preventDefault();   
+    try {
+        const employeesRef = collection(db, "employee");
+
+        // Create an array of conditions for the query
+        const employeeQuery = query(
+            employeesRef,
+            where("email", "==", email),
+            where("password", "==", password)
+        ); 
+
+        const querySnapshot = await getDocs(employeeQuery);
+        const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log(employeeData, "employeeData");
+        if (employeeData.length > 0) {
+            setEmployee(employeeData[0]);          
+            Cookies.set('employe', JSON.stringify(employeeData[0]));    
+        } else {
+            console.log("No employee found with the provided credentials.");
+        }
+    } catch (error) {
+        console.error("Error fetching employee data:", error);             
+    } 
+};
+
+
+
+    // signInWithEmailAndPassword(auth, email, password)
+    //   .then(async(userCredential) => {
+    //     toast("Login successfully");
+    //     const user = userCredential.user;
+    //     const uid = user.uid;
+    //     if (user) {                  
+    //         console.log(uid,user);        
+    //         try {
+    //           const employeesRef = collection(db, "employee");
+    //           const employeeQuery = query(employeesRef, where("id", "==", uid)); 
+    //           const querySnapshot = await getDocs(employeeQuery);
+    //           const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //           setEmployee(employeeData[0])          
+    //            Cookies.set('employe', JSON.stringify(employeeData[0]));    
+    //           console.log(employeeData)                      
+    //       } catch (error) {
+    //           console.error("Error fetching employee data:", error);             
+    //       } 
+    //       }     
+           
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;    
+    //     toast(error.message);
+    //   });
+
+
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 p-3  h-screen  lg:py-10 lg:px-10  lg:gap-4  flex items-center ">

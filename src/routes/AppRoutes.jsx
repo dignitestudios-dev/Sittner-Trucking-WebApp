@@ -21,6 +21,8 @@ import Notification from '../pages/notification/Notification'
 import CreateNotification from '../pages/notification/CreateNotification'
 import EditNotification from '../pages/notification/editNotification'
 import Employee from '../pages/employee/Employee'
+import AddAdmin from '../pages/admin/addAdmin'
+import Admin from '../pages/admin/Admin'
 
 export default function AppRoutes() {
   return (
@@ -52,16 +54,24 @@ export default function AppRoutes() {
          <Route path='/createschedule' element={<Layout pages={<CreateSchedule/>} /> }/>
          <Route path='/editschedule' element={<Layout pages={<EditSchedule/>} /> }/>
          {/* Schedule */}
+         
          {/* Notification */}
          <Route path='/notification' element={<Layout pages={<Notification/>} /> }/>
          <Route path='/createnotification' element={<Layout pages={<CreateNotification/>} /> }/>
          <Route path='/editnotification' element={<Layout pages={<EditNotification/>} /> }/>
          {/* Notification */}
+
          {/* Employee */}
          <Route path='/employee' element={<Layout pages={<Employee/>} /> }/>
          <Route path='/addmember' element={<Layout pages={<AddMember/>} /> }/>
          <Route path='/editmember' element={<Layout pages={<EditMember/>} /> }/>
          {/* Employee */}
+
+         {/* Admin */}
+         <Route path='/admin' element={<Layout pages={<Admin/>} /> }/>
+         <Route path='/addAdmin' element={<Layout pages={<AddAdmin/>} /> }/>
+         {/* Admin */}
+
     </Routes>
     </BrowserRouter>
   )

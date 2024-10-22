@@ -16,15 +16,20 @@ export const MyContextProvider = ({ children }) => {
   const [MessageInfo, setIsMessageInfo] = useState(false);
   const [viewImage, setIviewImage] = useState(false);
   const [token,setToken]=useState("");
-  const user=localStorage.getItem("token");
   const [sideDraw, setSideDraw] = useState(false);
   const [LookAhedDraw, setLookAhedDraw] = useState(false);
-
-
-
+  const [Employee, setEmployee] = useState({});
+  const [Otp, setOtp] = useState();
   const [displaySize,setDisplaySize]=useState(window.innerWidth);
   const [hideMsgGroup,setHideMsgGroup]=useState(false);
   const [hideLookAhed,sethideLookAhed]=useState(false);
+  
+  const [DeleteEmpId,setDeleteEmpId]=useState();
+  const [DeleteDocId,setDeleteDocId]=useState();
+
+
+
+
   useEffect(() => {
     const handleResize = () => {
       setDisplaySize(window.innerWidth)       
@@ -35,17 +40,7 @@ export const MyContextProvider = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [displaySize]);
   
-  useEffect(()=>{
-    if(user=="admin") {
-     setToken("admin");
-   }
-   else if(user=="user") {
-     setToken("user");
-   }
-   else if(user=="logout") {
-     setToken("logout");
-   }
- },[user])
+
 
   return (
     <MyContext.Provider
@@ -83,7 +78,15 @@ export const MyContextProvider = ({ children }) => {
         hideLookAhed,
         LookAhedDraw,
         setLookAhedDraw,
-        sethideLookAhed
+        sethideLookAhed,
+        setEmployee,
+        Employee,
+        setOtp,
+        Otp,
+        DeleteEmpId,
+        setDeleteEmpId,
+        DeleteDocId,
+        setDeleteDocId
       }}
     >
       {children}

@@ -5,17 +5,16 @@ import { IoExitOutline } from "react-icons/io5";
 import { MyContext } from "../context/GlobalContext";
 export default function Sidebar() {
   const pathName = useLocation();
-  const { setIsLogOut, token } = useContext(MyContext);
+  const { setIsLogOut,Employee } = useContext(MyContext);
   const [user, setUser] = useState("");
-  console.log(token, "checkUser");
 
   useEffect(() => {
-    if (token == "admin") {
+    if (Employee?.role == "admin") {
       setUser(true);
-    } else if (token == "user") {
+    } else if (Employee?.role == "user") {
       setUser(false);
     }
-  }, [token]);
+  }, [Employee?.role]);
 
   return (
     <div className="w-full px-2">
@@ -44,6 +43,7 @@ export default function Sidebar() {
               <NavLink
                 key={i}
                 to={e?.to}
+                state={{id:e.title=="Profile"&&Employee?.id}}
                 className={`flex text-sm items-center font-normal mt-3 px-4 py-2  ${
                   pathName.pathname == e?.to
                     ? "bg-[#0A8A33] text-white rounded-xl h-[40px]"

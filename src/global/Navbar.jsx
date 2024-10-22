@@ -4,31 +4,30 @@ import { MyContext } from "../context/GlobalContext";
 import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
-  const { token } = useContext(MyContext);
-
+  const {Employee } = useContext(MyContext);
+console.log(Employee)
   return (
     <div class="flex items-center justify-between h-16 bg-white border-b border-gray-200">
       <div className="flex items-center w-full justify-end pr-4">
-        {token == "user" && (
+        {Employee?.role == "user" && (
           <div className="flex justify-end">
             <Dropdown />
           </div>
         )}
-
-        {token == "user" ? (
-          <NavLink to={"/profile"} className="flex items-center">
-            <img
-              src={token == "admin" ? "/admin.png" : "/person.webp"}
+        {Employee?.role == "user" ? (
+          <NavLink to={"/profile"} state={{id:Employee.id}} className="flex items-center">
+           <img
+              src={Employee?.role == "user"&&Employee.pic?Employee?.pic:"/noprofile.png"}
               className="rounded-full cursor-pointer w-[40px] h-[40px] object-cover"
               alt=""
             />
             <div>
               <h2 className="font-medium ml-2 text-[13px] leading-[15px]">
                 {" "}
-                {token == "admin" ? "Chris Tom" : "Mike Smith"}
+                {Employee?.name}
                 <br />
                 <span className="text-[#9E9E9E]">
-                  {token == "admin" ? "Admin" : "Employee"}
+                  {Employee?.role == "admin" ? "Admin" : "Employee"}
                 </span>
               </h2>
             </div>
@@ -36,17 +35,17 @@ export default function Navbar() {
         ) : (
           <button className="flex items-center">
             <img
-              src={token == "admin" ? "/admin.png" : "/person.webp"}
+              src={Employee?.role == "admin"&&Employee?.pic?Employee?.pic:"/noprofile.png"}
               className="rounded-full cursor-pointer w-[40px] h-[40px] object-cover"
               alt=""
             />
             <div>
               <h2 className="font-medium ml-2 text-[13px] leading-[15px]">
                 {" "}
-                {token == "admin" ? "Chris Tom" : "Mike Smith"}
+                {Employee?.name}
                 <br />
                 <span className="text-[#9E9E9E]">
-                  {token == "admin" ? "Admin" : "Employee"}
+                  {Employee?.role == "admin" ? "Admin" : "Employee"}
                 </span>
               </h2>
             </div>

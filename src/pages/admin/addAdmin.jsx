@@ -20,16 +20,16 @@ import {
 import { toast } from "react-toastify";
 import Cookies from 'js-cookie';
 
-export default function AddMember() {
+export default function AddAdmin() {
   const navigate = useNavigate("");
   const [contact, setContact] = useState({ value: "" });
   const [image, setImage] = useState();
-  const [member, setMember] = useState({
+  const [Admin, setAdmin] = useState({
     name: "",
     address: "",
     email: "",
     password: "",
-    role: "user",
+    role: "admin",
   });
 
   const re = /^[0-9\b]+$/;
@@ -42,8 +42,8 @@ export default function AddMember() {
 
   const HandleInput = (e) => {
     const { name, value } = e.target;
-    setMember({
-      ...member,
+    setAdmin({
+      ...Admin,
       [name]: value,
     });
   };
@@ -61,22 +61,20 @@ export default function AddMember() {
 const handleAddMember = async (e) => {
     e.preventDefault();
     const currentUser = JSON.parse(Cookies.get("employe"));
-    if (member?.password.length < 6) {
+    if (Admin?.password.length < 6) {
         return toast("Password must be at least 6 characters");
     }
   
     if (contact.value?.length < 10) {
         return toast("Contact must be at least 10 characters");
     }
-    const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", member?.email)));
+    const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", Admin?.email)));
     if (!existingEmployeeByEmail.empty) {
         return toast("Email is already in use");
     }else{
       const myPromise = new Promise(async (resolve, reject) => {
         try {
-            const uniqueId = await generateUniqueId();
-           
-
+            const uniqueId = await generateUniqueId();          
             const storageRef = ref(storage, `member/${uniqueId}`);
             const uploadTask = uploadBytesResumable(storageRef, image);
             uploadTask.on(
@@ -89,11 +87,11 @@ const handleAddMember = async (e) => {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                     await addDoc(collection(db, "employee"), {
                         contact: contact.value,
-                        address: member?.address,
-                        email: member?.email,
-                        name: member?.name,
-                        password: member?.password,
-                        role: member?.role,
+                        address: Admin?.address,
+                        email: Admin?.email,
+                        name: Admin?.name,
+                        password: Admin?.password,
+                        role: Admin?.role,
                         id: uniqueId, 
                         pic: image ? downloadURL : "",
                     });
@@ -126,7 +124,7 @@ const handleAddMember = async (e) => {
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
-        <IoMdArrowBack size={25} className="mr-2" /> Add New Member
+        <IoMdArrowBack size={25} className="mr-2" /> Add Admin
       </NavLink>
 
       <div class="bg-[#FFFFFF] border rounded-[10px] border-[#E4E4E4] mt-6 lg:py-10 lg:px-10">

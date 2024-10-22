@@ -3,10 +3,10 @@ import { NavLink } from "react-router-dom";
 import { FaPlus } from "react-icons/fa6";
 import { MyContext } from "../../context/GlobalContext";
 export default function LookAhead() {
-  const { token } = useContext(MyContext);
+  const { Employee } = useContext(MyContext);
   return (
     <div className=" mt-3 h-[100%] scroll-box  px-3 overflow-auto">
-      {token == "admin" && (
+      {Employee?.role == "admin" && (
         <NavLink
           to={"/createlook"}
           className={`flex text-sm w-[203px] font-semibold text-center bg-[#0A8A33] text-white h-[44px] flex items-center justify-center rounded-[8px] font-semibold mt-3 px-4 mx-5 py-2 `}
@@ -18,7 +18,7 @@ export default function LookAhead() {
       <div className="look-ahead   px-3 py-5 w-[100%]">
         <div className="username mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-sm leading-[14px] ">Monday</h2>
-          {token == "admin" && (
+          {Employee?.role == "admin" && (
             <NavLink to={"/editlook"} className="bg-transparent">
               <img src="/whiteedit.png" className="w-5" alt="" srcset="" />
             </NavLink>

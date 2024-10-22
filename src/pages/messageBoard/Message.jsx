@@ -9,13 +9,14 @@ import AddMemberModal from "../../components/Message/AddMember";
 import MessageInfo from "../../components/Message/MessageInfo";
 import ViewImage from "../../components/Message/LargeImageModal";
 import { MdOutlineClose } from "react-icons/md";
+import { toast } from "react-toastify";
 
 export default function Message() {
   const sidebarRef = useRef(null);
   const {
     LookScreen,
     setLookScreen,
-    token,
+    Employee,
     setHideMsgGroup,
     hideMsgGroup,
     setSideDraw,
@@ -27,6 +28,10 @@ export default function Message() {
   useEffect(() => {
     window.scroll(0, 0);
   }, []);
+
+   console.log(Employee,"roles");
+   
+
   return (
     <div class="bg-[#F7F7F7] h-[100%]   py-2 px-2 lg:px-10 lg:py-6 ">
       {LookScreen && (
@@ -50,7 +55,7 @@ export default function Message() {
             <MessageBox />
           </div>
         )}
-        {!hideMsgGroup && token == "admin" && (
+        {!hideMsgGroup && Employee?.role == "admin" && (
           <div
             className={`w-screen h-screen fixed top-0 right-0 transition-all duration-500  ${
               sideDraw
@@ -70,7 +75,7 @@ export default function Message() {
             </div>
           </div>
         )}
-        {hideMsgGroup && token == "admin" && (
+        {hideMsgGroup && Employee?.role == "admin" && (
           <div className={`${LookScreen ? "col-span-2" : "col-span-1"}  `}>
             <GroupDetail />
           </div>
@@ -100,14 +105,14 @@ export default function Message() {
                 </button>
               </div>
               <div className="col-span-1">
-                {token == "user" ? <Look /> : !LookScreen && <Look />}
+                {Employee?.role == "user" ? <Look /> : !LookScreen && <Look />}
               </div>
             </div>
           </div>
         )}
         {hideLookAhed && (
           <div className="col-span-1">
-            {token == "user" ? <Look /> : LookScreen && <Look />}
+            {Employee?.role == "user" ? <Look /> : LookScreen && <Look />}
           </div>
         )}
       </div>

@@ -1,11 +1,37 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
+import {
+  collection,
+  db,
+  doc,
+  getDocs,
+  getDownloadURL,
+  query,
+  ref,
+  storage,
+  updateDoc,
+  uploadBytesResumable,
+  where,
+} from "../../firbase/FirebaseInit";
+import { toast } from "react-toastify";
 
 export default function EditMember() {
-  const { token } = useContext(MyContext);
+  const { Employee } = useContext(MyContext);
   const [contact, setContact] = useState({ value: "" });
+  const location = useLocation();
+  const [image, setImage] = useState();
+  const [member, setMember] = useState({
+    name: "",
+    address: "",
+    email: "",
+    password: "",
+    role: "user",
+    id: "",
+    pic: "",
+    docId: "",
+  });
   const navigate = useNavigate("");
   const re = /^[0-9\b]+$/;
   const handleChange = (e) => {
@@ -14,6 +40,116 @@ export default function EditMember() {
       setContact({ value });
     }
   };
+  const getMemberRec = async () => {
+    const employeesRef = collection(db, "employee");
+    console.log(location?.state?.id?.empId);
+
+    const employeeQuery = query(
+      employeesRef,
+      where("id", "==", location?.state?.id)
+    );
+    const querySnapshot = await getDocs(employeeQuery);
+    const employeeData = querySnapshot.docs.map((doc) => ({
+      docId: doc.id,
+      ...doc.data(),
+    }));
+    console.log(employeeData, location?.state?.id?.empId);
+    setMember({
+      name: employeeData[0].name,
+      address: employeeData[0].address,
+      email: employeeData[0].email,
+      password: employeeData[0].password,
+      pic: employeeData[0].pic,
+      docId: employeeData[0].docId,
+      id: employeeData[0].id,
+    });
+    setContact({ value: employeeData[0]?.contact });
+  };
+
+  useEffect(() => {
+    getMemberRec();
+  }, []);
+
+  const HandleInput = (e) => {
+    const { name, value } = e.target;
+    setMember({
+      ...member,
+      [name]: value,
+    });
+  };
+
+  const UpdateEmp = async (e) => {
+    e.preventDefault();
+    const washingtonRef = doc(db, "employee", member?.docId);
+    if (image) {
+      const storageRef = ref(storage, `member/${member?.id}`);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+      const myPromise = new Promise(async (resolve, reject) => {
+        try {
+          uploadTask.on(
+            "state_changed",
+            null,
+            (error) => {
+              reject(error.message);
+            },
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              await updateDoc(washingtonRef, {
+                name: member?.name,
+                email: member?.email,
+                address: member?.address,
+                pic: downloadURL,
+                contact: contact?.value,
+                password: member?.password,
+              });
+              resolve("Member Update");
+            }
+          );
+        } catch (error) {
+          reject(error.message);
+        }
+      });
+      toast
+        .promise(myPromise, {
+          pending: "Updating member...",
+          success: (data) => data,
+          error: (error) => error,
+        })
+        .then(() => {
+          Employee.role == "admin" 
+          ? navigate("/employee") 
+          : navigate("/profile", { state: { id: Employee?.id } });              
+        });
+    } else {
+      const myPromise = new Promise(async (resolve, reject) => {
+        try {
+          await updateDoc(washingtonRef, {
+            name: member?.name,
+            email: member?.email,
+            address: member?.address,
+            pic: member?.pic,
+            contact: contact?.value,
+            password: member?.password,
+          });
+          resolve("Member Update");
+        } catch (error) {
+          reject(error.message);
+        }
+      });
+      toast
+        .promise(myPromise, {
+          pending: "Updating member...",
+          success: (data) => data,
+          error: (error) => error,
+        })
+        .then(() => {
+          Employee.role == "admin" 
+          ? navigate("/employee") 
+          : navigate("/profile", { state: { id: Employee?.id } });    
+        });
+    }
+  };
+
   return (
     <div class="bg-[#F7F7F7]  py-5 px-5 ">
       <NavLink
@@ -30,7 +166,7 @@ export default function EditMember() {
             <div className="flex items-center">
               <div className="bg-[#94D0E4] flex rounded-[50%] items-center justify-center  w-[58px] h-[58px]">
                 <img
-                  src="/large-person-3.png"
+                  src={member?.pic ? member?.pic : "/noprofile.png"}
                   class="cursor-pointer w-[58px] h-[58px]"
                   alt=""
                 />
@@ -43,9 +179,14 @@ export default function EditMember() {
               {" "}
               Change Photo
             </label>
-            <input type="file" className="hidden" id="changeprofile" />
+            <input
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="hidden"
+              id="changeprofile"
+            />
           </div>
-          <form onSubmit={(e)=>e.preventDefault()} >
+          <form onSubmit={(e) => UpdateEmp(e)}>
             <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
               <div className="mb-3">
                 <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
@@ -54,6 +195,9 @@ export default function EditMember() {
                 <input
                   type="text"
                   id="name-input"
+                  name="name"
+                  onChange={HandleInput}
+                  value={member.name}
                   className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                   required
                   placeholder="Full Name"
@@ -66,11 +210,14 @@ export default function EditMember() {
                 <input
                   type="email"
                   id="email-input"
+                  name="email"
+                  onChange={HandleInput}
+                  value={member.email}
                   className={`bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33] ${
-                    token == "admin" ? "" : "cursor-not-allowed"
+                    Employee?.role == "admin" ? "" : "cursor-not-allowed"
                   } `}
                   required
-                  disabled={token == "admin" ? false : true}
+                  disabled={Employee?.role == "admin" ? false : true}
                   placeholder="Email Address"
                 />
               </div>
@@ -95,12 +242,15 @@ export default function EditMember() {
                 <input
                   type="text"
                   id="address-input"
+                  name="address"
+                  onChange={HandleInput}
+                  value={member.address}
                   className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                   required
                   placeholder="Address"
                 />
               </div>
-              {token === "admin" && (
+              {Employee?.role === "admin" && (
                 <div className="mb-3">
                   <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
                     Password
@@ -108,6 +258,9 @@ export default function EditMember() {
                   <input
                     type="password"
                     id="password-input"
+                    name="password"
+                    onChange={HandleInput}
+                    value={member.password}
                     className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                     required
                     placeholder="Password"
@@ -115,26 +268,21 @@ export default function EditMember() {
                 </div>
               )}
             </div>
+            <div className="flex items-center gap-5">
+              <button
+                type="submit"
+                className="text-white bg-[#0A8A33] rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
+              >
+                Update
+              </button>
+              <NavLink
+                to={"/"}
+                className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
+              >
+                Cancel
+              </NavLink>
+            </div>
           </form>
-          <div className="flex items-center gap-5">
-            <button
-              onClick={() => {
-                token === "admin"
-                  ? navigate("/employee")
-                  : navigate("/profile");
-              }}
-              type="submit"
-              className="text-white bg-[#0A8A33] rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
-            >
-              Update
-            </button>
-            <NavLink
-              to={"/"}
-              className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
-            >
-              Cancel
-            </NavLink>
-          </div>
         </div>
         <div></div>
       </div>

@@ -4,6 +4,7 @@ import { TbAlertSquare } from "react-icons/tb";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { TbCalendarClock } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
+import { GrUserAdmin } from "react-icons/gr";
 // Create a function to return the JSX
 const getImage = (icon) => {
     return icon();
@@ -52,5 +53,10 @@ export const admin_links = [
         title: "Employee Directory",
         to: "/employee",
         img: getImage(FaUsers),
+    },
+    {
+        title: "Add Admin",
+        to: "/admin",
+        img: getImage(GrUserAdmin),
     }
 ];

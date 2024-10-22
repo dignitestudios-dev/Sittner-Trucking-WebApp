@@ -1,7 +1,21 @@
 import React, { useContext } from "react";
 import { MyContext } from "../../context/GlobalContext";
-export default function DeleteEmpProfile() {
-  const { DeleteProfile, setIsDeleteProfile } = useContext(MyContext);
+import { toast } from "react-toastify";
+import { db, deleteDoc, deleteObject, doc, ref, storage } from "../../firbase/FirebaseInit";
+
+export default function DeleteEmpProfile() {  
+    const { DeleteProfile, setIsDeleteProfile, DeleteEmpId,DeleteDocId} = useContext(MyContext);
+    const DeleteEmp = async () => {
+        await deleteDoc(doc(db, "employee", DeleteDocId));  
+        const desertRef = ref(storage,"member/"+DeleteEmpId);
+        deleteObject(desertRef).then(() => {
+          toast("Deleted");
+          setIsDeleteProfile(false);
+        }).catch((error) => {
+          toast(error.message);
+          setIsDeleteProfile(false);
+        });
+      } 
 
   return (
     <>
@@ -29,7 +43,7 @@ export default function DeleteEmpProfile() {
                     </button>
                     <button
                       className={`flex text-xs w-[140px] text-white text-center bg-[#EE3131] h-[44px] flex items-center justify-center rounded-[8px] font-semibold mt-3 px-4 py-2   `}
-                      onClick={() => setIsDeleteProfile(false)}
+                      onClick={() =>DeleteEmp()}
                     >
                       Yes, Delete Now
                     </button>

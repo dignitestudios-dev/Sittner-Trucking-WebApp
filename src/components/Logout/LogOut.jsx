@@ -2,13 +2,15 @@ import React, { useContext} from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { useNavigate } from "react-router-dom";
 import { IoExit } from "react-icons/io5";
+import Cookies from 'js-cookie';
 export default function LogOut() {
-    const {LogOut,setIsLogOut}=useContext(MyContext);
+    const {LogOut,setIsLogOut,setEmployee}=useContext(MyContext);
     const navigate=useNavigate("");
    const handleLogOut=()=>{
-    localStorage.setItem("token","logout")
-    setIsLogOut(false)
-    navigate("/login")
+       Cookies.set('employe',""); 
+       setEmployee({});          
+       setIsLogOut(false)
+       navigate("/login")
    }
 
     

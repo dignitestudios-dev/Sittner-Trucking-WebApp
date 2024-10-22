@@ -7,7 +7,6 @@ export default function MessageBox() {
   const {
     LookScreen,
     setLookScreen,
-    token,
     setIsMessageInfo,
     MessageInfo,
     viewImage,
@@ -16,6 +15,7 @@ export default function MessageBox() {
     setSideDraw,
     hideLookAhed,
     setLookAhedDraw,
+    Employee
   } = useContext(MyContext);
 
   return (
@@ -34,7 +34,7 @@ export default function MessageBox() {
             <div
               className="ml-2 cursor-pointer "
               onClick={() =>
-                (token == "admin" || !hideLookAhed) &&
+                (Employee?.role == "admin" || !hideLookAhed) &&
                 (hideLookAhed
                   ? setLookScreen(!LookScreen)
                   : setLookAhedDraw(true))
@@ -48,7 +48,7 @@ export default function MessageBox() {
               </p>
             </div>
           </div>
-          {token == "admin" && (
+          {Employee?.role == "admin" && (
             <div className="ms-auto">
               <button
                 className="text-white bg-[#0A8A33] hover:bg-green-800  rounded-full text-sm p-2.5 text-center flex lg:hidden items-center"
@@ -66,7 +66,7 @@ export default function MessageBox() {
       {/* Message Body */}
       <div
         className={`chat-body ${
-          token == "admin" ? "h-[70%] lg:h-[440px]" : "h-[70%] lg:h-[440px]"
+          Employee?.role == "admin" ? "h-[70%] lg:h-[440px]" : "h-[70%] lg:h-[440px]"
         }  scroll-box  overflow-auto`}
       >
         {/* Day Timer */}
@@ -78,10 +78,10 @@ export default function MessageBox() {
         {/* Messages */}
         <div
           className={`left-side ${
-            token == "admin" && "ms-auto"
+            Employee?.role == "admin" && "ms-auto"
           } mb-3 px-3 py-3 w-auto lg:max-w-[30%]`}
         >
-          {token == "user" && (
+          {Employee?.role == "user" && (
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">Admin</h2>
             </div>
@@ -89,14 +89,14 @@ export default function MessageBox() {
           <div className="w-full py-2">
             <div
               className={` ${
-                token == "admin" ? "bg-[#0A8A33] text-white" : "bg-[#F4F4F4]"
+                Employee?.role == "admin" ? "bg-[#0A8A33] text-white" : "bg-[#F4F4F4]"
               }   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
             >
               labore et dolore magna aliqua.
             </div>
           </div>
           <div className="flex items-center gap-1 justify-end">
-            {token == "admin" && (
+            {Employee?.role == "admin" && (
               <div className="flex items-center ">
                 <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
                   <img
@@ -137,10 +137,10 @@ export default function MessageBox() {
         </div>
         <div
           className={`left-side ${
-            token == "admin" && "ms-auto"
+            Employee?.role == "admin" && "ms-auto"
           } mb-3 px-3 py-3 w-auto lg:max-w-[30%]`}
         >
-          {token == "user" && (
+          {Employee?.role == "user" && (
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">Admin</h2>
             </div>
@@ -157,7 +157,7 @@ export default function MessageBox() {
             </div>
           </div>
           <div className="flex items-center gap-1 justify-end">
-            {token == "admin" && (
+            {Employee?.role == "admin" && (
               <div className="flex items-center ">
                 <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
                   <img
@@ -198,10 +198,10 @@ export default function MessageBox() {
         </div>
         <div
           className={`left-side ${
-            token == "admin" && "ms-auto"
+            Employee?.role == "admin" && "ms-auto"
           } mb-3 px-3 py-3 w-auto lg:max-w-[30%]`}
         >
-          {token == "user" && (
+          {Employee?.role == "user" && (
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">Admin</h2>
             </div>
@@ -225,7 +225,7 @@ export default function MessageBox() {
             </div>
           </div>
           <div className="flex items-center gap-1 justify-end">
-            {token == "admin" && (
+            {Employee?.role == "admin" && (
               <div className="flex items-center ">
                 <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
                   <img
@@ -266,10 +266,10 @@ export default function MessageBox() {
         </div>
         <div
           className={`left-side ${
-            token == "admin" && "ms-auto"
+            Employee?.role == "admin" && "ms-auto"
           } mb-3 px-3 py-3 w-auto lg:max-w-[30%]`}
         >
-          {token == "user" && (
+          {Employee?.role == "user" && (
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">Admin</h2>
             </div>
@@ -277,7 +277,7 @@ export default function MessageBox() {
           <div className="w-full py-2">
             <div
               className={` ${
-                token == "admin"
+                Employee?.role == "admin"
                   ? "bg-[#0A8A33] text-white"
                   : "bg-[#F4F4F4] text-[#007AFF]"
               }   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
@@ -286,7 +286,7 @@ export default function MessageBox() {
             </div>
           </div>
           <div className="flex items-center gap-1 justify-end">
-            {token == "admin" && (
+            {Employee?.role == "admin" && (
               <div className="flex items-center ">
                 <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
                   <img
@@ -327,7 +327,7 @@ export default function MessageBox() {
         </div>
       </div>
       {/* Send Message */}
-      {token == "admin" && (
+      {Employee?.role == "admin" && (
         <form onSubmit={(e)=>e.preventDefault()} className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center absolute bottom-0 w-full  justify-center gap-8 ">
           <div className="relative w-[85%] h-[40px]">
             <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">

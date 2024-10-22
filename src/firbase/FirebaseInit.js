@@ -1,14 +1,63 @@
 import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
+  updateDoc,
+  doc,
+  deleteDoc,
+  onSnapshot
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject 
+} from "firebase/storage";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyCzOvI5pg2eP-R3VgT353AdhvERIe2thpA",
+  authDomain: "jbst-dispatch-app-b62fd.firebaseapp.com",
+  projectId: "jbst-dispatch-app-b62fd",
+  storageBucket: "jbst-dispatch-app-b62fd.appspot.com",
+  messagingSenderId: "883367538515",
+  appId: "1:883367538515:web:43a35efb234a3e1be9bba6",
+  measurementId: "G-YD03QBDEMJ",
+};
 
-// const firebaseConfig = {
-//     apiKey: "AIzaSyDbY64yhhVD7uTOpxLdP0eYZRWJfrLiVLw",
-//     authDomain: "sittnertruck.firebaseapp.com",
-//     projectId: "sittnertruck",
-//     storageBucket: "sittnertruck.appspot.com",
-//     messagingSenderId: "205400416707",
-//     appId: "1:205400416707:web:8e3a7dedd043d73dd99d76",
-//     measurementId: "G-REKQCKK3RJ"
-//   };
-  
-//   const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore();
+const storage = getStorage();
+export {
+  auth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  db,
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
+  createUserWithEmailAndPassword,
+  storage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  updateDoc,
+  doc,
+  deleteDoc,
+  deleteObject,
+  onSnapshot
+};

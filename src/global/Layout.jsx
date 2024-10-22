@@ -6,21 +6,45 @@ import LogOut from "../components/Logout/LogOut";
 import { MyContext } from "../context/GlobalContext";
 import DropdownList from "../components/Navbar/DropdownList";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+import { auth, onAuthStateChanged,collection, db, getDocs, query,where } from "../firbase/FirebaseInit";
 
 const Layout = ({ pages }) => {
   const sidebarRef = useRef(null);
   const [isOpen, setisOpen] = useState(false);
-  const { token } = useContext(MyContext);
+  const {setEmployee,Employee}=useContext(MyContext);
   const toggleModal = () => {
     setisOpen(!isOpen);
   };
 
-  const navigate = useNavigate("");
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (token == "logout" || !token) {
-      navigate("/login");
-    }
-  }, [token]);
+      const cookieData = Cookies.get('employe');
+      console.log(cookieData, "cookieData");
+  
+      if (cookieData) {
+          try {
+              const data = JSON.parse(cookieData);
+              console.log(data, "data");
+              
+              if (data.email) {
+                  setEmployee(data);
+              } else {
+                  setEmployee({});
+                  navigate('/login');
+              }
+          } catch (error) {
+              console.error("Error parsing cookie data:", error);
+              setEmployee({});
+              navigate('/login');
+          }
+      } else {
+          setEmployee({});
+          navigate('/login');
+      }
+  }, []);
+  
 
   return (
     <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
@@ -41,7 +65,7 @@ const Layout = ({ pages }) => {
       </div>
 
       <div className="w-full relative lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)] h-full  overflow-y-auto overflow-x-hidden">
-        <div className="sticky top-0 left-0 w-full h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99999]">
+        <div className="sticky top-0 left-0 w-full h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99]">
           <button
             onClick={() => setisOpen((prev) => !prev)}
             className="lg:hidden block"
@@ -53,6 +77,7 @@ const Layout = ({ pages }) => {
         {pages}
         <DropdownList />
         <LogOut />
+     
       </div>
     </div>
   );
