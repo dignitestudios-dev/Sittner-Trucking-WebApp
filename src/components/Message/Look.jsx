@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LookBehind from "./LookBehind";
 import LookAhead from "./LookAhead";
 
-export default function Look() {
+export default function Look({pendingNotifications,deliveredNotifications}) {
   const [IsBehind, setIsBehind] = useState(true);
+
+
+
   return (
     <div className="bg-[#FFFFFF] h-[630px]  rounded-[24px]">
       <div className="flex items-center w-full mt-2 py-2 justify-evenly">
@@ -24,7 +27,7 @@ export default function Look() {
           Look Ahead
         </button>
       </div>
-      {IsBehind ? <LookBehind /> : <LookAhead />}
+      {IsBehind ? <LookBehind deliveredNotifications={deliveredNotifications} /> : <LookAhead pendingNotifications={pendingNotifications} />}
     </div>
   );
 }

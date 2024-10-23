@@ -1,12 +1,52 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
+import { collection, db, getDocs, query, updateDoc } from "../../firbase/FirebaseInit";
 
 export default function DropdownList() {
-  const { IsDropdownOpen, setIsDropdown } = useContext(MyContext);
+  const { IsDropdownOpen, setIsDropdown,setNotificationCount } = useContext(MyContext);
+  const [notifications, setNotifications] = useState([]);
+
   const DropdownRef = useRef(null);
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+        const currentDate = new Date();
+        const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); // Format: hh:mm AM/PM
+
+        const notificationsRef = collection(db, "notification");
+        const querySnapshot = await getDocs(notificationsRef);
+        const fetchedNotifications = [];
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const notificationDate = new Date(data.date + ' ' + data.time); // Assuming date and time are in proper format
+            fetchedNotifications.push({ id: doc.id, ...data });
+            setNotificationCount(fetchedNotifications.length)
+            // Check if the notification date and time is less than or equal to the current date and time
+            if (notificationDate <= currentDate) {
+                // Update status to "Delivered"
+                updateDoc(doc.ref, { status: "Delivered" });
+            }
+        });
+
+        // Sort notifications by date and time (latest first)
+        const sortedNotifications = fetchedNotifications.sort((a, b) => {
+            const dateA = new Date(a.date + ' ' + a.time);
+            const dateB = new Date(b.date + ' ' + b.time);
+            return dateB - dateA; // Sort in descending order
+        });
+
+        setNotifications(sortedNotifications);
+    };
+
+    fetchNotifications();
+}, []);
+
+const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+
   return (
     <>
       {IsDropdownOpen && (
@@ -30,34 +70,32 @@ export default function DropdownList() {
             <h3 className="text-base leading-[19px] font-bold">
               Notifications
             </h3>
-
+            {deliveredNotifications.length === 0 ? (
+                <p className="text-center text-gray-500 mt-4">No notifications available.</p>
+            ) : (
             <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
-              <li className="pb-3 sm:pb-4 border-b border-[#F4F4F4]">
-                <div className="flex  space-x-4 rtl:space-x-reverse">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold  ">
-                      New Message from Admin
-                    </p>
-                    <p className="text-[13px] text-[#909090] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. In volutpat et
-                      mattis ut tristique viverra blandit.{" "}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <p className="text-xs text-[#717171] font-medium">
-                      7:30 PM
-                    </p>
-                    <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900 ">
-                      <span className="">
-                        <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
-                          6
+            {deliveredNotifications.map((notification) => (
+                <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
+                    <div className="flex space-x-4 ">
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-bold">New Messages From Admin</p>
+                            <p className="text-[13px] text-[#909090] font-normal">{notification.description}</p>
                         </div>
-                      </span>
+                        <div className="flex flex-col items-end">
+                            <p className="text-xs text-[#717171] font-medium">{notification.time}</p>
+                            <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
+                                <span className="">
+                                    <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
+                                        {notification.status === "Delivered" ? "1" : "📭"}
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                </div>
-              </li>
+                </li>
+            ))}
             </ul>
+            )}
           </div>
         </div>
       )}

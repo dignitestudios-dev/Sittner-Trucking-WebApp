@@ -6,6 +6,7 @@ export default function UpdatePasswordModal() {
   const {PasswordSuccessFullChange,setPasswordSuccessFullChange}=useContext(MyContext);
   const navigate=useNavigate("");
   const loc=useLocation();
+
   
   
   return (

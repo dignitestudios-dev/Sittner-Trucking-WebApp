@@ -1,9 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FaPlus } from "react-icons/fa6";
 import { MyContext } from "../../context/GlobalContext";
-export default function LookAhead() {
+
+export default function LookAhead({pendingNotifications}) {
   const { Employee } = useContext(MyContext);
+
+
+
   return (
     <div className=" mt-3 h-[100%] scroll-box  px-3 overflow-auto">
       {Employee?.role == "admin" && (
@@ -15,29 +19,48 @@ export default function LookAhead() {
           <FaPlus className="mr-2 text-sm" /> Create New Message
         </NavLink>
       )}
-      <div className="look-ahead   px-3 py-5 w-[100%]">
-        <div className="username mb-3 flex items-center justify-between">
-          <h2 className="font-semibold text-sm leading-[14px] ">Monday</h2>
-          {Employee?.role == "admin" && (
-            <NavLink to={"/editlook"} className="bg-transparent">
-              <img src="/whiteedit.png" className="w-5" alt="" srcset="" />
-            </NavLink>
-          )}
-        </div>
-        <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
-          <h3 className="font-semibold text-sm leading-[14px]">Day 1</h3>
-          <div className=" w-full rounded-2xl mt-2 text-xs font-normal">
-            Lorem ipsum dolor sit amet consectetur. Tellus ornare viverra arcu
-            at gravida sed.{" "}
-          </div>
-          <span className="text-[12px] font-normal text-[#5C5C5C]">
-            20-08-2024
-          </span>
-          <span className="text-[12px] ml-2 font-normal text-[#5C5C5C]">
-            09:00 AM
-          </span>
-        </div>
+
+{pendingNotifications && pendingNotifications.length > 0 ? (
+  pendingNotifications.map((item, i) => (
+    <div key={i} className="look-ahead px-3 py-5 w-[100%]">
+      <div className="username mb-3 flex items-center justify-between">
+        <h2 className="font-semibold text-sm leading-[14px]">
+          {new Date(item.date).toLocaleDateString("en-US", {
+            weekday: "long",
+          })}
+        </h2>
+        {Employee?.role === "admin" && (
+          <NavLink
+            to={"/editlook"}
+            state={{ data: item }}
+            className="bg-transparent"
+          >
+            <img src="/whiteedit.png" className="w-5" alt="Edit" />
+          </NavLink>
+        )}
       </div>
+      <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
+        <h3 className="font-semibold text-sm leading-[14px]">
+          Day {i + 1}
+        </h3>
+        <div className="w-full rounded-2xl mt-2 text-xs font-normal">
+          {item.message}
+        </div>
+        <span className="text-[12px] font-normal text-[#5C5C5C]">
+          {item.date}
+        </span>
+        <span className="text-[12px] ml-2 font-normal text-[#5C5C5C]">
+          {item.time}
+        </span>
+      </div>
+    </div>
+  ))
+) : (
+  <div className="no-data-message text-center py-5">
+    <p className="text-sm text-gray-500">No Look Ahead available.</p>
+  </div>
+)}
+
     </div>
   );
 }

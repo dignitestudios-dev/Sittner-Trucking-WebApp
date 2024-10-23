@@ -5,7 +5,6 @@ import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
   const {Employee } = useContext(MyContext);
-console.log(Employee)
   return (
     <div class="flex items-center justify-between h-16 bg-white border-b border-gray-200">
       <div className="flex items-center w-full justify-end pr-4">

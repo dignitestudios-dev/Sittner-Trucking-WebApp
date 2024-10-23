@@ -1,16 +1,32 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TimePicker } from "react-ios-time-picker";
+import { MyContext } from "../../context/GlobalContext";
 
-export const ModernTimePicker = () => {
-  const [value, setValue] = useState("10:00 AM");
+export const ModernTimePicker = ({time}) => {
+  const {setSelectTime}=useContext(MyContext);
+  const [value, setValue] = useState(time || '10:00 AM'); 
+  useEffect(() => {
+    if (time) {
+      console.log("Updating value to:", time);
+      setValue(time);
+      setSelectTime(time)
+    }
+  }, [time]);
 
   const onChange = (timeValue) => {
     setValue(timeValue);
+    setSelectTime(timeValue);
   };
+
 
   return (
     <div className="relative mt-3 lg:mt-0">
-      <TimePicker onChange={onChange} value={value} use12Hours />
+      <TimePicker 
+        key={value}
+        onChange={onChange} 
+        value={value} 
+        use12Hours 
+      />
       <img
         src="/clock.png"
         alt=""

@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import { LuBell } from "react-icons/lu";
 import { MyContext } from "../../context/GlobalContext";
 export default function Dropdown() {
-  const { setIsDropdown } = useContext(MyContext);
+  const { setIsDropdown,NotificationCount } = useContext(MyContext);
   console.log(setIsDropdown);
 
   return (
@@ -15,7 +15,7 @@ export default function Dropdown() {
         <LuBell />
         <span className="absolute -inset-2 object-right-top -mr-8">
           <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
-            6
+            {NotificationCount}
           </div>
         </span>
       </button>

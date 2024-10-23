@@ -28,9 +28,8 @@ export default function Login() {
             where("email", "==", email),
             where("password", "==", password)
         ); 
-
         const querySnapshot = await getDocs(employeeQuery);
-        const employeeData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const employeeData = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
         console.log(employeeData, "employeeData");
 
         if (employeeData.length > 0) {

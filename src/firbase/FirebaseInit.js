@@ -15,7 +15,8 @@ import {
   updateDoc,
   doc,
   deleteDoc,
-  onSnapshot
+  onSnapshot,
+  getDoc
 } from "firebase/firestore";
 import {
   getStorage,
@@ -59,5 +60,6 @@ export {
   doc,
   deleteDoc,
   deleteObject,
-  onSnapshot
+  onSnapshot,
+  getDoc
 };

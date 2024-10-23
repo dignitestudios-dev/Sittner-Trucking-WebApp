@@ -1,15 +1,74 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MdLockOutline } from "react-icons/md";
 import UpdatePasswordModal from "../Auth/UpdatePasswordModal";
 import { MyContext } from "../../context/GlobalContext";
+import { db, doc, getDoc, updateDoc } from "../../firbase/FirebaseInit";
+import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
 export default function PasswordUpdate() {
   const {
     ChangePassword,
     setIsChangePassword,
     setPasswordSuccessFullChange,
-    PasswordSuccessFullChange,
+    Employee,
   } = useContext(MyContext);
+
+  const [initialVal, setInitialVal] = useState({
+    currentPass: "",
+    newPass: "",
+    confirmNewPass: "",
+  });
+
+  const HandleInput = (e) => {
+    const { name, value } = e.target;
+    setInitialVal({
+      ...initialVal,
+      [name]: value,
+    });
+  };
+
+  const ChangeEmpPassword = (e) => {
+    e.preventDefault();
+    if (initialVal.currentPass != Employee.password) {
+      return toast.error("Wrong Password");
+    }
+    if (
+      initialVal.currentPass.length < 6 ||
+      initialVal.newPass.length < 6 ||
+      initialVal.confirmNewPass.length < 6
+    ) {
+      return toast.error("Password Must be 6 Character");
+    }
+    if (initialVal.newPass != initialVal.confirmNewPass) {
+      return toast.error("Password Not Matched");
+    }
+    const washingtonRef = doc(db, "employee", Employee?.docId);
+    const myPromise = new Promise(async (resolve, reject) => {
+      try {
+        await updateDoc(washingtonRef, {
+          password: initialVal.newPass,
+        });
+        const updatedDoc = await getDoc(washingtonRef);
+        const data={ docId:Employee?.docId,...updatedDoc.data() }
+        Cookies.set('employe', JSON.stringify(data));
+        resolve("Password Updated");
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+    toast
+      .promise(myPromise, {
+        pending: "Updating Password...",
+        success: (data) =>data,
+        error: (error) => error,
+      })
+      .then(() => {
+        setPasswordSuccessFullChange(true);
+        setIsChangePassword(false);
+      });
+  };
+
   return (
     <>
       <button
@@ -39,11 +98,17 @@ export default function PasswordUpdate() {
                   <h3 className="font-bold text-[24px] leading-[29px] text-start mb-5">
                     Change Password
                   </h3>
-                  <form class="w-full mx-auto">
+                  <form
+                    onSubmit={(e) => ChangeEmpPassword(e)}
+                    class="w-full mx-auto"
+                  >
                     <div class="relative mb-3">
                       <input
                         type="password"
                         id="password"
+                        name="currentPass"
+                        value={initialVal.currentPass}
+                        onChange={HandleInput}
                         class="bg-white border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"
                         placeholder="Current password"
                         required
@@ -57,6 +122,9 @@ export default function PasswordUpdate() {
                       <input
                         type="password"
                         id="password"
+                        value={initialVal.newPass}
+                        name="newPass"
+                        onChange={HandleInput}
                         class="bg-white border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"
                         placeholder="New Password"
                         required
@@ -66,6 +134,9 @@ export default function PasswordUpdate() {
                       <input
                         type="password"
                         id="password"
+                        name="confirmNewPass"
+                        value={initialVal.confirmNewPass}
+                        onChange={HandleInput}
                         class="bg-white border border-[#CFCFCF] text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33]"
                         placeholder="confirm password"
                         required
@@ -74,11 +145,7 @@ export default function PasswordUpdate() {
 
                     <button
                       className="bg-[#0A8A33]  mt-3 w-full text-white  uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                      type="button"
-                      onClick={() => {
-                        setPasswordSuccessFullChange(true);
-                        setIsChangePassword(false);
-                      }}
+                      type="submit"
                     >
                       Update Password
                     </button>

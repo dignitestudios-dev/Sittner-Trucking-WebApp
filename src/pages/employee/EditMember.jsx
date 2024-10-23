@@ -42,8 +42,6 @@ export default function EditMember() {
   };
   const getMemberRec = async () => {
     const employeesRef = collection(db, "employee");
-    console.log(location?.state?.id?.empId);
-
     const employeeQuery = query(
       employeesRef,
       where("id", "==", location?.state?.id)
@@ -53,7 +51,6 @@ export default function EditMember() {
       docId: doc.id,
       ...doc.data(),
     }));
-    console.log(employeeData, location?.state?.id?.empId);
     setMember({
       name: employeeData[0].name,
       address: employeeData[0].address,

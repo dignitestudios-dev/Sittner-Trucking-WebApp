@@ -23,13 +23,13 @@ export const MyContextProvider = ({ children }) => {
   const [displaySize,setDisplaySize]=useState(window.innerWidth);
   const [hideMsgGroup,setHideMsgGroup]=useState(false);
   const [hideLookAhed,sethideLookAhed]=useState(false);
-  
   const [DeleteEmpId,setDeleteEmpId]=useState();
   const [DeleteDocId,setDeleteDocId]=useState();
-
-
-
-
+  const [NotificationCount,setNotificationCount]=useState(0);
+  
+  const [SelectedDate,setSelectDate]=useState(new Date().toLocaleDateString());
+  const [SelectedTime,setSelectTime]=useState("");
+  
   useEffect(() => {
     const handleResize = () => {
       setDisplaySize(window.innerWidth)       
@@ -86,7 +86,13 @@ export const MyContextProvider = ({ children }) => {
         DeleteEmpId,
         setDeleteEmpId,
         DeleteDocId,
-        setDeleteDocId
+        setDeleteDocId,
+        setSelectDate,
+        SelectedDate,
+        SelectedTime,
+        setSelectTime,
+        setNotificationCount,
+        NotificationCount
       }}
     >
       {children}

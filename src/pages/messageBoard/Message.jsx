@@ -10,7 +10,7 @@ import MessageInfo from "../../components/Message/MessageInfo";
 import ViewImage from "../../components/Message/LargeImageModal";
 import { MdOutlineClose } from "react-icons/md";
 import { toast } from "react-toastify";
-
+import { collection, db, getDocs, updateDoc } from "../../firbase/FirebaseInit";
 export default function Message() {
   const sidebarRef = useRef(null);
   const {
@@ -29,8 +29,50 @@ export default function Message() {
     window.scroll(0, 0);
   }, []);
 
-   console.log(Employee,"roles");
-   
+
+  const [notifications, setNotifications] = useState([]);
+
+useEffect(() => {
+  const fetchNotifications = async () => {
+    const currentDate = new Date().toLocaleDateString("en-US");
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    
+    const notificationsRef = collection(db, "look");
+    const querySnapshot = await getDocs(notificationsRef);
+    const fetchedNotifications = [];
+
+    querySnapshot.forEach(async (doc) => {
+      const data = doc.data();
+      fetchedNotifications.push({ docId: doc.id, ...data });
+      const notificationDate = new Date(`${data.date} ${data.time}`);
+      const now = new Date(`${currentDate} ${currentTime}`);
+         console.log(notificationDate,now,"dateing");
+         
+      // Compare the date and time
+      if (notificationDate <= now) {
+        await updateDoc(doc.ref, { status: "Delivered" });
+      }
+    });
+
+    setNotifications(fetchedNotifications);
+  };
+
+  fetchNotifications();
+}, []);
+
+  
+  const deliveredNotifications = notifications.filter(
+    (notification) => notification.status == "Delivered"
+  );
+  const pendingNotifications = notifications.filter(
+    (notification) => notification.status == "pending"
+  );
+
+  console.log(Employee, "roles");
 
   return (
     <div class="bg-[#F7F7F7] h-[100%]   py-2 px-2 lg:px-10 lg:py-6 ">
@@ -105,14 +147,14 @@ export default function Message() {
                 </button>
               </div>
               <div className="col-span-1">
-                {Employee?.role == "user" ? <Look /> : !LookScreen && <Look />}
+                {Employee?.role == "user" ? <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} /> : !LookScreen && <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} />}
               </div>
             </div>
           </div>
         )}
         {hideLookAhed && (
           <div className="col-span-1">
-            {Employee?.role == "user" ? <Look /> : LookScreen && <Look />}
+            {Employee?.role == "user" ? <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} /> : LookScreen && <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications}/>}
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   format,
   subMonths,
@@ -10,16 +10,30 @@ import {
   getDay,
 } from "date-fns";
 import { FaChevronRight } from "react-icons/fa6";
+import { MyContext } from "../../context/GlobalContext";
 
 const DatepickerType = "date" | "month" | "year";
 
-export default function DatePicker() {
+export default function DatePicker(props) {
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const [dayCount, setDayCount] = useState([]);
+  const { setSelectDate } = useContext(MyContext);
   const [blankDays, setBlankDays] = useState([]);
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [datepickerHeaderDate, setDatepickerHeaderDate] = useState(new Date());
+
   const [selectedDate, setSelectedDate] = useState(new Date());
+  useEffect(() => {
+    if (props.date) {
+      const parsedDate = new Date(props.date);
+      if (!isNaN(parsedDate)) {
+        console.log("Updating selectedDate to:", parsedDate);
+        setSelectedDate(parsedDate);
+        setSelectDate(parsedDate)
+      }
+    }
+  }, [props.date]);
+
   const [type, setType] = useState("date");
 
   const decrement = () => {
@@ -63,6 +77,14 @@ export default function DatePicker() {
         datepickerHeaderDate.getMonth(),
         date
       )
+    );
+
+    setSelectDate(
+      new Date(
+        datepickerHeaderDate.getFullYear(),
+        datepickerHeaderDate.getMonth(),
+        date
+      ).toLocaleDateString()
     );
     setShowDatepicker(false);
   };
@@ -174,33 +196,39 @@ export default function DatePicker() {
                         className="text-center border p-1 border-transparent text-sm"
                       ></div>
                     ))}
-                    {dayCount.map((d, i) => (
-                      <div
-                        key={i}
-                        style={{ width: "14.26%" }}
-                        className="px-1 mb-2"
-                      >
+                    {dayCount.map((d, i) => {
+                      const dateToCheck = new Date(
+                        datepickerHeaderDate.getFullYear(),
+                        datepickerHeaderDate.getMonth(),
+                        d
+                      );
+
+                      // Get the current date without time
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0); // Reset time to midnight
+
+                      const isPastDate = dateToCheck < today;
+
+                      return (
                         <div
-                          onClick={setDateValue(d)}
-                          className={`cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100 
-        ${isToday(d) ? "text-[#0A8A33]" : "hover:text-[#0A8A33]"}
-        ${
-          getDay(
-            new Date(
-              datepickerHeaderDate.getFullYear(),
-              datepickerHeaderDate.getMonth(),
-              d
-            )
-          ) === 0
-            ? "text-red-500"
-            : ""
-        }
-      `}
+                          key={i}
+                          style={{ width: "14.26%" }}
+                          className="px-1 mb-2"
                         >
-                          {d}
+                          <button
+                            disabled={isPastDate}
+                            onClick={setDateValue(d)}
+                            className={`cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100 
+          ${isToday(d) ? "text-[#0A8A33]" : "hover:text-[#0A8A33]"} 
+          ${getDay(dateToCheck) === 0 ? "text-red-500" : ""} 
+          ${isPastDate ? "opacity-50 cursor-not-allowed" : ""}
+        `}
+                          >
+                            {d}
+                          </button>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               )}

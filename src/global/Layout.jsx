@@ -18,11 +18,8 @@ const Layout = ({ pages }) => {
   };
 
   const navigate = useNavigate();
-
+  const cookieData = Cookies.get('employe');
   useEffect(() => {
-      const cookieData = Cookies.get('employe');
-      console.log(cookieData, "cookieData");
-  
       if (cookieData) {
           try {
               const data = JSON.parse(cookieData);
@@ -43,7 +40,7 @@ const Layout = ({ pages }) => {
           setEmployee({});
           navigate('/login');
       }
-  }, []);
+  }, [cookieData]);
   
 
   return (
