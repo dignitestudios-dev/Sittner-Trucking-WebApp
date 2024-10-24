@@ -1,7 +1,34 @@
 import React, { useContext } from "react";
 import { MyContext } from "../../context/GlobalContext";
+import { db, deleteDoc, deleteObject, doc, listAll, ref, storage } from "../../firbase/FirebaseInit";
+import { toast } from "react-toastify";
 export default function DeleteSchedule() {
-  const { DeleteSchedule, setIsDeleteSchedule } = useContext(MyContext);
+  const { DeleteSchedule,setIsDeleteSchedule, DeleteProfile } = useContext(MyContext);
+
+  const DeleteEmp = async () => {
+    // Show a loading toast
+    await deleteDoc(doc(db, "scheduled", DeleteProfile.docId));  
+    const loadingToast = toast.loading("Deleting images...");
+  
+    const storageRef = ref(storage, "images/");
+    const { items } = await listAll(storageRef);
+    const filteredImages = items.filter((item) => item.name.includes(DeleteProfile.id));
+  
+    const deletePromises = filteredImages.map((item) => {
+      const desertRef = ref(storage, "images/" + item.name);
+      return deleteObject(desertRef);
+    });
+
+    try {
+      await Promise.all(deletePromises);
+      toast.update(loadingToast, { render: "Deleted", type: "success", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      toast.update(loadingToast, { render: error.message, type: "error", isLoading: false, autoClose: 3000 });
+    } finally {
+      setIsDeleteSchedule(false);  // Update state regardless of success or failure
+    }
+  };
+  
 
   return (
     <>
@@ -29,7 +56,7 @@ export default function DeleteSchedule() {
                     </button>
                     <button
                       className={`flex text-xs w-[140px] text-white text-center bg-[#EE3131] h-[44px] flex items-center justify-center rounded-[8px] font-semibold mt-3 px-4 py-2   `}
-                      onClick={() => setIsDeleteSchedule(false)}
+                      onClick={() => DeleteEmp()}
                     >
                       Yes, Delete Now
                     </button>

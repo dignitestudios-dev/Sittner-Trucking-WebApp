@@ -3,7 +3,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
-import { db, doc, getDoc, updateDoc } from "../../firbase/FirebaseInit";
+import { db, doc, getDoc, storage, updateDoc } from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
 
@@ -11,12 +11,12 @@ export default function EditNotification() {
   const navigate = useNavigate("");
   const loc = useLocation();
   const { SelectedTime, SelectedDate } = useContext(MyContext);
-  console.log(SelectedDate,"selectedDate");
   
   const [Notification, SetNotification] = useState({
     title: "",
     description: "",
   });
+
   console.log(loc?.state?.data, "data");
   useEffect(() => {
     SetNotification({
@@ -27,6 +27,8 @@ export default function EditNotification() {
     });
     // getMemberRec();
   }, [loc?.state?.data]);
+
+  
 
   const HandleInput = (e) => {
     const { name, value } = e.target;

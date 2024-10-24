@@ -26,9 +26,10 @@ export const MyContextProvider = ({ children }) => {
   const [DeleteEmpId,setDeleteEmpId]=useState();
   const [DeleteDocId,setDeleteDocId]=useState();
   const [NotificationCount,setNotificationCount]=useState(0);
-  
   const [SelectedDate,setSelectDate]=useState(new Date().toLocaleDateString());
   const [SelectedTime,setSelectTime]=useState("");
+  const [GroupName,setGroupName]=useState("");
+  const [ModalImageUrl,setModalImageUrl]=useState("");
   
   useEffect(() => {
     const handleResize = () => {
@@ -92,7 +93,11 @@ export const MyContextProvider = ({ children }) => {
         SelectedTime,
         setSelectTime,
         setNotificationCount,
-        NotificationCount
+        NotificationCount,
+        setGroupName,
+        GroupName,
+        setModalImageUrl,
+        ModalImageUrl
       }}
     >
       {children}

@@ -16,14 +16,19 @@ import {
   doc,
   deleteDoc,
   onSnapshot,
-  getDoc
+  getDoc,
+  orderBy
 } from "firebase/firestore";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
-  deleteObject 
+  deleteObject ,
+   list,
+   updateMetadata ,
+   listAll,
+   getMetadata
 } from "firebase/storage";
 
 const firebaseConfig = {
@@ -61,5 +66,10 @@ export {
   deleteDoc,
   deleteObject,
   onSnapshot,
-  getDoc
+  getDoc,
+   list,
+   listAll,
+   updateMetadata ,
+   getMetadata,
+   orderBy
 };

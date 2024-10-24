@@ -15,8 +15,7 @@ export default function CreateSchedule() {
   const [images, setImages] = useState([]);
   const generateUniqueId = async () => {
     const randomId = Math.floor(100000 + Math.random() * 900000).toString();
-    const existingEmployee = await getDocs(query(collection(db, "scheduled"), where("id", "==", randomId)));
-    
+    const existingEmployee = await getDocs(query(collection(db, "scheduled"), where("id", "==", randomId)));    
     if (!existingEmployee.empty) {
         return generateUniqueId();
     }
@@ -26,6 +25,7 @@ export default function CreateSchedule() {
     e.preventDefault();
     const scheduledRef = collection(db, "scheduled");
     const imageUrls = [];
+    const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
         const uniqueId = await generateUniqueId();   
@@ -34,6 +34,7 @@ export default function CreateSchedule() {
             await uploadBytesResumable(storageRef, image);
             const url = await getDownloadURL(storageRef);
             imageUrls.push(url);
+            docType.push(image.type);
         }
 
         // Add the scheduled message to Firestore
@@ -45,6 +46,7 @@ export default function CreateSchedule() {
             images: imageUrls,
             status:"pending",
             createdAt: new Date(),
+            type:docType,
             employeeId: Employee.id,
         });
 
@@ -71,7 +73,7 @@ export default function CreateSchedule() {
 
 
 const handleImageChange = (e) => {
-    setImages([...e.target.files]); // Store the selected files
+    setImages([...e.target.files]); 
 };
 
   return (

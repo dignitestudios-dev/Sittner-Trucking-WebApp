@@ -4,7 +4,7 @@ import { MyContext } from "../../context/GlobalContext";
 import { collection, db, onSnapshot, query } from "../../firbase/FirebaseInit";
 
 export default function MessageList() {
-  const { DeleteSchedule, setIsDeleteSchedule } = useContext(MyContext);
+  const { DeleteSchedule, setIsDeleteSchedule, DeleteProfile, setIsDeleteProfile, } = useContext(MyContext);
 
   const [scheduled, setscheduled] = useState([]);
   const getEmploye = () => {
@@ -41,12 +41,25 @@ export default function MessageList() {
               </p>
             )}
             <div className="grid grid-cols-3 gap-2 lg:gap-2 mt-2  lg:grid-cols-10">
-              {item?.images?.length > 0 &&
-                item?.images?.map((img, i) => (
-                  <div>
-                    <img src={img} alt="" className="rounded-lg h-[80px] " />
-                  </div>
-                ))}
+              {
+                item?.images?.length > 0 &&
+                item?.images?.map((img, i) => 
+                (
+                    item.type[i].includes("image")?(
+                      <div>
+                      <img src={img} alt="" className="rounded-lg h-[80px] " />
+                      </div>
+                      ):(
+                        <div>
+                        <img src={"/pdf.png"} alt="" className="rounded-lg h-[50px] " />
+                        </div>
+                      )
+                    )
+                )
+              }
+               
+                
+                
             </div>
             <div className="flex items-center mt-3 ">
               <span className="flex items-center text-[#5C5C5C] text-xs">
@@ -68,12 +81,17 @@ export default function MessageList() {
               <div className="flex items-center">
               <button
                 className="bg-transparent"
-                onClick={() => setIsDeleteSchedule(!DeleteSchedule)}
+                onClick={() =>
+                {
+                  setIsDeleteProfile(item)
+                  setIsDeleteSchedule(!DeleteSchedule)
+                }
+                  }
               >
                 <img src="/trash.png" className="w-5" alt="" srcset="" />
               </button>
-              <NavLink to={"/editschedule"} className="ml-2 bg-transparent ">
-                <img src="/whiteedit.png" className="w-5" alt="" srcset="" />
+              <NavLink to={"/editschedule"} state={{data:item}} className="ml-2 bg-transparent ">
+                <img src="/whiteedit.png" state={{data:item}} className="w-5" alt="" srcset="" />
               </NavLink>
             </div>
             )

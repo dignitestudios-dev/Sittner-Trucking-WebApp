@@ -1,14 +1,174 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
-
+import { MyContext } from "../../context/GlobalContext";
+import {
+  collection,
+  db,
+  doc,
+  getDownloadURL,
+  getMetadata,
+  list,
+  listAll,
+  ref,
+  storage,
+  updateDoc,
+  updateMetadata,
+  uploadBytesResumable,
+} from "../../firbase/FirebaseInit";
+import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { toast } from "react-toastify";
 export default function EditSchedule() {
   const navigate = useNavigate("");
+  const { SelectedTime, SelectedDate, Employee } = useContext(MyContext);
+  const loc = useLocation();
+  const [ImagesPath, setImagesPath] = useState([]);
+  const [images, setImages] = useState([]);
+  const [Scheduled, setScheduled] = useState({
+    description: "",
+    images: [],
+    time: "",
+    date: "",
+    type: [],
+  });
+
+  async function updateImageNames() {
+    const storageRef = ref(storage, "images/");
+    const { items } = await listAll(storageRef);
+    const filteredImages = items.filter((item) =>
+      item.name.includes(loc?.state?.data?.id)
+    );
+
+    const metadataPromises = filteredImages.map(async (imgPath) => {
+      try {
+        const metadata = await getMetadata(imgPath);
+        const downloadURL = await getDownloadURL(imgPath);
+        return { metadata, downloadURL };
+      } catch (error) {
+        console.error("Error fetching metadata or download URL:", error);
+      }
+    });
+
+    const results = await Promise.all(metadataPromises);
+    setImagesPath(results);
+
+    const existingImageNames = new Set(images.map((image) => image.name));
+    let updatedImg = [];
+
+    const img_data = results.filter(
+      (item) => item && !existingImageNames.has(item.metadata.name)
+    );
+    for (const item of img_data) {
+      const { metadata, downloadURL } = item;
+      const response = await fetch(downloadURL);
+      const blob = await response.blob();
+      const file = new File([blob], metadata.name, {
+        type: metadata.contentType,
+      });
+      updatedImg.push(file);
+    }
+    setImages(updatedImg);
+  }
+
+  useEffect(() => {
+    setScheduled({
+      description: loc?.state?.data?.message,
+      time: loc?.state?.data?.time,
+      date: loc?.state?.data?.date,
+      images: loc?.state?.data?.images,
+      type: loc?.state?.data?.type,
+    });
+    updateImageNames();
+  }, []);
+
+  const handleImageChange = (e, img) => {
+    const filesArray = Array.from(e.target.files);
+    const updatedFiles = filesArray.map((file) => {
+      return new File([file], img.metadata.name, { type: file.type });
+    });
+
+    updatedFiles.forEach((file) => {
+      const existingIndex = images.findIndex(
+        (image) => image.name === file.name
+      );
+
+      if (existingIndex !== -1) {
+        setImages((prev) => {
+          const newImages = [...prev];
+          newImages[existingIndex] = file;
+          return newImages;
+        });
+      } else {
+        setImages((prev) => [...prev, file]);
+      }
+    });
+  };
+
+  const HandleUploadAttach = (e) => {
+    const filesArray = Array.from(e.target.files);
+    const updatedFiles = filesArray.map((file) => {
+      return new File([file], loc.state.data.id + file.name, {
+        type: file.type,
+      });
+    });
+
+    updatedFiles.forEach((file) => {
+      setImages((prev) => [...prev, file]);
+    });
+  };
+
+  const HandleScheduled = async (e) => {
+    e.preventDefault();
+    console.log(images, "checkImages");
+    const scheduledRef = doc(db, "scheduled", loc.state.data.docId);
+    const imageUrls = [];
+    const docType = [];
+    const loadingToastId = toast.loading("Uploading...");
+    try {
+      // Upload images and get URLs
+      for (const image of images) {
+        const storageRef = ref(storage, `images/${image.name}`);
+        await uploadBytesResumable(storageRef, image);
+        const url = await getDownloadURL(storageRef);
+        imageUrls.push(url);
+        docType.push(image.type);
+      }
+
+      await updateDoc(scheduledRef, {
+        date: SelectedDate,
+        time: SelectedTime,
+        message: Scheduled.description,
+        images: imageUrls,
+        type: docType,
+        status: "pending",
+        createdAt: new Date(),
+        employeeId: Employee.id,
+      });
+      toast.update(loadingToastId, {
+        render: "Scheduled successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      navigate("/schedule");
+    } catch (error) {
+      console.error("Failed to schedule:", error);
+      // Update the loading toast to error
+      toast.update(loadingToastId, {
+        render: "Failed to schedule. Please try again.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    }
+  };
+
+  console.log(Scheduled, "getUpdateArray");
   return (
-    <div class="bg-[#F7F7F7] h-[80vh] py-5 px-5 ">
+    <div class="bg-[#F7F7F7] h-[90vh] py-5 px-5 ">
       <NavLink
         to={"/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
@@ -18,32 +178,73 @@ export default function EditSchedule() {
       </NavLink>
 
       <div class="bg-[#FFFFFF] mb-3 h-full border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={HandleScheduled}>
           <div className="mt-5 grid grid-cols-1 gap-5  lg:grid-cols-2">
             <div className="mb-1 col-span-2">
               <textarea
                 type="text"
                 id="base-input"
+                value={Scheduled.description}
+                onChange={(e) =>
+                  setScheduled({ ...images, description: e.target.value })
+                }
                 className="bg-white border border-gray-300 text-gray-900 text-sm rounded-[12px] h-[127px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]  "
                 placeholder="Type Here...."
               ></textarea>
             </div>
             <div className="mb-3 col-span-2">
               <label htmlFor="file">
-                <div className="text-[#007AFF] flex items-center  cursor-pointer">
+                <div className="text-[#007AFF] flex items-center cursor-pointer">
                   <FaPlus className="mr-2" /> Attachment
                 </div>
-                <input type="file" className="hidden" id="file" />
+                <input
+                  type="file"
+                  onChange={HandleUploadAttach}
+                  className="hidden"
+                  id="file"
+                  multiple
+                />
               </label>
             </div>
+            <div className="mb-3 col-span-2">
+              <div className="grid grid-cols-10 gap-2">
+                {ImagesPath.map((img, i) => (
+                  <div key={i}>
+                    <label htmlFor={`file${i}`}>
+                      <div className="text-[#007AFF] flex items-center cursor-pointer">
+                        <HiOutlinePencilSquare className="mr-2 mb-2" />
+                      </div>
+                      {Scheduled.type[i].includes("image") ? (
+                        <img
+                          src={img.downloadURL}
+                          alt=""
+                          className="h-[100px] rounded-md"
+                        />
+                      ) : (
+                        <img
+                          src="/pdf.png"
+                          alt=""
+                          className="h-[50px] rounded-md"
+                        />
+                      )}
+                      <input
+                        type="file"
+                        onChange={(e) => handleImageChange(e, img)}
+                        className="hidden"
+                        id={`file${i}`}
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="mb-3 grid grid-cols-1  lg:grid-cols-2  col-span-1">
-              <DatePicker />
-              <ModernTimePicker />
+              <DatePicker date={Scheduled.date} />
+              <ModernTimePicker time={Scheduled.time} />
             </div>
           </div>
           <div className="flex items-center gap-5 mt-5">
             <button
-              onClick={() => navigate("/schedule")}
               type="submit"
               className="text-white bg-[#0A8A33] text-nowrap text-sm lg:text-base rounded-lg  lg:w-[200px] h-[50px]  px-5 py-2.5 text-center"
             >

@@ -5,7 +5,7 @@ import EditGroup from "./EditGroup";
 import { MyContext } from "../../context/GlobalContext";
 import { MdOutlineClose } from "react-icons/md";
 export default function GroupDetail() {
-  const { isEditGroup, setEditGroup, LookScreen, setLookScreen, setSideDraw } =
+  const { isEditGroup, setEditGroup, LookScreen,GroupName, setSideDraw } =
     useContext(MyContext);
   return (
     <div className="bg-[#FFFFFF] h-[630px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5">
@@ -31,14 +31,14 @@ export default function GroupDetail() {
       <div className="flex flex-col items-center">
         <div className="w-[88px] h-[88px]">
           <img
-            src="/messageprofile.jfif"
+           src={GroupName.groupimg}
             className="w-full h-full rounded-full"
             alt=""
             srcset=""
           />
         </div>
         <h3 className="lg:text-base font-semibold leading-[19px] mt-3">
-          JB Sittner Trucking LLC
+        {GroupName.group_name}
         </h3>
       </div>
       <Attachment />

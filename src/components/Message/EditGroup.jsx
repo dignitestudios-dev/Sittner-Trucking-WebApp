@@ -1,9 +1,66 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MyContext } from "../../context/GlobalContext";
-import { useNavigate } from "react-router-dom";
+import { db, doc, getDownloadURL, ref, storage, updateDoc, uploadBytesResumable } from "../../firbase/FirebaseInit";
+import { toast } from "react-toastify";
 export default function EditGroup() {
-  const { isEditGroup, setEditGroup } = useContext(MyContext);
+  const { isEditGroup, setEditGroup, GroupName } =
+    useContext(MyContext);
+  const [Image, setImage] = useState("");
+  const [preview, setPreview] = useState();
+  const [groupVal, setGroupVal] = useState(GroupName.group_name);
+  const UpdateGroup = async (e) => {
+    e.preventDefault();
+    const myPromise = new Promise(async (resolve, reject) => {
+      try {                
+        const scheduledRef = doc(db, "group", GroupName.docId);
+          const storageRef = ref(storage, `group/group-pic`);
+          const uploadTask = uploadBytesResumable(storageRef, Image);
+          uploadTask.on(
+              "state_changed",
+              null,
+              (error) => {
+                  reject(error.message);
+              },
+              async () => {
+                  const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                  await updateDoc(scheduledRef, {
+                    group_name: groupVal,
+                    groupimg: downloadURL,
+                  });
+
+                  resolve("Group Update");
+              }
+          );
+      } catch (error) {
+          reject(error.message);
+      }
+  });
+
+  toast.promise(myPromise, {
+      pending: "Updating Group...",
+      success: (data) => data,
+      error: (error) => error,
+  }).then(() => {
+    setEditGroup(false);
+  });
+  };
+
+  useEffect(()=>{
+    setGroupVal(GroupName.group_name)
+  },[GroupName])
+   
+  useEffect(() => {
+    if (!Image) {
+        setPreview(undefined)
+        return
+    }
+    const objectUrl = URL.createObjectURL(Image)
+    setPreview(objectUrl)
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl)
+}, [Image])
 
   return (
     <>
@@ -32,7 +89,7 @@ export default function EditGroup() {
                     className="w-[88px] mb-3 h-[88px] text-center  relative cursor-pointer"
                   >
                     <img
-                      src="/messageprofile.jfif"
+                      src={preview?preview:GroupName.groupimg}
                       className="w-full h-full rounded-full"
                       alt=""
                       srcset=""
@@ -43,14 +100,19 @@ export default function EditGroup() {
                       alt=""
                       srcset=""
                     />
-                    <input type="file" className="hidden" id="file" />
+                    <input
+                      type="file"
+                      onChange={(e) => setImage(e.target.files[0])}
+                      className="hidden"
+                      id="file"
+                    />
                     <button className="bg-transparent text-[#FF3B30] font-medium text-[15px] mt-2">
                       Remove
                     </button>
                   </label>
 
                   <div className="w-full mt-5">
-                    <form onSubmit={(e)=>e.preventDefault()} className="w-full">
+                    <form onSubmit={(e) => UpdateGroup(e)} className="w-full">
                       <div className="mb-3">
                         <label class=" text-[13px] mb-1 font-semibold leading-[16.94px] ">
                           Name
@@ -58,7 +120,9 @@ export default function EditGroup() {
                         <input
                           type="text"
                           id="base-input"
-                          class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]  "
+                          value={groupVal}
+                          onChange={(e) => setGroupVal(e.target.value)}
+                          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]  "
                           required
                           placeholder="JB Sittner Trucking LLC"
                         />
@@ -66,7 +130,6 @@ export default function EditGroup() {
                       <div>
                         <button
                           type="submit"
-                          onClick={() => setEditGroup(false)}
                           class="text-white bg-[#0A8A33]  rounded-lg  w-full mt-3 h-[50px]  px-5 py-2.5 text-center"
                         >
                           Update

@@ -29,7 +29,7 @@ export default function DatePicker(props) {
       if (!isNaN(parsedDate)) {
         console.log("Updating selectedDate to:", parsedDate);
         setSelectedDate(parsedDate);
-        setSelectDate(parsedDate)
+        setSelectDate(parsedDate.toLocaleDateString())
       }
     }
   }, [props.date]);

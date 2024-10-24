@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaChevronUp } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
+import { collection, db, onSnapshot, query } from "../../firbase/FirebaseInit";
 export default function Member() {
   const [openIndex, setOpenIndex] = useState(null);
   const { LookScreen, setIsAddMem, AddMem } = useContext(MyContext);
@@ -35,6 +36,26 @@ export default function Member() {
     "bg-[#E8F569]",
     "bg-[#94D0E4]",
   ];
+
+  const [employee, setEmployee] = useState([]);
+  const getEmploye = () => {
+    const employeesRef = collection(db, "employee");
+    const employeeQuery = query(employeesRef);
+    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
+      const employeeData = querySnapshot.docs.map((doc) => ({
+        docid: doc.id,
+        ...doc.data(),
+      }));
+      setEmployee(employeeData);
+    });
+    return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = getEmploye();
+    return () => unsubscribe();
+  }, []);
+
 
   return (
     <div>
@@ -81,7 +102,9 @@ export default function Member() {
                 <img src="/addmember.png" width={150} alt="" srcset="" />
               </NavLink>
               <ul className="w-full h-[363px] scroll-box overflow-auto ">
-                {user.map((item, i) => (
+                {employee
+              .filter((rec) => rec.role !== "admin")
+              .map((item, i) => (
                   <li className="mt-3 ">
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                       <div
@@ -89,13 +112,13 @@ export default function Member() {
                       >
                         <img
                           className="object-contain w-full  h-full"
-                          src={item.img}
+                          src={item.pic}
                           alt={item.img}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-medium  ">
-                          {item.title}
+                          {item.name}
                         </p>
                       </div>
                     </div>
