@@ -1,54 +1,85 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import LeftImage from "../../components/Auth/LeftImage";
-import { NavLink } from "react-router-dom";
-import emailjs from "@emailjs/browser"
+import { NavLink, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
+import { toast } from "react-toastify";
+import { collection, db, getDocs, query, where } from "../../firbase/FirebaseInit";
 
 export default function ForgotPassword() {
   const [email,setEmail]=useState("")
-  const {setOtp}=useContext(MyContext);
-  const form = useRef();
-   useEffect(()=>{
-    emailjs.init("1mVFy68Lbo1hIkjxW");
-   },[])
+  const {setOtp,setForgetEmail}=useContext(MyContext);
+  const navigate=useNavigate("")
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  };
+  const sendOTP = async (e) => {
+    e.preventDefault();
 
-  // const sendEmail = (e) => {
-  //   e.preventDefault();
+    const q = query(collection(db, "employee"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
 
-  //   emailjs
-  //     .sendForm('service_9ontqnw', 'template_7lzu55c', form.current, {
-  //       publicKey: '1mVFy68Lbo1hIkjxW',
-  //     })
-  //     .then(
-  //       () => {
-  //         console.log('SUCCESS!');
-  //       },
-  //       (error) => {
-  //         console.log('FAILED...', error.text);
-  //       },
-  //     );
-  // };
+    if (querySnapshot.empty) {
+      return toast.error("No employee found with that email");
+    }
+
+    const otpCode = generateOTP();
+    setOtp(otpCode);
   
-  // const sendEmail = (e) => {
-  //   e.preventDefault();
-  //   const randomOtp=Math.floor(100000 + Math.random() * 900000)
-  //   var templateParams = {
-  //     email:email,
-  //     otp_code:randomOtp,
-  //   };
-  //   emailjs
-  //     .sendForm('service_9ontqnw', 'template_7lzu55c', templateParams, {
-  //       publicKey: '1mVFy68Lbo1hIkjxW',
-  //     })
-  //     .then(
-  //       () => {
-  //         console.log('SUCCESS!');
-  //       },
-  //       (error) => {
-  //         console.log('FAILED...', error.text);
-  //       },
-  //     );
-  // };
+    const formData = new FormData(e.target);
+    formData.append("access_key", "606e475b-e83a-4580-88d9-86d6681239bc");
+    formData.append("email", email);
+    formData.append("name", "Sittner Trucking LLC");
+    formData.append("message", otpCode);
+    setForgetEmail(email)
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+    console.log(json);
+  
+    // Show loading toast
+    const toastId = toast.loading("Sending OTP...");
+  
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: json
+      });
+      
+      const data = await res.json();
+  
+      if (res.ok && data.success) {
+        // Success toast
+        toast.update(toastId, {
+          render: "OTP sent successfully!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000
+        });
+        navigate("/otp");
+      } else {
+        // Error toast
+        toast.update(toastId, {
+          render: "Failed to send OTP.",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000
+        });
+      }
+    } catch (error) {
+      // Error toast on catch
+      toast.update(toastId, {
+        render: "An error occurred.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000
+      });
+      console.error("Error:", error);
+    }
+  };
+  
 
   return (
     <div className="grid sm:grid-cols-1 h-screen lg:grid-cols-2  md:py-10 md:px-10 gap-4 flex items-center ">
@@ -66,7 +97,7 @@ export default function ForgotPassword() {
             your experience.
           </p>
         </div>
-        <form ref={form} onSubmit={(e)=>sendEmail(e)} className="max-w-sm mx-auto mt-4">
+        <form onSubmit={(e)=>sendOTP(e)} className="max-w-sm mx-auto mt-4">
           <div className="mb-5">
             <input
               type="email"

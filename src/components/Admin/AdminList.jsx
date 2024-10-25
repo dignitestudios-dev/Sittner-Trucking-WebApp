@@ -1,30 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import DeleteEmpProfile from "../Profile/DeleteProfile";
 import { collection, db, getDocs, onSnapshot, query, where } from "../../firbase/FirebaseInit";
 import EditEmp from "../Employee/editEmp";
+import { MyContext } from "../../context/GlobalContext";
+import Loader from "../../global/Loader";
 
 export default function AdminList() {
   const navgiate = useNavigate("");
    const [employee,setEmployee]=useState([]);
+   const { setLoader, loader,setDeleteEmpId,setDeleteDocId } = useContext(MyContext);
    const getEmploye = () => {
     const employeesRef = collection(db, "employee");
-    const employeeQuery = query(employeesRef); 
-    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
-        const employeeData = querySnapshot.docs.map(doc => ({ docid: doc.id, ...doc.data() }));
-        setEmployee(employeeData);
-    });
-    return unsubscribe;
-};
+    const employeeQuery = query(employeesRef);
 
-useEffect(() => {
+    setLoader(true); // Set loader to true before fetching data
+
+    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
+      const employeeData = querySnapshot.docs.map(doc => ({
+        docId: doc.id,
+        ...doc.data(),
+      }));
+      setEmployee(employeeData);
+      setLoader(false); // Set loader to false after data is fetched
+    }, (error) => {
+      console.error("Error fetching employees: ", error);
+      setLoader(false); // Also set loader to false in case of an error
+    });
+
+    return unsubscribe;
+  };
+
+  useEffect(() => {
     const unsubscribe = getEmploye();
-        return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="bg-[#FFFFFF] border rounded-[10px] h-[70vh] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-5 lg:px-5">
       <div className="relative scroll-box overflow-x-auto h-full ">
+        {
+          loader?(<Loader/>):(
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-[#787F8C] uppercase bg-[#F3F5F7]">
             <tr>
@@ -79,13 +95,21 @@ useEffect(() => {
                   {item.address}
                   </p>
                 </td>
-                <td className="px-6 py-6">
-                  <EditEmp empId={item.id} docId={item.docid} />
+                <td className="px-6 py-6"  
+                onClick={()=>{
+                  setDeleteDocId(item.docId)
+                  setDeleteEmpId(item.id)
+                }
+                  }
+                >
+                  <EditEmp/>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+         )
+        }
       </div>
       <DeleteEmpProfile   />
     </div>

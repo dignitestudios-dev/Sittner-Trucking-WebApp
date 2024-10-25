@@ -7,7 +7,16 @@
 * {
   font-family: "Inter", sans-serif !important;
 }
-
+body{
+  background-color: #F7F7F7;
+}
+.chat-body{
+  overflow-anchor: auto !important;
+  overscroll-behavior: contain;
+}
+.msg-list{
+  transform: translateZ(0) !important;
+}
 
 .left-side-img {
   background-image: linear-gradient(208.37deg, rgba(0, 0, 0, 0) -24.58%, #000000 116.89%), url('/login1.jpeg');
@@ -28,7 +37,7 @@ input:focus{
 
 .custom-input {
   height: 20px !important;
-  width: 60px !important;
+  /* width: 110px !important; */
   background: #F9FAFB !important;
   border: 1px solid #F9FAFB !important; 
 }

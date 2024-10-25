@@ -1,12 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { MdOutlineFilePresent } from "react-icons/md";
 import { MyContext } from "../../context/GlobalContext";
+import Loader from "../../global/Loader";
 import {
   addDoc,
   collection,
   db,
+  doc,
   getDocs,
   getDownloadURL,
   onSnapshot,
@@ -14,10 +16,12 @@ import {
   query,
   ref,
   storage,
+  updateDoc,
   uploadBytesResumable,
   where,
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 export default function MessageBox() {
   const {
     LookScreen,
@@ -31,25 +35,56 @@ export default function MessageBox() {
     setGroupName,
     GroupName,
     setModalImageUrl,
+    setIsMessageSeen,
+    setIsAttachments,
+    setLoader,
+    loader,
   } = useContext(MyContext);
   const [Message, SetMessages] = useState([]);
   const [UserMsg, setUserMsg] = useState("");
   const [images, setImages] = useState([]);
   const [sentMessage, setSentMessage] = useState(0);
   const [sentLoad, setSentLoad] = useState(false);
+  const loc = useLocation();
+  const msgBodyScroll = useRef();
+
+   
 
   useEffect(() => {
-    const q = query(collection(db, "message"), orderBy("createdAt")); // Order by createdAt
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const msg_array = [];
-      querySnapshot.forEach((doc) => {
-        msg_array.push({ id: doc.id, ...doc.data() }); // Include document ID
-      });
-      SetMessages(msg_array); // Set messages state
-    });
+    if (sentMessage === 0) {
+      setLoader(true);
+    }
 
-    return () => unsubscribe(); // Cleanup on unmount
-  }, [sentMessage]);
+    
+
+    const q = query(collection(db, "message"), orderBy("createdAt"));
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const msgArray = [];
+        querySnapshot.forEach((doc) => {
+          msgArray.push({ docId: doc.id, ...doc.data() });
+        });        
+        SetMessages(msgArray);
+        setIsAttachments(msgArray);
+        setLoader(false); // Set loader to false after data is fetched
+       setTimeout(()=>{
+        if (msgBodyScroll.current) {
+          msgBodyScroll.current.scrollTop = msgBodyScroll.current.scrollHeight;
+        }
+       },600)
+      },
+      (error) => {
+        console.error("Error fetching messages: ", error);
+        setLoader(false); // Set loader to false in case of an error
+      }
+    );
+ 
+    return () => {
+      setLoader(false); // Ensure loader is false when the component unmounts
+      unsubscribe(); // Clean up subscription
+    };
+  }, []); // Dependency array
 
   useEffect(() => {
     const group = query(collection(db, "group"));
@@ -90,7 +125,6 @@ export default function MessageBox() {
         imageUrls.push(url);
         docType.push(image.type);
       }
-
       await addDoc(scheduledRef, {
         date: new Date().toLocaleDateString(),
         time: new Date().toLocaleTimeString(),
@@ -131,6 +165,21 @@ export default function MessageBox() {
   const handleImageChange = (e) => {
     setImages([...e.target.files]);
   };
+
+  const MessageSeen = () => {
+    if (loc.pathname == "/") {
+      Message.map(async (item, i) => {
+        const scheduledRef = doc(db, "message", item.docId);
+        console.log(scheduledRef, "itemsssMsgs");
+        if (!item.UserMsgSeen.includes(Employee.id)) {
+          await updateDoc(scheduledRef, {
+            UserMsgSeen: [...item.UserMsgSeen, Employee.id],
+          });
+        }
+      });
+    }
+  };
+  MessageSeen();
 
   return (
     <div className="bg-[#FFFFFF] w-full  h-[80%] lg:h-[630px]  relative rounded-[24px]">
@@ -179,6 +228,7 @@ export default function MessageBox() {
       </div>
       {/* Message Body */}
       <div
+        ref={msgBodyScroll}
         className={`chat-body ${
           Employee?.role == "admin"
             ? "h-[70%] lg:h-[440px]"
@@ -186,116 +236,162 @@ export default function MessageBox() {
         }  scroll-box  overflow-auto`}
       >
         {/* Day Timer */}
-        <div className="flex justify-center py-2">
-          <span className="bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal">
-            Today
-          </span>
-        </div>
-        {/* Messages */}
-        {Message?.map((msg, i) => (
-          <div
-            key={i}
-            className={`left-side ${
-              Employee?.role == "admin" && "ms-auto"
-            } mb-3 px-3 py-3 w-auto lg:max-w-[30%]`}
-          >
-            {Employee?.role == "user" && (
-              <div className="username mb-3">
-                <h2 className="font-semibold text-sm leading-[14px] ">Admin</h2>
-              </div>
-            )}
-            <div className="w-full py-2">
-              {msg.message && (
-                <div
-                  className={` ${
-                    Employee?.role == "admin"
-                      ? "bg-[#0A8A33] text-white"
-                      : "bg-[#F4F4F4]"
-                  }   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
-                >
-                  {msg.message}
-                </div>
-              )}
-              {msg.images.length > 0 && (
-                <div
-                  className={`w-full py-3 grid grid-cols-${msg.images.length} gap-2`}
-                >
-                  {msg.images.length > 0 &&
-                    msg.images.map((img, index) =>
-                      msg.type[index].includes("image") ? (
-                        <div
-                          key={index}
-                          className="w-full rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4]   text-xs font-normal"
-                        >
-                          <img
-                            src={img}
-                            className="cursor-pointer rounded-md h-[80px] w-[80px]"
-                            onClick={() => {
-                              setModalImageUrl(img);
-                              setIviewImage(true);
-                            }}
-                            alt=""
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          key={index}
-                          className="w-full rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4]   text-xs font-normal"
-                        >
-                          <a href={img} download target="_blank">
-                            <img
-                              src="/pdf.png"
-                              className="cursor-pointer"
-                              alt=""
-                            />
-                          </a>
-                        </div>
-                      )
-                    )}
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-1 justify-end">
-              {Employee?.role == "admin" && (
-                <div className="flex items-center ">
-                  <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
-                    <img
-                      src="/person1.png"
-                      className="w-full h-full"
-                      alt=""
-                      srcset=""
-                    />
-                  </div>
-                  <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#B9FF9E] rounded-full">
-                    <img
-                      src="/person2.png"
-                      className="w-full h-full"
-                      alt=""
-                      srcset=""
-                    />
-                  </div>
-                  <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#94D0E4] rounded-full">
-                    <img
-                      src="/person3.png"
-                      className="w-full  h-full"
-                      alt=""
-                      srcset=""
-                    />
-                  </div>
-                  <img
-                    src="/tick-double.png"
-                    onClick={() => setIsMessageInfo(true)}
-                    className="w-5 cursor-pointer ml-1 "
-                    alt=""
-                  />
-                </div>
-              )}
-              <span className=" text-[10px] font-normal leading-[10px] text-[#797C7B]">
-                {msg?.time}
+
+        {loader ? (
+          <Loader />
+        ) : (
+          <>
+            <div className="flex justify-center py-2">
+              <span className="bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal">
+                Today
               </span>
             </div>
-          </div>
-        ))}
+            {/* Messages */}
+            {Message?.map((msg, i) => (
+              <div
+                key={i}
+                className={`left-side ${
+                  Employee?.role == "admin" && "ms-auto"
+                } mb-3 px-3 py-3 msg-list w-auto lg:max-w-[30%]`}
+              >
+                {Employee?.role == "user" && (
+                  <div className="username mb-3">
+                    <h2 className="font-semibold text-sm leading-[14px] ">
+                      Admin
+                    </h2>
+                  </div>
+                )}
+                <div className="w-full py-2">
+                  {msg.message && (
+                    <div
+                      className={` ${
+                        Employee?.role == "admin"
+                          ? "bg-[#0A8A33] text-white"
+                          : "bg-[#F4F4F4]"
+                      }   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
+                    >
+                      {msg.message}
+                    </div>
+                  )}
+                  {msg.images.length > 0 && (
+                    <div
+                      className={`w-full py-3 grid grid-cols-${msg.images.length} gap-2`}
+                    >
+                      {msg.images.map((img, index) =>
+                        msg.type[index]?.includes("image") ? (
+                          <div
+                            key={index}
+                            className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
+                          >
+                            <img
+                              src={img}
+                              className="cursor-pointer rounded-md h-[80px] w-[80px]"
+                              onClick={() => {
+                                setModalImageUrl(img);
+                                setIviewImage(true);
+                              }}
+                              alt=""
+                            />
+                          </div>
+                        ) : msg.type[index]?.includes("video") ? (
+                          <div
+                            key={index}
+                            className="rounded-xl flex justify-center  bg-[#F4F4F4] text-xs font-normal"
+                          >
+                            <video
+                              className="cursor-pointer rounded-md "
+                              onClick={() => {}}
+                              controls
+                              src={img}
+                            />
+                          </div>
+                        ) : msg.type[index]?.includes("spreadsheetml") ? (
+                          <div
+                            key={index}
+                            className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
+                          >
+                            <a
+                              href={img}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <img
+                                src="/xl.png"
+                                className="cursor-pointer"
+                                alt=""
+                              />
+                            </a>
+                          </div>
+                        ) : (
+                          <div
+                            key={index}
+                            className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
+                          >
+                            <a
+                              href={img}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <img
+                                src="/pdf.png"
+                                className="cursor-pointer"
+                                alt=""
+                              />
+                            </a>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 justify-end">
+                  {Employee?.role == "admin" && (
+                    <div className="flex items-center ">
+                      <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
+                        <img
+                          src="/person1.png"
+                          className="w-full h-full"
+                          alt=""
+                          srcset=""
+                        />
+                      </div>
+                      <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#B9FF9E] rounded-full">
+                        <img
+                          src="/person2.png"
+                          className="w-full h-full"
+                          alt=""
+                          srcset=""
+                        />
+                      </div>
+                      <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#94D0E4] rounded-full">
+                        <img
+                          src="/person3.png"
+                          className="w-full  h-full"
+                          alt=""
+                          srcset=""
+                        />
+                      </div>
+                      <img
+                        src="/tick-double.png"
+                        onClick={() => {
+                          setIsMessageSeen(msg.UserMsgSeen);
+                          setIsMessageInfo(true);
+                        }}
+                        className="w-5 cursor-pointer ml-1 "
+                        alt=""
+                      />
+                    </div>
+                  )}
+                  <span className=" text-[10px] font-normal leading-[10px] text-[#797C7B]">
+                    {msg?.time}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
       {/* Send Message */}
       {Employee?.role == "admin" && (
@@ -321,7 +417,7 @@ export default function MessageBox() {
               value={UserMsg}
               onChange={(e) => setUserMsg(e.target.value)}
               id="email-address-icon"
-              required
+             autocomplete="off"
               className="bg-[#FFFFFF] w-[100%] h-[100%] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl  block w-full p-2.5  focus:outline-[#0A8A33]"
               placeholder="Type Here"
             />

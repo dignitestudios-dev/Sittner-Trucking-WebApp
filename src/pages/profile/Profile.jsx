@@ -110,18 +110,18 @@ export default function Profile() {
               </p>
             </div>
             {Employee?.role == "admin" && (
-              <div>
+              <div className="" >
                 <h2 className="text-[#787F8C] text-sm mb-2 font-semibold leading-[16.94px] uppercase">
                   Password{" "}
                 </h2>
-                <div className="flex items-center">
+                <div className="flex items-center relative">
                   <input
                     type={!showPassword ? "password" : "text"}
-                    className="bg-transparent custom-input"
+                    className={`bg-transparent custom-input ${!showPassword ? "w-[110px]" : "w-auto"} `}
                     value={member?.password}
                     disabled
                   />
-
+                 <div className="" >
                   {showPassword ? (
                     <div onClick={() => setShowPassword(!showPassword)}>
                       {" "}
@@ -132,6 +132,7 @@ export default function Profile() {
                       <FaRegEye className="text-gray-300 cursor-pointer" />
                     </div>
                   )}
+                  </div>
                 </div>
               </div>
             )}

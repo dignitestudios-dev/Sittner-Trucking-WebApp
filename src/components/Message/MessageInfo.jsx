@@ -1,8 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { IoMdClose } from "react-icons/io";
+import { collection, db, onSnapshot, query } from "../../firbase/FirebaseInit";
 export default function MessageInfo() {
-  const { MessageInfo, setIsMessageInfo } = useContext(MyContext);
+  const { MessageInfo, setIsMessageInfo, isMessageSeen } =
+    useContext(MyContext);
 
   const user = [
     {
@@ -54,6 +56,36 @@ export default function MessageInfo() {
     "bg-[#94D0E4]",
   ];
 
+  const [employee, setEmployee] = useState([]);
+  const [msgSeenEmp, setMsgSeenEmp] = useState([]);
+
+  const getEmploye = () => {
+    const employeesRef = collection(db, "employee");
+    const employeeQuery = query(employeesRef);
+    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
+      const employeeData = querySnapshot.docs.map((doc) => ({
+        docid: doc.id,
+        ...doc.data(),
+      }));
+      setEmployee(employeeData);
+    });
+    return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = getEmploye();
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const messageSeenEMp = employee.filter((item) =>
+      isMessageSeen.includes(item.id)
+    );
+    setMsgSeenEmp(messageSeenEMp);
+  }, [isMessageSeen]);
+
+  console.log(isMessageSeen, "employeeMessage");
+
   return (
     <>
       {MessageInfo ? (
@@ -81,21 +113,21 @@ export default function MessageInfo() {
                 <div className="relative h-[90%] mt-4 scroll-box overflow-auto">
                   <div className="py-1 rounded-md  ">
                     <ul className="px-1">
-                      {user.map((item, i) => (
+                      {msgSeenEmp.map((item, i) => (
                         <li className="mt-3">
                           <div className="flex items-center space-x-2 rtl:space-x-reverse">
                             <div
                               className={`w-[50px] h-[50px]  rounded-full ${color[i]} `}
                             >
                               <img
-                                className="object-contain w-full  h-full"
-                                src={item.img}
-                                alt={item.img}
+                                className="rounded-full w-full  h-full"
+                                src={item.pic?item.pic:"noprofile.png"}
+                                alt={item.pic}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[13px] font-medium  ">
-                                {item.title}
+                                {item.name}
                               </p>
                               <p className="text-[#ABABAB] text-[12px]">
                                 {item.seen}

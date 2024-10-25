@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { IoMdPerson } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -115,7 +115,18 @@ const handleAddMember = async (e) => {
  
 };
 
-  
+const [Preview, setPreview] = useState();
+useEffect(() => {
+  if (!image) {
+      setPreview(undefined)
+      return
+  }
+  const objectUrl = URL.createObjectURL(image)
+  setPreview(objectUrl)
+
+  // free memory when ever this component is unmounted
+  return () => URL.revokeObjectURL(objectUrl)
+}, [image])
   
   return (
     <div class="bg-[#F7F7F7] h-[80vh] py-5 px-5 ">
@@ -131,7 +142,14 @@ const handleAddMember = async (e) => {
         <div class="bg-[#F9FAFB] rounded-[10px] border border-[#E4E4E4] py-3 px-3 lg:py-10 lg:px-10">
           <div className="flex items-center">
             <div className="w-[60px] h-[60px] rounded-full border border-dashed border-[#0A8A33] flex items-center justify-center">
-              <IoMdPerson color="#0A8A33" size={25} />
+            {
+              Preview?(
+                <img src={Preview} alt=""  className="w-[55px] h-[55px] rounded-full " srcset="" /> 
+              ):
+              (
+                 <IoMdPerson color="#0A8A33" size={25} />
+              )
+            }
             </div>
             <label
               htmlFor="changeprofile"

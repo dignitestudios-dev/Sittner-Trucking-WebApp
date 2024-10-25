@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
-import { collection, db, getDocs, query, updateDoc } from "../../firbase/FirebaseInit";
+import { collection, db, getDocs, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
 
 export default function DropdownList() {
-  const { IsDropdownOpen, setIsDropdown,setNotificationCount } = useContext(MyContext);
+  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,RealTimeData } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
+  const [DevNotifications, setDevNotifications] = useState([]);
 
   const DropdownRef = useRef(null);
   const toggleModal = () => {
@@ -12,25 +13,28 @@ export default function DropdownList() {
   };
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const notificationsRef = collection(db, "notification");
+
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
         const currentDate = new Date();
-        const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); // Format: hh:mm AM/PM
-
-        const notificationsRef = collection(db, "notification");
-        const querySnapshot = await getDocs(notificationsRef);
+        const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        
         const fetchedNotifications = [];
-
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             const notificationDate = new Date(data.date + ' ' + data.time); // Assuming date and time are in proper format
+            
             fetchedNotifications.push({ id: doc.id, ...data });
-            setNotificationCount(fetchedNotifications.length)
             // Check if the notification date and time is less than or equal to the current date and time
-            if (notificationDate <= currentDate) {
+            if (notificationDate <= currentDate && data.status !== "Delivered") {
                 // Update status to "Delivered"
                 updateDoc(doc.ref, { status: "Delivered" });
+                setRealTimeData(prev=>prev+1)
             }
         });
+
+        // Set notification count
+        setNotificationCount(fetchedNotifications.length);
 
         // Sort notifications by date and time (latest first)
         const sortedNotifications = fetchedNotifications.sort((a, b) => {
@@ -40,12 +44,17 @@ export default function DropdownList() {
         });
 
         setNotifications(sortedNotifications);
-    };
+    });
 
-    fetchNotifications();
+    // Clean up the subscription on unmount
+    return () => unsubscribe();
 }, []);
 
-const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+  useEffect(()=>{
+    const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+    setDevNotifications(deliveredNotifications)
+  },[RealTimeData]) 
+
 
   return (
     <>
@@ -70,11 +79,11 @@ const deliveredNotifications = notifications.filter(notification => notification
             <h3 className="text-base leading-[19px] font-bold">
               Notifications
             </h3>
-            {deliveredNotifications.length === 0 ? (
+            {DevNotifications.length === 0 ? (
                 <p className="text-center text-gray-500 mt-4">No notifications available.</p>
             ) : (
             <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
-            {deliveredNotifications.map((notification) => (
+            {DevNotifications.map((notification) => (
                 <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
                     <div className="flex space-x-4 ">
                         <div className="flex-1 min-w-0">

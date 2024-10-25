@@ -2,34 +2,55 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
 import { collection, db, onSnapshot, query } from "../../firbase/FirebaseInit";
+import Loader from "../../global/Loader";
 
 export default function MessageList() {
-  const { DeleteSchedule, setIsDeleteSchedule, DeleteProfile, setIsDeleteProfile, } = useContext(MyContext);
+  const { DeleteSchedule, setIsDeleteSchedule, DeleteProfile, setIsDeleteProfile,setLoader,loader } = useContext(MyContext);
 
   const [scheduled, setscheduled] = useState([]);
+    
   const getEmploye = () => {
     const employeesRef = collection(db, "scheduled");
-    const employeeQuery = query(employeesRef);
-    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
-      const employeeData = querySnapshot.docs.map((doc) => ({
-        docId: doc.id,
-        ...doc.data(),
-      }));
-      setscheduled(employeeData);
-    });
+    const employeeQuery = query(employeesRef);    
+    setLoader(true);
+    const unsubscribe = onSnapshot(
+        employeeQuery,
+        (querySnapshot) => {
+            const employeeData = querySnapshot.docs.map((doc) => ({
+                docId: doc.id,
+                ...doc.data(),
+            }));            
+            setscheduled(employeeData);
+            // Set loader to false after data is fetched
+            setLoader(false);
+        },
+        (error) => {
+            console.error("Error fetching data: ", error);
+            // Set loader to false if there's an error
+            setLoader(false);
+        }
+    );
+
     return unsubscribe;
-  };
+};
 
-  console.log(scheduled, "rec");
-
-  useEffect(() => {
+useEffect(() => {
     const unsubscribe = getEmploye();
     return () => unsubscribe();
-  }, []);
+}, []);
 
   return (
     <div className="bg-[#FFFFFF] border rounded-[10px] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-6  lg:px-10">
-      {scheduled.map((item, i) => (
+
+      {
+      
+      loader?(<Loader/>):(
+      scheduled.length === 0 ? (
+    <div className="text-center text-gray-500 mt-4">
+        No scheduled items available.
+    </div>
+) : (
+      scheduled.map((item, i) => (
         <div
           key={i}
           className="flex mb-2 items-center justify-between border-b-2 py-4 border-[#F4F4F4]"
@@ -98,7 +119,11 @@ export default function MessageList() {
           }
         
         </div>
-      ))}
+      ))
+    )
+  )
+    
+    }
 
     </div>
   );

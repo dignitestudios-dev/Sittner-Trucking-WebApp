@@ -27,7 +27,8 @@ export default function UpdatePasswordModal() {
                     onClick={() =>{
                       if(loc.pathname.includes("/profile")){
                         setPasswordSuccessFullChange(false)
-                      }else{
+                      }
+                      else{
                         setPasswordSuccessFullChange(false)
                         navigate('/login')
                       }

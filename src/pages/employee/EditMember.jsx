@@ -31,7 +31,11 @@ export default function EditMember() {
     id: "",
     pic: "",
     docId: "",
+    role:""
   });
+
+
+
   const navigate = useNavigate("");
   const re = /^[0-9\b]+$/;
   const handleChange = (e) => {
@@ -59,6 +63,7 @@ export default function EditMember() {
       pic: employeeData[0].pic,
       docId: employeeData[0].docId,
       id: employeeData[0].id,
+      role:employeeData[0].role
     });
     setContact({ value: employeeData[0]?.contact });
   };
@@ -146,11 +151,23 @@ export default function EditMember() {
         });
     }
   };
+  const [Preview, setPreview] = useState();
+  useEffect(() => {
+    if (!image) {
+        setPreview(undefined)
+        return
+    }
+    const objectUrl = URL.createObjectURL(image)
+    setPreview(objectUrl)  
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [image])
+  
+console.log(member?.role,"roleess");
 
   return (
     <div class="bg-[#F7F7F7]  py-5 px-5 ">
       <NavLink
-        to={"/"}
+        to={`${member?.role=="admin"?"/admin":"/employee"}`}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
@@ -162,11 +179,20 @@ export default function EditMember() {
           <div className="flex items-center">
             <div className="flex items-center">
               <div className="bg-[#94D0E4] flex rounded-[50%] items-center justify-center  w-[58px] h-[58px]">
+              {
+              Preview?(
+                <img src={Preview} alt=""  className="w-[55px] h-[55px] rounded-full " srcset="" /> 
+              ):
+              (
                 <img
                   src={member?.pic ? member?.pic : "/noprofile.png"}
                   class="cursor-pointer w-[58px] h-[58px]"
                   alt=""
                 />
+              )
+            }
+               
+               
               </div>
             </div>
             <label

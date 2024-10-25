@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import EditEmp from "./editEmp";
 import DeleteEmpProfile from "../Profile/DeleteProfile";
@@ -10,31 +10,47 @@ import {
   query,
   where,
 } from "../../firbase/FirebaseInit";
+import { MyContext } from "../../context/GlobalContext";
+import Loader from "../../global/Loader";
 
 export default function EmployeeList() {
   const navgiate = useNavigate("");
   const [employee, setEmployee] = useState([]);
-  const getEmploye = () => {
+  const { setLoader, loader,setDeleteEmpId,setDeleteDocId } = useContext(MyContext);
+  const getEmployee = () => {
     const employeesRef = collection(db, "employee");
     const employeeQuery = query(employeesRef);
+
+    setLoader(true); // Set loader to true before fetching data
+
     const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
       const employeeData = querySnapshot.docs.map((doc) => ({
-        docid: doc.id,
+        docId: doc.id,
         ...doc.data(),
       }));
       setEmployee(employeeData);
+      setLoader(false); 
+    }, (error) => {
+      console.error("Error fetching employees: ", error);
+      setLoader(false); 
     });
+
     return unsubscribe;
   };
 
   useEffect(() => {
-    const unsubscribe = getEmploye();
+    const unsubscribe = getEmployee();
     return () => unsubscribe();
   }, []);
+
+  console.log(employee);
+  
 
   return (
     <div className="bg-[#FFFFFF] border rounded-[10px] h-[70vh] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-5 lg:px-5">
       <div className="relative scroll-box overflow-x-auto h-full ">
+        {
+          loader?(<Loader/>):(
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-[#787F8C] uppercase bg-[#F3F5F7]">
             <tr>
@@ -93,13 +109,20 @@ export default function EmployeeList() {
                       {item.address}
                     </p>
                   </td>
-                  <td className="px-6 py-6">
-                    <EditEmp empId={item.id} docId={item.docid} />
+                  <td className="px-6 py-6" onClick={()=>{
+                    setDeleteDocId(item.docId)
+                    setDeleteEmpId(item.id)
+                  }
+                    } >
+              
+                    <EditEmp  />
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
+         )
+        }
       </div>
       <DeleteEmpProfile />
     </div>

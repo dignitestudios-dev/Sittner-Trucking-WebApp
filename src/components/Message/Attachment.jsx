@@ -5,8 +5,7 @@ import { MyContext } from "../../context/GlobalContext";
 import ViewAllModal from "./ViewAllModal";
 export default function Attachment() {
   const [openIndex, setOpenIndex] = useState(null);
-  const { LookScreen, setLookScreen, viewAll, setIsViewAll } =
-    useContext(MyContext);
+  const { LookScreen, IsAttachments, setIsViewAll } = useContext(MyContext);
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -14,21 +13,22 @@ export default function Attachment() {
   const attachment = [
     {
       title: "Excel File.xls",
-      img: "/bg-xl.webp",
+      img: "/xl.webp",
     },
     {
       title: "Document File.pdf",
-      img: "/bg-pdf.webp",
+      img: "/pdf.webp",
     },
     {
       title: "Important Picture.jpg",
-      img: "/bg-jpg.webp",
+      img: "/image.webp",
     },
     {
       title: "Important Video.mp4",
-      img: "/bg-mp4.webp",
+      img: "/video.webp",
     },
   ];
+
   return (
     <div>
       <div
@@ -69,19 +69,92 @@ export default function Attachment() {
           >
             <div className="py-1 rounded-md mt-1 ">
               <ul className="max-w-md  dark:divide-gray-700">
-                {attachment.map((item, i) => (
-                  <li className="mt-3">
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 ">
-                        <img className="w-10 " src={item.img} alt={item.img} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium  ">
-                          {item.title}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
+                {IsAttachments?.slice(0, 5)?.map((msg, i) => (
+                  <>
+                    {msg.images.map((img, index) =>
+                      msg.type[index]?.includes("image") ? (
+                        <li className="mt-3">
+                          <a
+                            href={img}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                              <div className="flex-shrink-0 ">
+                                <img className="w-10 " src={"/image.webp"} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium  ">
+                                  Important Picture.jpg
+                                </p>
+                              </div>
+                            </div>
+                          </a>
+                        </li>
+                      ) : msg.type[index]?.includes("video") ? (
+                        <li className="mt-3">
+                          <a
+                            href={img}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                              <div className="flex-shrink-0 ">
+                                <img className="w-10 " src={"/video.webp"} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium  ">
+                                  Important Video.mp4
+                                </p>
+                              </div>
+                            </div>
+                          </a>
+                        </li>
+                      ) : msg.type[index]?.includes("spreadsheetml") ? (
+                        <li className="mt-3">
+                          <a
+                            href={img}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                              <div className="flex-shrink-0 ">
+                                <img className="w-10 " src={"/xl.webp"} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium  ">
+                                  Excel File.xls
+                                </p>
+                              </div>
+                            </div>
+                          </a>
+                        </li>
+                      ) : (
+                        <li className="mt-3">
+                          <a
+                            href={img}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                              <div className="flex-shrink-0 ">
+                                <img className="w-10 " src={"/pdf.webp"} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium  ">
+                                  Document File.pdf
+                                </p>
+                              </div>
+                            </div>
+                          </a>
+                        </li>
+                      )
+                    )}
+                  </>
                 ))}
 
                 <button

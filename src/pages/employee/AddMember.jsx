@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { IoMdPerson } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -24,6 +24,7 @@ export default function AddMember() {
   const navigate = useNavigate("");
   const [contact, setContact] = useState({ value: "" });
   const [image, setImage] = useState();
+  const [Preview, setPreview] = useState();
   const [member, setMember] = useState({
     name: "",
     address: "",
@@ -69,9 +70,13 @@ const handleAddMember = async (e) => {
         return toast("Contact must be at least 10 characters");
     }
     const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", member?.email)));
+    const existingEmployeeByNumber = await getDocs(query(collection(db, "employee"), where("contact", "==", contact.value)));
     if (!existingEmployeeByEmail.empty) {
         return toast("Email is already in use");
-    }else{
+    }else if(!existingEmployeeByNumber.empty){
+      return toast("Number is already in use");
+    }
+    else{
       const myPromise = new Promise(async (resolve, reject) => {
         try {
             const uniqueId = await generateUniqueId();
@@ -111,11 +116,25 @@ const handleAddMember = async (e) => {
         success: (data) => data,
         error: (error) => error,
     }).then(() => {
-        navigate("/admin");
+        navigate("/employee");
     });
     }
  
 };
+
+
+ 
+useEffect(() => {
+  if (!image) {
+      setPreview(undefined)
+      return
+  }
+  const objectUrl = URL.createObjectURL(image)
+  setPreview(objectUrl)
+
+  // free memory when ever this component is unmounted
+  return () => URL.revokeObjectURL(objectUrl)
+}, [image])
 
   
   
@@ -133,7 +152,15 @@ const handleAddMember = async (e) => {
         <div class="bg-[#F9FAFB] rounded-[10px] border border-[#E4E4E4] py-3 px-3 lg:py-10 lg:px-10">
           <div className="flex items-center">
             <div className="w-[60px] h-[60px] rounded-full border border-dashed border-[#0A8A33] flex items-center justify-center">
-              <IoMdPerson color="#0A8A33" size={25} />
+            {
+              Preview?(
+                <img src={Preview} alt=""  className="w-[55px] h-[55px] rounded-full " srcset="" /> 
+              ):
+              (
+                 <IoMdPerson color="#0A8A33" size={25} />
+              )
+            }
+            
             </div>
             <label
               htmlFor="changeprofile"

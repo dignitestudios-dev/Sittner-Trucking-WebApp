@@ -30,6 +30,13 @@ export const MyContextProvider = ({ children }) => {
   const [SelectedTime,setSelectTime]=useState("");
   const [GroupName,setGroupName]=useState("");
   const [ModalImageUrl,setModalImageUrl]=useState("");
+  const [isMessageSeen,setIsMessageSeen]=useState([]);
+  const [IsAttachments,setIsAttachments]=useState([]);
+  const [loader,setLoader] =useState(false);
+  const [OtpVal,setOtpVal] =useState("");
+  const [ForgetEmail,setForgetEmail] =useState("");
+  const [RealTimeData,setRealTimeData] =useState(0);
+
   
   useEffect(() => {
     const handleResize = () => {
@@ -46,6 +53,10 @@ export const MyContextProvider = ({ children }) => {
   return (
     <MyContext.Provider
       value={{
+        setOtpVal,
+        setRealTimeData,
+        RealTimeData,
+        OtpVal,
         PasswordSuccessFullChange,
         setPasswordSuccessFullChange,
         ChangePassword,
@@ -97,7 +108,15 @@ export const MyContextProvider = ({ children }) => {
         setGroupName,
         GroupName,
         setModalImageUrl,
-        ModalImageUrl
+        ModalImageUrl,
+        setIsMessageSeen,
+        isMessageSeen,
+        setIsAttachments,
+        IsAttachments,
+        setLoader,
+        loader,
+        setForgetEmail,
+        ForgetEmail
       }}
     >
       {children}

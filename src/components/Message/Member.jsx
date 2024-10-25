@@ -95,12 +95,12 @@ export default function Member() {
             }`}
           >
             <div className="py-1 w-full rounded-md mt-1 ">
-              <NavLink
+              {/* <NavLink
                 onClick={() => setIsAddMem(true)}
                 className="bg-transparent mt-2 mb-2 "
               >
                 <img src="/addmember.png" width={150} alt="" srcset="" />
-              </NavLink>
+              </NavLink> */}
               <ul className="w-full h-[363px] scroll-box overflow-auto ">
                 {employee
               .filter((rec) => rec.role !== "admin")
@@ -111,8 +111,8 @@ export default function Member() {
                         className={`w-[50px] h-[50px]  rounded-full ${color[i]} `}
                       >
                         <img
-                          className="object-contain w-full  h-full"
-                          src={item.pic}
+                          className=" w-full  rounded-full h-full"
+                          src={item.pic?item.pic:"/noprofile.png"}
                           alt={item.img}
                         />
                       </div>

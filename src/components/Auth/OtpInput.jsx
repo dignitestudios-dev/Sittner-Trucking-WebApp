@@ -1,10 +1,12 @@
 import OtpInput from "react-otp-input";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { MyContext } from "../../context/GlobalContext";
 
 export default function OtpCom() {
     const [code, setCode] = useState("");
+    const {setOtpVal,OtpVal}=useContext(MyContext);
 
-    const handleChange = (code) => setCode(code);
+    const handleChange = (code) => setOtpVal(code);
 
     const renderInput = (props) => (
         <input {...props} />
@@ -13,7 +15,7 @@ export default function OtpCom() {
     return (
         <div class="otp-component">
             <OtpInput
-                value={code}
+                value={OtpVal}
                 onChange={handleChange}
                 numInputs={6}
                 separator={<span style={{ width: "8px" }}></span>}

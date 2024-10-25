@@ -12,7 +12,6 @@ export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee } = useContext(MyContext);
   const [message, setMessage] = useState("");
-  const [images, setImages] = useState([]);
   const generateUniqueId = async () => {
     const randomId = Math.floor(100000 + Math.random() * 900000).toString();
     const existingEmployee = await getDocs(query(collection(db, "scheduled"), where("id", "==", randomId)));    
@@ -71,7 +70,7 @@ export default function CreateSchedule() {
     }
 };
 
-
+const [images, setImages] = useState([]);
 const handleImageChange = (e) => {
     setImages([...e.target.files]); 
 };
@@ -110,6 +109,20 @@ const handleImageChange = (e) => {
                   onChange={handleImageChange}
                 />
               </label>
+              <div className={`image-preview grid grid-cols-12 mt-2 gap-2`}>
+                {images.length > 0 ? (
+                    Array.from(images).map((image, index) => (
+                        <img
+                            key={index}
+                            src={URL.createObjectURL(image)}
+                            alt={`preview-${index}`}
+                            className="w-[55px] h-[55px] "
+                        />
+                    ))
+                ) : (
+null
+                )}
+            </div>
             </div>
             <div className="mb-3 grid grid-cols-1 lg:grid-cols-2 col-span-1">
               <DatePicker />

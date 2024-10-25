@@ -6,6 +6,8 @@ import { db, deleteDoc, deleteObject, doc, ref, storage } from "../../firbase/Fi
 export default function DeleteEmpProfile() {  
     const { DeleteProfile, setIsDeleteProfile, DeleteEmpId,DeleteDocId} = useContext(MyContext);
     const DeleteEmp = async () => {
+        console.log(DeleteDocId,DeleteEmpId,"empppsss");
+        
         await deleteDoc(doc(db, "employee", DeleteDocId));  
         const desertRef = ref(storage,"member/"+DeleteEmpId);
         deleteObject(desertRef).then(() => {
