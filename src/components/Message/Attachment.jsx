@@ -44,7 +44,7 @@ export default function Attachment() {
           <button
             name="faq-question"
             type="button"
-            className={`flex border-b border-[#F2F2F2] pb-2  items-center justify-between w-full  font-medium rtl:text-right  outline-none hover:opacity-95  gap-3`}
+            className={`flex my-divider pb-2  items-center justify-between w-full  font-medium rtl:text-right  hover:opacity-95  gap-3`}
             onClick={() => !LookScreen && handleToggle(1)}
           >
             <div
@@ -159,7 +159,7 @@ export default function Attachment() {
 
                 <button
                   onClick={() => setIsViewAll(true)}
-                  className="bg-transparent text-[13px] font-medium text-[#007AFF] space-x-4 mt-3 underline"
+                  className="bg-transparent text-[13px] font-medium text-[#007AFF] space-x-4 mt-5 underline"
                 >
                   View all
                 </button>

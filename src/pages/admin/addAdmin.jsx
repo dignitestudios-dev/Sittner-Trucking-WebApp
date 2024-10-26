@@ -68,9 +68,12 @@ const handleAddMember = async (e) => {
     if (contact.value?.length < 10) {
         return toast("Contact must be at least 10 characters");
     }
-    const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", Admin?.email)));
+    const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", member?.email)));
+    const existingEmployeeByNumber = await getDocs(query(collection(db, "employee"), where("contact", "==", contact.value)));
     if (!existingEmployeeByEmail.empty) {
         return toast("Email is already in use");
+    }else if(!existingEmployeeByNumber.empty){
+      return toast("Number is already in use");
     }else{
       const myPromise = new Promise(async (resolve, reject) => {
         try {
@@ -93,6 +96,7 @@ const handleAddMember = async (e) => {
                         password: Admin?.password,
                         role: Admin?.role,
                         id: uniqueId, 
+                        createdat:new Date().toLocaleString(),
                         pic: image ? downloadURL : "",
                     });
 
@@ -246,7 +250,7 @@ useEffect(() => {
                 Save
               </button>
               <NavLink
-                to={"/"}
+                to={"/admin"}
                 className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
               >
                 Cancel

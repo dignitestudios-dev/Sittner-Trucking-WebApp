@@ -41,7 +41,7 @@ export default function LookAhead({pendingNotifications}) {
       </div>
       <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
         <h3 className="font-semibold text-sm leading-[14px]">
-          Day {i + 1}
+          Day {new Date(item.date).getDay()}
         </h3>
         <div className="w-full rounded-2xl mt-2 text-xs font-normal">
           {item.message}

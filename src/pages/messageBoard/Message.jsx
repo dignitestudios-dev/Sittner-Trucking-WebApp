@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../../components/Message/MessageBox";
 import Look from "../../components/Message/Look";
 import GroupDetail from "../../components/Message/GroupDetail";
@@ -10,7 +10,7 @@ import MessageInfo from "../../components/Message/MessageInfo";
 import ViewImage from "../../components/Message/LargeImageModal";
 import { MdOutlineClose } from "react-icons/md";
 import { toast } from "react-toastify";
-import { collection, db, getDocs, updateDoc } from "../../firbase/FirebaseInit";
+import { collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
 export default function Message() {
   const sidebarRef = useRef(null);
   const {
@@ -28,51 +28,61 @@ export default function Message() {
   useEffect(() => {
     window.scroll(0, 0);
   }, []);
-
-
+  
   const [notifications, setNotifications] = useState([]);
+  const [PendNot, setPendNot] = useState([]);
+  const [DelNot, setDelNot] = useState([]);
 
-useEffect(() => {
-  const fetchNotifications = async () => {
-    const currentDate = new Date().toLocaleDateString("en-US");
-    const currentTime = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-    
+  useEffect(() => {
     const notificationsRef = collection(db, "look");
-    const querySnapshot = await getDocs(notificationsRef);
-    const fetchedNotifications = [];
+    const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
+      const currentDate = new Date().toLocaleDateString("en-US");
+      const currentTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
 
-    querySnapshot.forEach(async (doc) => {
-      const data = doc.data();
-      fetchedNotifications.push({ docId: doc.id, ...data });
-      const notificationDate = new Date(`${data.date} ${data.time}`);
-      const now = new Date(`${currentDate} ${currentTime}`);
-         console.log(notificationDate,now,"dateing");
-         
-      // Compare the date and time
-      if (notificationDate <= now) {
-        await updateDoc(doc.ref, { status: "Delivered" });
+      const fetchedNotifications = [];
+      const updates = [];
+
+      querySnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const notificationDate = new Date(`${data.date} ${data.time}`);
+        const now = new Date(`${currentDate} ${currentTime}`);
+
+        fetchedNotifications.push({ docId: doc.id, ...data });
+
+        if (notificationDate <= now && data.status !== "Delivered") {
+          updates.push(updateDoc(doc.ref, { status: "Delivered" }));
+        }
+      });
+
+      if (updates.length > 0) {
+        await Promise.all(updates);
       }
+
+      // Sort and update state
+      fetchedNotifications.sort((a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`));
+      setNotifications(fetchedNotifications);
     });
+    return unsubscribe;
+  }, []);
 
-    setNotifications(fetchedNotifications);
-  };
+  useEffect(() => {
+    const deliveredNotifications = notifications.filter(
+      (notification) => notification.status === "Delivered"
+    );
+    const pendingNotifications = notifications.filter(
+      (notification) => notification.status === "pending"
+    );
 
-  fetchNotifications();
-}, []);
+    setPendNot(pendingNotifications);
+    setDelNot(deliveredNotifications);
+  }, [notifications]);
 
   
-  const deliveredNotifications = notifications.filter(
-    (notification) => notification.status == "Delivered"
-  );
-  const pendingNotifications = notifications.filter(
-    (notification) => notification.status == "pending"
-  );
 
-  console.log(Employee, "roles");
 
   return (
     <div class=" h-[90%]   py-2 px-2 lg:px-10 lg:py-6 ">
@@ -147,14 +157,14 @@ useEffect(() => {
                 </button>
               </div>
               <div className="col-span-1">
-                {Employee?.role == "user" ? <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} /> : !LookScreen && <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} />}
+                {Employee?.role == "user" ? <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} /> : !LookScreen && <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} />}
               </div>
             </div>
           </div>
         )}
         {hideLookAhed && (
           <div className="col-span-1">
-            {Employee?.role == "user" ? <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications} /> : LookScreen && <Look pendingNotifications={pendingNotifications} deliveredNotifications={deliveredNotifications}/>}
+            {Employee?.role == "user" ? <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} /> : LookScreen && <Look pendingNotifications={PendNot} deliveredNotifications={DelNot}/>}
           </div>
         )}
       </div>

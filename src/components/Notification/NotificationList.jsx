@@ -7,8 +7,7 @@ import Loader from "../../global/Loader";
 export default function NotificationList() {
   const [Notification, SetNotification] = useState([]);
   const { setLoader, loader,RealTimeData } = useContext(MyContext);
-  console.log(RealTimeData);
-  
+
   const getNotification = () => {
     const employeesRef = collection(db, "notification");
     const employeeQuery = query(employeesRef);

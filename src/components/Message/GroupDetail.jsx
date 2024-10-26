@@ -30,12 +30,23 @@ export default function GroupDetail() {
       </div>
       <div className="flex flex-col items-center">
         <div className="w-[88px] h-[88px]">
-          <img
-           src={GroupName.groupimg}
-            className="w-full h-full rounded-full"
-            alt=""
-            srcset=""
-          />
+        {
+                      GroupName.groupimg?(
+                        <img
+                        src={GroupName.groupimg}
+                         className="w-full h-full rounded-full"
+                         alt=""
+                         srcset=""
+                       />
+                      ):(
+                        <img
+                src={"noprofile.png"}
+                class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                alt=""
+              />
+                      )
+                    }
+         
         </div>
         <h3 className="lg:text-base font-semibold leading-[19px] mt-3">
         {GroupName.group_name}

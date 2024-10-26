@@ -9,48 +9,29 @@ export default function ForgotPassword() {
   const [email,setEmail]=useState("")
   const {setOtp,setForgetEmail}=useContext(MyContext);
   const navigate=useNavigate("")
-  const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-  };
   const sendOTP = async (e) => {
     e.preventDefault();
+    // const q = query(collection(db, "employee"), where("email", "==", email));
+    // const querySnapshot = await getDocs(q);
 
-    const q = query(collection(db, "employee"), where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      return toast.error("No employee found with that email");
-    }
-
-    const otpCode = generateOTP();
-    setOtp(otpCode);
-  
-    const formData = new FormData(e.target);
-    formData.append("access_key", "606e475b-e83a-4580-88d9-86d6681239bc");
-    formData.append("email", email);
-    formData.append("name", "Sittner Trucking LLC");
-    formData.append("message", otpCode);
+    // if (querySnapshot.empty) {
+    //   return toast.error("No employee found with that email");
+    // }
     setForgetEmail(email)
-    const object = Object.fromEntries(formData);
-    const json = JSON.stringify(object);
-    console.log(json);
-  
-    // Show loading toast
     const toastId = toast.loading("Sending OTP...");
-  
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch(`http://localhost:4000/sendOTP?email=${email}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json"
-        },
-        body: json
+        },      
       });
       
       const data = await res.json();
-  
-      if (res.ok && data.success) {
+      if (res) {
+        console.log(data,"data");
+        setOtp(data.result.otp);
         // Success toast
         toast.update(toastId, {
           render: "OTP sent successfully!",
@@ -60,7 +41,6 @@ export default function ForgotPassword() {
         });
         navigate("/otp");
       } else {
-        // Error toast
         toast.update(toastId, {
           render: "Failed to send OTP.",
           type: "error",
@@ -69,7 +49,6 @@ export default function ForgotPassword() {
         });
       }
     } catch (error) {
-      // Error toast on catch
       toast.update(toastId, {
         render: "An error occurred.",
         type: "error",

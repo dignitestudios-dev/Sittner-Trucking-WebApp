@@ -17,7 +17,8 @@ import {
   deleteDoc,
   onSnapshot,
   getDoc,
-  orderBy
+  orderBy,
+  Timestamp
 } from "firebase/firestore";
 import {
   getStorage,
@@ -71,5 +72,6 @@ export {
    listAll,
    updateMetadata ,
    getMetadata,
-   orderBy
+   orderBy,
+   Timestamp
 };

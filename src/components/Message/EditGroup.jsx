@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MyContext } from "../../context/GlobalContext";
-import { db, doc, getDownloadURL, ref, storage, updateDoc, uploadBytesResumable } from "../../firbase/FirebaseInit";
+import { db, deleteDoc, deleteObject, doc, getDownloadURL, ref, storage, updateDoc, uploadBytesResumable } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 export default function EditGroup() {
   const { isEditGroup, setEditGroup, GroupName } =
@@ -58,9 +58,26 @@ export default function EditGroup() {
     const objectUrl = URL.createObjectURL(Image)
     setPreview(objectUrl)
 
-    // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl)
 }, [Image])
+
+const HandleDeletePic = async () => {
+  try {
+    
+    await updateDoc(doc(db, "group", "z63TKBszLhvBTAmtvfAq"), {
+          groupimg:""
+    });
+    
+    const desertRef = ref(storage, "group/group-pic");
+    await deleteObject(desertRef);
+    toast("Deleted");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    setIsDeleteProfile(false);
+  }
+}
+
 
   return (
     <>
@@ -88,12 +105,24 @@ export default function EditGroup() {
                     htmlFor="file"
                     className="w-[88px] mb-3 h-[88px] text-center  relative cursor-pointer"
                   >
-                    <img
-                      src={preview?preview:GroupName.groupimg}
-                      className="w-full h-full rounded-full"
-                      alt=""
-                      srcset=""
-                    />
+                    {
+                      GroupName.groupimg?(
+                        <img
+                        src={preview?preview:GroupName.groupimg}
+                        className="w-full h-full rounded-full"
+                        alt=""
+                        srcset=""
+                      />
+                      ):(
+                        <img
+                        src={preview?preview:"noprofile.png"}
+                        className="w-full h-full rounded-full"
+                        alt=""
+                        srcset=""
+                      />
+                      )
+                    }
+                  
                     <img
                       src="/upload-img.png"
                       className="absolute -right-2 bottom-0  w-8"
@@ -106,7 +135,7 @@ export default function EditGroup() {
                       className="hidden"
                       id="file"
                     />
-                    <button className="bg-transparent text-[#FF3B30] font-medium text-[15px] mt-2">
+                    <button onClick={HandleDeletePic} className="bg-transparent text-[#FF3B30] font-medium text-[15px] mt-2">
                       Remove
                     </button>
                   </label>

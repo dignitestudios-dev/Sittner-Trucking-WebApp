@@ -33,7 +33,8 @@ export default function CreateNotification() {
                 time:SelectedTime,
                 date:SelectedDate,
                 status:"Scheduled",
-                author:Employee
+                author:Employee,
+                seen:"pending"
             });
             resolve("Notification Created")
         } catch (error) {

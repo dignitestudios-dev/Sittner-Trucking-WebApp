@@ -13,19 +13,17 @@ export default function AdminList() {
    const getEmploye = () => {
     const employeesRef = collection(db, "employee");
     const employeeQuery = query(employeesRef);
-
-    setLoader(true); // Set loader to true before fetching data
-
+    setLoader(true);
     const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
       const employeeData = querySnapshot.docs.map(doc => ({
         docId: doc.id,
         ...doc.data(),
       }));
       setEmployee(employeeData);
-      setLoader(false); // Set loader to false after data is fetched
+      setLoader(false);
     }, (error) => {
       console.error("Error fetching employees: ", error);
-      setLoader(false); // Also set loader to false in case of an error
+      setLoader(false);
     });
 
     return unsubscribe;

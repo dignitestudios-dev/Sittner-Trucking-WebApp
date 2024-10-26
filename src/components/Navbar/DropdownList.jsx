@@ -3,7 +3,7 @@ import { MyContext } from "../../context/GlobalContext";
 import { collection, db, getDocs, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
 
 export default function DropdownList() {
-  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,RealTimeData } = useContext(MyContext);
+  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
 
@@ -12,48 +12,50 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
-  useEffect(() => {
+   const getNots=()=>{
     const notificationsRef = collection(db, "notification");
-
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
         const currentDate = new Date();
         const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-        
         const fetchedNotifications = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            const notificationDate = new Date(data.date + ' ' + data.time); // Assuming date and time are in proper format
-            
-            fetchedNotifications.push({ id: doc.id, ...data });
-            // Check if the notification date and time is less than or equal to the current date and time
+            const notificationDate = new Date(data.date + ' ' + data.time); 
+            fetchedNotifications.push({ id: doc.id, ...data });   
             if (notificationDate <= currentDate && data.status !== "Delivered") {
-                // Update status to "Delivered"
                 updateDoc(doc.ref, { status: "Delivered" });
                 setRealTimeData(prev=>prev+1)
             }
         });
-
-        // Set notification count
-        setNotificationCount(fetchedNotifications.length);
-
-        // Sort notifications by date and time (latest first)
         const sortedNotifications = fetchedNotifications.sort((a, b) => {
             const dateA = new Date(a.date + ' ' + a.time);
             const dateB = new Date(b.date + ' ' + b.time);
-            return dateB - dateA; // Sort in descending order
+            return dateB - dateA;
         });
 
         setNotifications(sortedNotifications);
     });
-
-    // Clean up the subscription on unmount
+    return unsubscribe;
+   }
+   
+  useEffect(() => {
+    const unsubscribe = getNots();
     return () => unsubscribe();
-}, []);
+}, [notifications]);
 
-  useEffect(()=>{
-    const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
-    setDevNotifications(deliveredNotifications)
-  },[RealTimeData]) 
+useEffect(() => {
+  const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+  const pendingNotifications = notifications.filter(notification => notification.seen == "pending");
+  const employeeCreatedAt = new Date(Employee.createdat);
+  const oldNot = deliveredNotifications.filter(notification => {
+      const notificationDate = new Date(`${notification.date} ${notification.time}`);
+      return notificationDate > employeeCreatedAt;
+  });
+  
+  setNotificationCount(pendingNotifications.length);
+  setDevNotifications(oldNot);
+}, [notifications]);
+
 
 
   return (
@@ -94,9 +96,13 @@ export default function DropdownList() {
                             <p className="text-xs text-[#717171] font-medium">{notification.time}</p>
                             <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
                                 <span className="">
-                                    <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
-                                        {notification.status === "Delivered" ? "1" : "📭"}
+                                  {
+                                    notification.seen === "pending"&&(
+                                      <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
+                                        {notification.seen === "pending" ? "1" : ""}
                                     </div>
+                                    )
+                                  }
                                 </span>
                             </div>
                         </div>

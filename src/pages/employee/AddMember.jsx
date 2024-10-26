@@ -79,9 +79,7 @@ const handleAddMember = async (e) => {
     else{
       const myPromise = new Promise(async (resolve, reject) => {
         try {
-            const uniqueId = await generateUniqueId();
-           
-
+            const uniqueId = await generateUniqueId();          
             const storageRef = ref(storage, `member/${uniqueId}`);
             const uploadTask = uploadBytesResumable(storageRef, image);
             uploadTask.on(
@@ -100,6 +98,7 @@ const handleAddMember = async (e) => {
                         password: member?.password,
                         role: member?.role,
                         id: uniqueId, 
+                        createdat:new Date().toLocaleString(),
                         pic: image ? downloadURL : "",
                     });
 
@@ -257,7 +256,7 @@ useEffect(() => {
                 Save
               </button>
               <NavLink
-                to={"/"}
+                to={"/employee"}
                 className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
               >
                 Cancel

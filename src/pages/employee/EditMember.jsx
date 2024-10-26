@@ -16,6 +16,7 @@ import {
   where,
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
+import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 
 export default function EditMember() {
   const { Employee } = useContext(MyContext);
@@ -33,7 +34,7 @@ export default function EditMember() {
     docId: "",
     role:""
   });
-
+  const [showPassword, setShowPassword] = useState(false);
 
 
   const navigate = useNavigate("");
@@ -44,6 +45,8 @@ export default function EditMember() {
       setContact({ value });
     }
   };
+
+  
   const getMemberRec = async () => {
     const employeesRef = collection(db, "employee");
     const employeeQuery = query(
@@ -145,8 +148,8 @@ export default function EditMember() {
           error: (error) => error,
         })
         .then(() => {
-          Employee.role == "admin" 
-          ? navigate("/employee") 
+          member.role == "admin" 
+          ? navigate("/admin"):member.role == "user"?navigate("/employee")
           : navigate("/profile", { state: { id: Employee?.id } });    
         });
     }
@@ -162,7 +165,6 @@ export default function EditMember() {
     return () => URL.revokeObjectURL(objectUrl)
   }, [image])
   
-console.log(member?.role,"roleess");
 
   return (
     <div class="bg-[#F7F7F7]  py-5 px-5 ">
@@ -274,21 +276,41 @@ console.log(member?.role,"roleess");
                 />
               </div>
               {Employee?.role === "admin" && (
-                <div className="mb-3">
+                <>
+
+<div className="relative mb-3">
                   <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
                     Password
                   </label>
                   <input
-                    type="password"
+                   type={showPassword ? "text" : "password"}
                     id="password-input"
                     name="password"
                     onChange={HandleInput}
                     value={member.password}
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
                     required
                     placeholder="Password"
-                  />
+                    />
+            <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
+              {showPassword ? (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  <FaRegEye className="text-gray-400 cursor-pointer" />
                 </div>
+              ) : (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  {" "}
+                  <FaEyeSlash className="text-gray-400 cursor-pointer" />
+                </div>
+              )}
+            </div>
+          </div>
+                
+              
+
+
+                    </>
+
               )}
             </div>
             <div className="flex items-center gap-5">
@@ -299,7 +321,7 @@ console.log(member?.role,"roleess");
                 Update
               </button>
               <NavLink
-                to={"/"}
+                to={"/employee"}
                 className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
               >
                 Cancel

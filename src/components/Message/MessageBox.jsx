@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { RiSendPlaneFill } from "react-icons/ri";
-import { MdOutlineFilePresent } from "react-icons/md";
+import { MdDeleteSweep, MdOutlineFilePresent } from "react-icons/md";
 import { MyContext } from "../../context/GlobalContext";
 import Loader from "../../global/Loader";
 import {
@@ -48,14 +48,10 @@ export default function MessageBox() {
   const loc = useLocation();
   const msgBodyScroll = useRef();
 
-   
-
   useEffect(() => {
     if (sentMessage === 0) {
       setLoader(true);
     }
-
-    
 
     const q = query(collection(db, "message"), orderBy("createdAt"));
     const unsubscribe = onSnapshot(
@@ -64,27 +60,28 @@ export default function MessageBox() {
         const msgArray = [];
         querySnapshot.forEach((doc) => {
           msgArray.push({ docId: doc.id, ...doc.data() });
-        });        
+        });
         SetMessages(msgArray);
         setIsAttachments(msgArray);
-        setLoader(false); // Set loader to false after data is fetched
-       setTimeout(()=>{
-        if (msgBodyScroll.current) {
-          msgBodyScroll.current.scrollTop = msgBodyScroll.current.scrollHeight;
-        }
-       },600)
+        setLoader(false);
+        setTimeout(() => {
+          if (msgBodyScroll.current) {
+            msgBodyScroll.current.scrollTop =
+              msgBodyScroll.current.scrollHeight;
+          }
+        }, 600);
       },
       (error) => {
         console.error("Error fetching messages: ", error);
-        setLoader(false); // Set loader to false in case of an error
+        setLoader(false);
       }
     );
- 
+
     return () => {
-      setLoader(false); // Ensure loader is false when the component unmounts
-      unsubscribe(); // Clean up subscription
+      setLoader(false);
+      unsubscribe();
     };
-  }, []); // Dependency array
+  }, []);
 
   useEffect(() => {
     const group = query(collection(db, "group"));
@@ -108,7 +105,12 @@ export default function MessageBox() {
   const HandleMessage = async (e) => {
     e.preventDefault();
     setSentLoad(true);
-
+    const trimmedUserMsg = UserMsg.trim();
+    if (trimmedUserMsg === "" && images.length === 0) {
+      toast.error("Please enter a message or upload an image.");
+      setSentLoad(false);
+      return;
+    }
     // Create a loading toast
     const loadingToastId = toast.loading("Sending your message...");
 
@@ -136,8 +138,7 @@ export default function MessageBox() {
         createdAt: new Date(),
         employeeId: Employee.id,
       });
-
-      // Update the toast to show success
+      setImages([]);
       setUserMsg("");
       toast.update(loadingToastId, {
         render: "Message sent successfully!",
@@ -150,7 +151,6 @@ export default function MessageBox() {
     } catch (error) {
       console.error("Failed to schedule:", error);
 
-      // Update the loading toast to show an error
       toast.update(loadingToastId, {
         render: "Failed to send message. Please try again.",
         type: "error",
@@ -163,7 +163,8 @@ export default function MessageBox() {
   };
 
   const handleImageChange = (e) => {
-    setImages([...e.target.files]);
+    const newImages = Array.from(e.target.files);
+    setImages((prev) => [...prev, ...newImages]);
   };
 
   const MessageSeen = () => {
@@ -179,7 +180,9 @@ export default function MessageBox() {
       });
     }
   };
-  MessageSeen();
+  useEffect(()=>{
+    MessageSeen();
+  },[])
 
   return (
     <div className="bg-[#FFFFFF] w-full  h-[80%] lg:h-[630px]  relative rounded-[24px]">
@@ -188,11 +191,24 @@ export default function MessageBox() {
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div>
-              <img
+
+            {
+                      GroupName.groupimg?(
+                        <img
                 src={GroupName.groupimg}
                 class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
                 alt=""
               />
+                      ):(
+                        <img
+                src={"noprofile.png"}
+                class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                alt=""
+              />
+                      )
+                    }
+
+             
             </div>
             <div
               className="ml-2 cursor-pointer "
@@ -284,10 +300,10 @@ export default function MessageBox() {
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
                             <img
-                              src={img}
+                              src={img?img:"noprofile.png"}
                               className="cursor-pointer rounded-md h-[80px] w-[80px]"
                               onClick={() => {
-                                setModalImageUrl(img);
+                                setModalImageUrl(msg.images);
                                 setIviewImage(true);
                               }}
                               alt=""
@@ -395,43 +411,97 @@ export default function MessageBox() {
       </div>
       {/* Send Message */}
       {Employee?.role == "admin" && (
-        <form
-          onSubmit={(e) => HandleMessage(e)}
-          className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center absolute bottom-0 w-full  justify-center gap-8 "
-        >
-          <div className="relative w-[85%] h-[40px]">
-            <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">
-              <label htmlFor="attach">
-                <GrAttachment color="#000000" className="cursor-pointer" />
-              </label>
+        <div className="pb-2 absolute w-full bottom-0">
+          {images.length > 0 && (
+            <div className="bg-white px-2 grid grid-cols-8">
+              {Array.from(images).map((image, targetIndex) => (
+                <div key={targetIndex}>
+                  <div className="flex justify-end px-3 pb-2">
+                    <button
+                      className="bg-transparent"
+                      onClick={() => {
+                        const newArray = images.filter(
+                          (item, index) => index !== targetIndex
+                        );
+                        setImages(newArray);
+                      }}
+                    >
+                      <MdDeleteSweep className="text-red-500" />
+                    </button>
+                  </div>
+                  <div></div>
+
+                  {image.type?.includes("image") ? (
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt=""
+                      className="h-[80px] w-[80px]"
+                      srcset=""
+                    />
+                  ) : image.type.includes("video") ? (
+                    <img
+                      src={"/video.webp"}
+                      alt=""
+                      className="h-[80px] w-[80px]"
+                      srcset=""
+                    />
+                  ) : image.type?.includes("spreadsheetml") ? (
+                    <img
+                      src={"/xl.webp"}
+                      alt=""
+                      className="h-[80px] w-[80px]"
+                      srcset=""
+                    />
+                  ) : (
+                    <img
+                      src={"/pdf.webp"}
+                      alt=""
+                      className="h-[80px] w-[80px]"
+                      srcset=""
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <form
+            onSubmit={(e) => HandleMessage(e)}
+            className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center  w-full  justify-center gap-5 "
+          >
+            <div className="relative w-[85%] h-[40px]">
+              <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">
+                <label htmlFor="attach">
+                  <GrAttachment color="#000000" className="cursor-pointer" />
+                </label>
+                <input
+                  type="file"
+                  className="hidden"
+                  id="attach"
+                  multiple
+                  onChange={handleImageChange}
+                />
+              </div>
               <input
-                type="file"
-                className="hidden"
-                id="attach"
-                multiple
-                onChange={handleImageChange}
+                type="text"
+                value={UserMsg}
+                onChange={(e) => setUserMsg(e.target.value)}
+                id="email-address-icon"
+                autocomplete="off"
+                className="bg-[#FFFFFF] w-[100%] h-[100%] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl  block w-full p-2.5  focus:outline-[#0A8A33]"
+                placeholder="Type Here"
               />
             </div>
-            <input
-              type="text"
-              value={UserMsg}
-              onChange={(e) => setUserMsg(e.target.value)}
-              id="email-address-icon"
-             autocomplete="off"
-              className="bg-[#FFFFFF] w-[100%] h-[100%] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl  block w-full p-2.5  focus:outline-[#0A8A33]"
-              placeholder="Type Here"
-            />
-          </div>
-          <div>
-            <button
-              type="submit"
-              disabled={sentLoad ? sentLoad : sentLoad}
-              className="text-white bg-[#0A8A33] hover:bg-green-800   rounded-full text-sm p-2.5 text-center flex items-center  "
-            >
-              <RiSendPlaneFill className="lg:text-2xl" />
-            </button>
-          </div>
-        </form>
+            <div>
+              <button
+                type="submit"
+                disabled={sentLoad ? sentLoad : sentLoad}
+                className="text-white bg-[#0A8A33] hover:bg-green-800   rounded-full text-sm p-2.5 text-center flex items-center  "
+              >
+                <RiSendPlaneFill className="lg:text-2xl" />
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   );

@@ -72,8 +72,8 @@ export default function Member() {
           <button
             name="faq-question"
             type="button"
-            className={`flex border-b border-[#F2F2F2] pb-2  items-center justify-between w-full  font-medium rtl:text-right  outline-none hover:opacity-95  gap-3`}
-            onClick={() => handleToggle(1)}
+            className={`flex my-divider pb-2  items-center justify-between w-full  font-medium rtl:text-right  outline-none hover:opacity-95  gap-3`}
+            onClick={() => !LookScreen && handleToggle(1)}
           >
             <div
               className={`w-auto flex justify-start items-center text-xs md:text-sm lg:text-xl text-left gap-2 `}
@@ -87,11 +87,10 @@ export default function Member() {
                 <FaChevronUp className="text-xl" />
               ))}
           </button>
-
           <div
             id="accordion-1"
             className={`transition-all w-full duration-200 ${
-              !openIndex == 1 ? "" : "hidden"
+              !LookScreen && (!openIndex == 1 ? "" : "hidden")
             }`}
           >
             <div className="py-1 w-full rounded-md mt-1 ">
