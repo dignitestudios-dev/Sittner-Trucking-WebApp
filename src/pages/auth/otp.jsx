@@ -8,6 +8,13 @@ import { toast } from "react-toastify";
 export default function Otp() {
   const {OtpVal,Otp,setOtp,ForgetEmail,setOtpVal}=useContext(MyContext);
   const navigate=useNavigate("");
+  
+   useEffect(()=>{
+      if(ForgetEmail==""){
+        navigate("/forgotpassword")
+      }
+   },[])
+
   const HandleSubmit=()=>{
     if (Otp.trim()==OtpVal.trim()) {
       setOtp("")
@@ -17,27 +24,22 @@ export default function Otp() {
     toast.error("wrong otp")
    }
   }
-  const [timer, setTimer] = useState(30);
-
+  const [timer, setTimer] = useState(60);
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTimer((prev) => {
-        if (prev > 0) {
-          return prev - 1;
-        } else {
-          setOtp("")
-          clearInterval(intervalId);
-          return prev;
-        }
-      });
-    }, 1000);
-
+    let intervalId;
+    if (timer > 0) {
+      intervalId = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setOtp(""); 
+    }
     return () => clearInterval(intervalId);
-  }, []);
-
-
+  }, [timer]);
+  
   const ResendOTP = async (e) => {
     e.preventDefault();
+    setTimer(60)
     setOtpVal("")
     const toastId = toast.loading("Sending OTP...");
     try {
@@ -51,7 +53,7 @@ export default function Otp() {
       
       const data = await res.json();
       if (res) {
-        setTimer(30)
+        setTimer(60)
         setOtp(data.result.otp);
         toast.update(toastId, {
           render: "OTP sent successfully!",

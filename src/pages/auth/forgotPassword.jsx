@@ -7,7 +7,7 @@ import { collection, db, getDocs, query, where } from "../../firbase/FirebaseIni
 
 export default function ForgotPassword() {
   const [email,setEmail]=useState("")
-  const {setOtp,setForgetEmail}=useContext(MyContext);
+  const {setOtp,setForgetEmail,setOtpVal}=useContext(MyContext);
   const navigate=useNavigate("")
   const sendOTP = async (e) => {
     e.preventDefault();
@@ -17,6 +17,7 @@ export default function ForgotPassword() {
     // if (querySnapshot.empty) {
     //   return toast.error("No employee found with that email");
     // }
+    setOtpVal("")
     setForgetEmail(email)
     const toastId = toast.loading("Sending OTP...");
     try {

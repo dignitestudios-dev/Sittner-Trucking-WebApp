@@ -9,8 +9,7 @@ import AddMemberModal from "../../components/Message/AddMember";
 import MessageInfo from "../../components/Message/MessageInfo";
 import ViewImage from "../../components/Message/LargeImageModal";
 import { MdOutlineClose } from "react-icons/md";
-import { toast } from "react-toastify";
-import { collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
+
 export default function Message() {
   const sidebarRef = useRef(null);
   const {
@@ -29,57 +28,6 @@ export default function Message() {
     window.scroll(0, 0);
   }, []);
   
-  const [notifications, setNotifications] = useState([]);
-  const [PendNot, setPendNot] = useState([]);
-  const [DelNot, setDelNot] = useState([]);
-
-  useEffect(() => {
-    const notificationsRef = collection(db, "look");
-    const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
-      const currentDate = new Date().toLocaleDateString("en-US");
-      const currentTime = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-
-      const fetchedNotifications = [];
-      const updates = [];
-
-      querySnapshot.docs.forEach(doc => {
-        const data = doc.data();
-        const notificationDate = new Date(`${data.date} ${data.time}`);
-        const now = new Date(`${currentDate} ${currentTime}`);
-
-        fetchedNotifications.push({ docId: doc.id, ...data });
-
-        if (notificationDate <= now && data.status !== "Delivered") {
-          updates.push(updateDoc(doc.ref, { status: "Delivered" }));
-        }
-      });
-
-      if (updates.length > 0) {
-        await Promise.all(updates);
-      }
-
-      // Sort and update state
-      fetchedNotifications.sort((a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`));
-      setNotifications(fetchedNotifications);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    const deliveredNotifications = notifications.filter(
-      (notification) => notification.status === "Delivered"
-    );
-    const pendingNotifications = notifications.filter(
-      (notification) => notification.status === "pending"
-    );
-
-    setPendNot(pendingNotifications);
-    setDelNot(deliveredNotifications);
-  }, [notifications]);
 
   
 
@@ -157,14 +105,14 @@ export default function Message() {
                 </button>
               </div>
               <div className="col-span-1">
-                {Employee?.role == "user" ? <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} /> : !LookScreen && <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} />}
+                {Employee?.role == "user" ? <Look  /> : !LookScreen && <Look  />}
               </div>
             </div>
           </div>
         )}
         {hideLookAhed && (
           <div className="col-span-1">
-            {Employee?.role == "user" ? <Look pendingNotifications={PendNot} deliveredNotifications={DelNot} /> : LookScreen && <Look pendingNotifications={PendNot} deliveredNotifications={DelNot}/>}
+            {Employee?.role == "user" ? <Look  /> : LookScreen && <Look />}
           </div>
         )}
       </div>

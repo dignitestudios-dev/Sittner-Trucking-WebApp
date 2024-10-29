@@ -1,10 +1,62 @@
 import React, { useEffect, useState } from "react";
 import LookBehind from "./LookBehind";
 import LookAhead from "./LookAhead";
-
-export default function Look({pendingNotifications,deliveredNotifications}) {
+import { toast } from "react-toastify";
+import { collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
+export default function Look() {
   const [IsBehind, setIsBehind] = useState(true);
 
+  const [notifications, setNotifications] = useState([]);
+  const [PendNot, setPendNot] = useState([]);
+  const [DelNot, setDelNot] = useState([]);
+
+  useEffect(() => {
+    const notificationsRef = collection(db, "look");
+    const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
+      const currentDate = new Date().toLocaleDateString("en-US");
+      const currentTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      const fetchedNotifications = [];
+      const updates = [];
+
+      querySnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const notificationDate = new Date(`${data.date} ${data.time}`);
+        const now = new Date(`${currentDate} ${currentTime}`);
+
+        fetchedNotifications.push({ docId: doc.id, ...data });
+
+        if (notificationDate <= now && data.status !== "Delivered") {
+          updates.push(updateDoc(doc.ref, { status: "Delivered" }));
+        }
+      });
+
+      if (updates.length > 0) {
+        await Promise.all(updates);
+      }
+
+      // Sort and update state
+      fetchedNotifications.sort((a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`));
+      setNotifications(fetchedNotifications);
+    });
+    return unsubscribe;
+  }, [IsBehind]);
+
+  useEffect(() => {
+    const deliveredNotifications = notifications.filter(
+      (notification) => notification.status === "Delivered"
+    );
+    const pendingNotifications = notifications.filter(
+      (notification) => notification.status === "pending"
+    );
+
+    setPendNot(pendingNotifications);
+    setDelNot(deliveredNotifications);
+  }, [notifications]);
 
 
   return (
@@ -27,7 +79,7 @@ export default function Look({pendingNotifications,deliveredNotifications}) {
           Look Ahead
         </button>
       </div>
-      {IsBehind ? <LookBehind deliveredNotifications={deliveredNotifications} /> : <LookAhead pendingNotifications={pendingNotifications} />}
+      {IsBehind ? <LookBehind deliveredNotifications={DelNot} /> : <LookAhead pendingNotifications={PendNot} />}
     </div>
   );
 }

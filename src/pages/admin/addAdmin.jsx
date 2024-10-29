@@ -19,11 +19,13 @@ import {
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import Cookies from 'js-cookie';
+import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 
 export default function AddAdmin() {
   const navigate = useNavigate("");
   const [contact, setContact] = useState({ value: "" });
   const [image, setImage] = useState();
+  const [showPassword, setShowPassword] = useState(false);
   const [Admin, setAdmin] = useState({
     name: "",
     address: "",
@@ -227,20 +229,32 @@ useEffect(() => {
                   placeholder="Address"
                 />
               </div>
-              <div className="mb-3 col-span-2 lg:col-span-1">
-                <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password-input"
-                  name="password"
-                  onChange={HandleInput}
-                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
-                  required
-                  placeholder="Password"
-                />
-              </div>
+              <div className="relative mb-3">
+                  <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
+                    Password
+                  </label>
+                  <input
+                   type={showPassword ? "text" : "password"}
+                    id="password-input"
+                    name="password"
+                    onChange={HandleInput}
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
+                    required
+                    placeholder="Password"
+                    />
+            <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
+              {showPassword ? (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  <FaRegEye className="text-gray-400 cursor-pointer" />
+                </div>
+              ) : (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  {" "}
+                  <FaEyeSlash className="text-gray-400 cursor-pointer" />
+                </div>
+              )}
+            </div>
+          </div>
             </div>
             <div className="flex items-center gap-5 mt-5">
               <button

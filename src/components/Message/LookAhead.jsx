@@ -25,9 +25,9 @@ export default function LookAhead({pendingNotifications}) {
     <div key={i} className="look-ahead px-3 py-5 w-[100%]">
       <div className="username mb-3 flex items-center justify-between">
         <h2 className="font-semibold text-sm leading-[14px]">
-          {new Date(item.date).toLocaleDateString("en-US", {
+          { i==0&&(new Date(item.date).toLocaleDateString("en-US", {
             weekday: "long",
-          })}
+          }))}
         </h2>
         {Employee?.role === "admin" && (
           <NavLink

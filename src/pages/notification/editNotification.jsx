@@ -50,7 +50,8 @@ export default function EditNotification() {
                 description:Notification.description,
                 time:SelectedTime,
                 date:SelectedDate,
-                status:"Scheduled"
+                status:"Scheduled",
+                seen:""
               });
               resolve("Notification Update");
             } catch (error) {

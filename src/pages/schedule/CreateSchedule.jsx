@@ -94,6 +94,7 @@ const handleImageChange = (e) => {
                 onChange={(e) => setMessage(e.target.value)}
                 className="bg-white border border-gray-300 text-gray-900 text-sm rounded-[12px] h-[127px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
                 placeholder="Type Here...."
+                required
               ></textarea>
             </div>
             <div className="mb-3 col-span-2">

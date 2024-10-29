@@ -11,7 +11,7 @@ export default function UpdatePassword() {
   const [NewPass, setNewPass] = useState(false);
   const [usernewPass, setuserNewPass] = useState("");
   const [ConfrimnewPass, setConfrimnewPass] = useState("");
-  const { PasswordSuccessFullChange, setPasswordSuccessFullChange,ForgetEmail } =
+  const { PasswordSuccessFullChange, setPasswordSuccessFullChange,ForgetEmail,setIsChangePassword } =
     useContext(MyContext);
 
 

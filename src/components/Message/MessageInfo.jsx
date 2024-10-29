@@ -84,7 +84,6 @@ export default function MessageInfo() {
     setMsgSeenEmp(messageSeenEMp);
   }, [isMessageSeen]);
 
-  console.log(isMessageSeen, "employeeMessage");
 
   return (
     <>
@@ -113,7 +112,7 @@ export default function MessageInfo() {
                 <div className="relative h-[90%] mt-4 scroll-box overflow-auto">
                   <div className="py-1 rounded-md  ">
                     <ul className="px-1">
-                      {msgSeenEmp.map((item, i) => (
+                      {msgSeenEmp.filter((fil)=>fil.role!="admin").map((item, i) => (
                         <li className="mt-3">
                           <div className="flex items-center space-x-2 rtl:space-x-reverse">
                             <div

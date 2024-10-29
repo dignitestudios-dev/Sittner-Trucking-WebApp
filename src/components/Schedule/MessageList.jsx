@@ -93,11 +93,11 @@ useEffect(() => {
     const empData = JSON.parse(cookieData);
     const intervalId = setInterval(() => {
       checkAndSendNotifications(empData);
-    }, 5000); // Check every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(intervalId);
   }
-}, [scheduled, updateCount]);
+}, [updateCount]);
 
   
 

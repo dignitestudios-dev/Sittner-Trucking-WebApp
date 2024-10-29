@@ -19,12 +19,14 @@ import {
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import Cookies from 'js-cookie';
+import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 
 export default function AddMember() {
   const navigate = useNavigate("");
   const [contact, setContact] = useState({ value: "" });
   const [image, setImage] = useState();
   const [Preview, setPreview] = useState();
+  const [showPassword, setShowPassword] = useState(false);
   const [member, setMember] = useState({
     name: "",
     address: "",
@@ -50,11 +52,11 @@ export default function AddMember() {
   };
 
   const generateUniqueId = async () => {
-    const randomId = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random 6-digit number
+    const randomId = Math.floor(100000 + Math.random() * 900000).toString(); 
     const existingEmployee = await getDocs(query(collection(db, "employee"), where("id", "==", randomId)));
     
     if (!existingEmployee.empty) {
-        return generateUniqueId(); // Recursively generate a new ID if this one is already taken
+        return generateUniqueId(); 
     }
     return randomId;
 };
@@ -130,8 +132,6 @@ useEffect(() => {
   }
   const objectUrl = URL.createObjectURL(image)
   setPreview(objectUrl)
-
-  // free memory when ever this component is unmounted
   return () => URL.revokeObjectURL(objectUrl)
 }, [image])
 
@@ -233,20 +233,33 @@ useEffect(() => {
                   placeholder="Address"
                 />
               </div>
-              <div className="mb-3 col-span-2 lg:col-span-1">
-                <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password-input"
-                  name="password"
-                  onChange={HandleInput}
-                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg h-[60px] mt-1 block w-full p-2.5 focus:outline-[#0A8A33]"
-                  required
-                  placeholder="Password"
-                />
-              </div>
+              <div className="relative mb-3 col-span-2 lg:col-span-1">
+                  <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
+                    Password
+                  </label>
+                  <input
+                   type={showPassword ? "text" : "password"}
+                    id="password-input"
+                    name="password"
+                    onChange={HandleInput}
+                    value={member.password}
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
+                    required
+                    placeholder="Password"
+                    />
+            <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
+              {showPassword ? (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  <FaRegEye className="text-gray-400 cursor-pointer" />
+                </div>
+              ) : (
+                <div onClick={() => setShowPassword(!showPassword)}>
+                  {" "}
+                  <FaEyeSlash className="text-gray-400 cursor-pointer" />
+                </div>
+              )}
+            </div>
+          </div>
             </div>
             <div className="flex items-center gap-5 mt-5">
               <button

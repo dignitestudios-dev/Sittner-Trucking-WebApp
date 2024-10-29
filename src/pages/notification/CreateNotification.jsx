@@ -34,7 +34,7 @@ export default function CreateNotification() {
                 date:SelectedDate,
                 status:"Scheduled",
                 author:Employee,
-                seen:"pending"
+                seen:""
             });
             resolve("Notification Created")
         } catch (error) {
@@ -60,7 +60,6 @@ export default function CreateNotification() {
         {" "}
         <IoMdArrowBack size={25} className="mr-2" /> Create Notification
       </NavLink>
-
       <div class="bg-[#FFFFFF] mb-3 h-full border rounded-[10px] border-[#E4E4E4] mt-6 px-3 py-3 lg:py-5 lg:px-10">
         <form onSubmit={(e) => UploadNotification(e)}>
           <div className="mt-5 grid grid-cols-1 gap-5  lg:grid-cols-2">
@@ -76,6 +75,7 @@ export default function CreateNotification() {
                 style={{ border: "1px solid #00000030" }}
                 className="bg-white  text-gray-900 text-sm rounded-[12px]  h-[46px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]"
                 placeholder="Type Here...."
+                required
               />
             </div>
             <div className="mb-1 col-span-2">
@@ -89,9 +89,9 @@ export default function CreateNotification() {
                 name="description"
                 className="bg-white border border-gray-300 text-gray-900 text-sm rounded-[12px] h-[75px] mt-1  block w-full p-2.5 focus:outline-[#0A8A33]  "
                 placeholder="Type Here...."
+                required
               ></textarea>
             </div>
-
             <div className="mb-3 grid grid-cols-1  lg:grid-cols-2  col-span-2 lg:col-span-1">
               <DatePicker />
               <ModernTimePicker />

@@ -9,6 +9,7 @@ import {
   collection,
   db,
   doc,
+  getCountFromServer,
   getDocs,
   getDownloadURL,
   onSnapshot,
@@ -22,6 +23,7 @@ import {
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import { IoMdClose } from "react-icons/io";
 export default function MessageBox() {
   const {
     LookScreen,
@@ -39,6 +41,7 @@ export default function MessageBox() {
     setIsAttachments,
     setLoader,
     loader,
+    isMessageSeen
   } = useContext(MyContext);
   const [Message, SetMessages] = useState([]);
   const [UserMsg, setUserMsg] = useState("");
@@ -47,7 +50,8 @@ export default function MessageBox() {
   const [sentLoad, setSentLoad] = useState(false);
   const loc = useLocation();
   const msgBodyScroll = useRef();
-
+  const [EmployeeCount,setEmployeeCount]=useState();
+  
   useEffect(() => {
     if (sentMessage === 0) {
       setLoader(true);
@@ -84,13 +88,22 @@ export default function MessageBox() {
   }, []);
 
   useEffect(() => {
-    const group = query(collection(db, "group"));
-    const unsubscribe = onSnapshot(group, (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        setGroupName({ docId: doc.id, ...doc.data() });
+    const fetchData = async () => {
+      const groupQuery = query(collection(db, "group"));      
+      const unsubscribe = onSnapshot(groupQuery, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          setGroupName({ docId: doc.id, ...doc.data() });
+        });
       });
-    });
-  }, []);
+
+      const employeeQuery = query(collection(db, "employee"), where("role", "==", "user"));
+      const snapshot = await getCountFromServer(employeeQuery);
+      setEmployeeCount(snapshot.data().count); 
+      return () => unsubscribe();
+    };
+
+    fetchData();
+  }, []);  
 
   const generateUniqueId = async () => {
     const randomId = Math.floor(100000 + Math.random() * 900000).toString();
@@ -171,7 +184,7 @@ export default function MessageBox() {
     if (loc.pathname == "/") {
       Message.map(async (item, i) => {
         const scheduledRef = doc(db, "message", item.docId);
-        console.log(scheduledRef, "itemsssMsgs");
+        console.log(item,"itemsssMsgs");
         if (!item.UserMsgSeen.includes(Employee.id)) {
           await updateDoc(scheduledRef, {
             UserMsgSeen: [...item.UserMsgSeen, Employee.id],
@@ -182,7 +195,9 @@ export default function MessageBox() {
   };
   useEffect(()=>{
     MessageSeen();
-  },[])
+  },[Message])
+
+ 
 
   return (
     <div className="bg-[#FFFFFF] w-full  h-[80%] lg:h-[630px]  relative rounded-[24px]">
@@ -223,7 +238,7 @@ export default function MessageBox() {
                 {GroupName.group_name}
               </h2>
               <p className="text-[#8A8A8A] text-[13px] font-normal">
-                50 members
+                {EmployeeCount} members
               </p>
             </div>
           </div>
@@ -413,9 +428,9 @@ export default function MessageBox() {
       {Employee?.role == "admin" && (
         <div className="pb-2 absolute w-full bottom-0">
           {images.length > 0 && (
-            <div className="bg-white px-2 grid grid-cols-8">
+            <div className="shadow-xl bg-slate-100 px-2 py-2 w-[90%] mx-auto flex items-center gap-5 nowrap scroll-box  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
-                <div key={targetIndex}>
+                <div key={targetIndex} >
                   <div className="flex justify-end px-3 pb-2">
                     <button
                       className="bg-transparent"
@@ -426,37 +441,36 @@ export default function MessageBox() {
                         setImages(newArray);
                       }}
                     >
-                      <MdDeleteSweep className="text-red-500" />
+                      <IoMdClose  className="text-red-500"/>
                     </button>
                   </div>
-                  <div></div>
 
                   {image.type?.includes("image") ? (
                     <img
                       src={URL.createObjectURL(image)}
                       alt=""
-                      className="h-[80px] w-[80px]"
+                      className="h-[60px] rounded-md w-[60px]"
                       srcset=""
                     />
                   ) : image.type.includes("video") ? (
                     <img
                       src={"/video.webp"}
                       alt=""
-                      className="h-[80px] w-[80px]"
+                      className="h-[60px] rounded-md w-[60px]"
                       srcset=""
                     />
                   ) : image.type?.includes("spreadsheetml") ? (
                     <img
                       src={"/xl.webp"}
                       alt=""
-                      className="h-[80px] w-[80px]"
+                      className="h-[60px] rounded-md w-[60px]"
                       srcset=""
                     />
                   ) : (
                     <img
                       src={"/pdf.webp"}
                       alt=""
-                      className="h-[80px] w-[80px]"
+                      className="h-[60px] rounded-md w-[60px]"
                       srcset=""
                     />
                   )}

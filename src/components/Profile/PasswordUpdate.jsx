@@ -12,6 +12,7 @@ export default function PasswordUpdate() {
     setIsChangePassword,
     setPasswordSuccessFullChange,
     Employee,
+    setOtpVal,
   } = useContext(MyContext);
 
   const [initialVal, setInitialVal] = useState({
@@ -52,6 +53,7 @@ export default function PasswordUpdate() {
         const updatedDoc = await getDoc(washingtonRef);
         const data={ docId:Employee?.docId,...updatedDoc.data() }
         Cookies.set('employe', JSON.stringify(data));
+        setOtpVal("")
         resolve("Password Updated");
       } catch (error) {
         reject(error.message);

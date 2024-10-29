@@ -12,49 +12,66 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
-   const getNots=()=>{
-    const notificationsRef = collection(db, "notification");
-    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-        const currentDate = new Date();
-        const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-        const fetchedNotifications = [];
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const notificationDate = new Date(data.date + ' ' + data.time); 
-            fetchedNotifications.push({ id: doc.id, ...data });   
-            if (notificationDate <= currentDate && data.status !== "Delivered") {
-                updateDoc(doc.ref, { status: "Delivered" });
-                setRealTimeData(prev=>prev+1)
-            }
-        });
-        const sortedNotifications = fetchedNotifications.sort((a, b) => {
-            const dateA = new Date(a.date + ' ' + a.time);
-            const dateB = new Date(b.date + ' ' + b.time);
-            return dateB - dateA;
-        });
+    const getNots=()=>{
+      const notificationsRef = collection(db, "notification");
+      const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+          const currentDate = new Date();
+          const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+          const fetchedNotifications = [];
+          querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              const notificationDate = new Date(data.date + ' ' + data.time); 
+              fetchedNotifications.push({ id: doc.id, ...data });   
+              if (notificationDate <= currentDate && data.status !== "Delivered") {
+                  updateDoc(doc.ref, { 
+                    status: "Delivered",
+                    seen:"pending"
+                  });
+                  setRealTimeData(prev=>prev+1)
+              }
+          });
+          const sortedNotifications = fetchedNotifications.sort((a, b) => {
+              const dateA = new Date(a.date + ' ' + a.time);
+              const dateB = new Date(b.date + ' ' + b.time);
+              return dateB - dateA;
+          });
 
-        setNotifications(sortedNotifications);
-    });
-    return unsubscribe;
-   }
-   
+          setNotifications(sortedNotifications);
+      });
+      return unsubscribe;
+    }
+    
+    useEffect(() => {
+      const unsubscribe = getNots();
+      const intervalId = setInterval(() => {
+          getNots();
+      }, 30000);
+
+      return () => {
+          clearInterval(intervalId);
+          unsubscribe();
+      };
+  }, []);
+
+
   useEffect(() => {
-    const unsubscribe = getNots();
-    return () => unsubscribe();
-}, [notifications]);
+    const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+    const pendingNotifications = notifications.filter(notification => notification.seen == "pending");
+    const employeeCreatedAt = new Date(Employee.createdat);
+    const oldNot = deliveredNotifications.filter(notification => {
+        const notificationDate = new Date(`${notification.date} ${notification.time}`);
+        return notificationDate > employeeCreatedAt;
+    });
+    console.log(pendingNotifications,"pending");
+    
+    if (deliveredNotifications.length<0) {
+      setNotificationCount(0);
+    } else {
+      setNotificationCount(pendingNotifications.length); 
+    }
 
-useEffect(() => {
-  const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
-  const pendingNotifications = notifications.filter(notification => notification.seen == "pending");
-  const employeeCreatedAt = new Date(Employee.createdat);
-  const oldNot = deliveredNotifications.filter(notification => {
-      const notificationDate = new Date(`${notification.date} ${notification.time}`);
-      return notificationDate > employeeCreatedAt;
-  });
-  
-  setNotificationCount(pendingNotifications.length);
-  setDevNotifications(oldNot);
-}, [notifications]);
+    setDevNotifications(oldNot);
+  }, [notifications]);
 
 
 

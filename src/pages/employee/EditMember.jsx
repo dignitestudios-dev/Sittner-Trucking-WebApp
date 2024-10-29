@@ -32,10 +32,9 @@ export default function EditMember() {
     id: "",
     pic: "",
     docId: "",
-    role:""
+    role: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-
 
   const navigate = useNavigate("");
   const re = /^[0-9\b]+$/;
@@ -46,7 +45,6 @@ export default function EditMember() {
     }
   };
 
-  
   const getMemberRec = async () => {
     const employeesRef = collection(db, "employee");
     const employeeQuery = query(
@@ -66,7 +64,7 @@ export default function EditMember() {
       pic: employeeData[0].pic,
       docId: employeeData[0].docId,
       id: employeeData[0].id,
-      role:employeeData[0].role
+      role: employeeData[0].role,
     });
     setContact({ value: employeeData[0]?.contact });
   };
@@ -121,9 +119,9 @@ export default function EditMember() {
           error: (error) => error,
         })
         .then(() => {
-          Employee.role == "admin" 
-          ? navigate("/employee") 
-          : navigate("/profile", { state: { id: Employee?.id } });              
+          Employee.role == "admin"
+            ? navigate("/employee")
+            : navigate("/profile", { state: { id: Employee?.id } });
         });
     } else {
       const myPromise = new Promise(async (resolve, reject) => {
@@ -148,28 +146,29 @@ export default function EditMember() {
           error: (error) => error,
         })
         .then(() => {
-          member.role == "admin" 
-          ? navigate("/admin"):member.role == "user"?navigate("/employee")
-          : navigate("/profile", { state: { id: Employee?.id } });    
+          member.role == "admin"
+            ? navigate("/admin")
+            : member.role == "user"
+            ? navigate("/employee")
+            : navigate("/profile", { state: { id: Employee?.id } });
         });
     }
   };
   const [Preview, setPreview] = useState();
   useEffect(() => {
     if (!image) {
-        setPreview(undefined)
-        return
+      setPreview(undefined);
+      return;
     }
-    const objectUrl = URL.createObjectURL(image)
-    setPreview(objectUrl)  
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [image])
-  
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
 
   return (
     <div class="bg-[#F7F7F7]  py-5 px-5 ">
       <NavLink
-        to={`${member?.role=="admin"?"/admin":"/employee"}`}
+        to={`${member?.role == "admin" ? "/admin" : "/employee"}`}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
@@ -181,20 +180,20 @@ export default function EditMember() {
           <div className="flex items-center">
             <div className="flex items-center">
               <div className="bg-[#94D0E4] flex rounded-[50%] items-center justify-center  w-[58px] h-[58px]">
-              {
-              Preview?(
-                <img src={Preview} alt=""  className="w-[55px] h-[55px] rounded-full " srcset="" /> 
-              ):
-              (
-                <img
-                  src={member?.pic ? member?.pic : "/noprofile.png"}
-                  class="cursor-pointer w-[58px] h-[58px]"
-                  alt=""
-                />
-              )
-            }
-               
-               
+                {Preview ? (
+                  <img
+                    src={Preview}
+                    alt=""
+                    className="w-[55px] h-[55px] rounded-full "
+                    srcset=""
+                  />
+                ) : (
+                  <img
+                    src={member?.pic ? member?.pic : "/noprofile.png"}
+                    class="cursor-pointer w-[58px] h-[58px]"
+                    alt=""
+                  />
+                )}
               </div>
             </div>
             <label
@@ -277,40 +276,34 @@ export default function EditMember() {
               </div>
               {Employee?.role === "admin" && (
                 <>
-
-<div className="relative mb-3">
-                  <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
-                    Password
-                  </label>
-                  <input
-                   type={showPassword ? "text" : "password"}
-                    id="password-input"
-                    name="password"
-                    onChange={HandleInput}
-                    value={member.password}
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
-                    required
-                    placeholder="Password"
+                  <div className="relative mb-3">
+                    <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
+                      Password
+                    </label>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password-input"
+                      name="password"
+                      onChange={HandleInput}
+                      value={member.password}
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
+                      required
+                      placeholder="Password"
                     />
-            <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
-              {showPassword ? (
-                <div onClick={() => setShowPassword(!showPassword)}>
-                  <FaRegEye className="text-gray-400 cursor-pointer" />
-                </div>
-              ) : (
-                <div onClick={() => setShowPassword(!showPassword)}>
-                  {" "}
-                  <FaEyeSlash className="text-gray-400 cursor-pointer" />
-                </div>
-              )}
-            </div>
-          </div>
-                
-              
-
-
-                    </>
-
+                    <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
+                      {showPassword ? (
+                        <div onClick={() => setShowPassword(!showPassword)}>
+                          <FaRegEye className="text-gray-400 cursor-pointer" />
+                        </div>
+                      ) : (
+                        <div onClick={() => setShowPassword(!showPassword)}>
+                          {" "}
+                          <FaEyeSlash className="text-gray-400 cursor-pointer" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
             <div className="flex items-center gap-5">

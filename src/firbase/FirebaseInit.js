@@ -18,7 +18,9 @@ import {
   onSnapshot,
   getDoc,
   orderBy,
-  Timestamp
+  Timestamp,
+  writeBatch,
+  getCountFromServer 
 } from "firebase/firestore";
 import {
   getStorage,
@@ -73,5 +75,7 @@ export {
    updateMetadata ,
    getMetadata,
    orderBy,
-   Timestamp
+   Timestamp,
+   writeBatch,
+   getCountFromServer 
 };
