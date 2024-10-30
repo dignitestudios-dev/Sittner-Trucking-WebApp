@@ -18,13 +18,18 @@ export default function ForgotPassword() {
   const navigate = useNavigate("");
   const sendOTP = async (e) => {
     e.preventDefault();
+    const q = query(collection(db, "employee"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      return toast.error("No employee found with that email");
+    }
     setLoader(true);
     setOtpVal("");
     setForgetEmail(email);
     const toastId = toast.loading("Sending OTP...");
     try {   
       const res = await fetch(
-        `https://nodejsotp-l71u6s1f2-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
+        `https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
           method: "GET",
           headers: {
