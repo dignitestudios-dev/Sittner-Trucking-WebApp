@@ -24,7 +24,7 @@ export default function ForgotPassword() {
     const toastId = toast.loading("Sending OTP...");
     try {
       const res = await fetch(
-        `https://nodejsotp-bcnself5p-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
+        `https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
           method: "POST",
           headers: {
