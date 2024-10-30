@@ -2,6 +2,8 @@ import React, { createContext, useEffect, useState } from "react";
 export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
+  const currentTime = new Date();
+  const formattedTime = `${currentTime.getHours() % 12 || 12}:${String(currentTime.getMinutes()).padStart(2, '0')}:${String(currentTime.getSeconds()).padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`;
 
   const [PasswordSuccessFullChange, setPasswordSuccessFullChange] = useState(false);
   const [ChangePassword, setIsChangePassword] = useState(false);
@@ -27,7 +29,7 @@ export const MyContextProvider = ({ children }) => {
   const [DeleteDocId,setDeleteDocId]=useState();
   const [NotificationCount,setNotificationCount]=useState(0);
   const [SelectedDate,setSelectDate]=useState(new Date().toLocaleDateString());
-  const [SelectedTime,setSelectTime]=useState("");
+  const [SelectedTime,setSelectTime]=useState(formattedTime);
   const [GroupName,setGroupName]=useState("");
   const [ModalImageUrl,setModalImageUrl]=useState("");
   const [isMessageSeen,setIsMessageSeen]=useState([]);

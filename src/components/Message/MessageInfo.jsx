@@ -3,61 +3,43 @@ import { MyContext } from "../../context/GlobalContext";
 import { IoMdClose } from "react-icons/io";
 import { collection, db, onSnapshot, query } from "../../firbase/FirebaseInit";
 export default function MessageInfo() {
-  const { MessageInfo, setIsMessageInfo,msgSeenEmp } =
-    useContext(MyContext);
+  const { MessageInfo, setIsMessageInfo, msgSeenEmp } = useContext(MyContext);
 
-  const user = [
-    {
-      title: "Adam Gilchrist",
-      img: "/large-person-4.png",
-      seen: "Seen Just now",
-    },
-    {
-      title: "Mike Tyson",
-      img: "/large-person-3.png",
-      seen: "Seen Just now",
-    },
-    {
-      title: "Adam Gilchrist",
-      img: "/large-person-4.png",
-      seen: "Seen Just now",
-    },
-    {
-      title: "Mike Tyson",
-      img: "/large-person-3.png",
-      seen: "Seen 5mins ago",
-    },
-    {
-      title: "Andrew Garfield",
-      img: "/large-person-2.png",
-      seen: "Seen 5mins ago",
-    },
-    {
-      title: "John Cena",
-      img: "/large-person-1.png",
-      seen: "Seen 10mins ago",
-    },
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    
+    // Parse the timestamp
+    const [time, modifier] = timestamp.split(' ');
+    let [hours, minutes, seconds] = time.split(':');
+  
+    // Convert to 24-hour format if PM
+    if (modifier === 'PM' && hours !== '12') {
+      hours = parseInt(hours) + 12;
+    }
+    if (modifier === 'AM' && hours === '12') {
+      hours = '00';
+    }
+  
+    const seenDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, seconds);
+  
+    const secondsDiff = Math.floor((now - seenDate) / 1000);
+    const minutesDiff = Math.floor(secondsDiff / 60);
+    const hoursDiff = Math.floor(minutesDiff / 60);
+    const daysDiff = Math.floor(hoursDiff / 24);
+  
+    if (secondsDiff < 60) return "seen just now";
+    if (minutesDiff < 60) return `seen ${minutesDiff} min ago`;
+    if (hoursDiff < 24) return `seen ${hoursDiff} hr ago`;
+    return `seen ${daysDiff} days ago`;
+  };
+  
 
-    {
-      title: "Andrew Garfield",
-      img: "/large-person-2.png",
-      seen: "Seen 15mins ago",
-    },
-    {
-      title: "John Cena",
-      img: "/large-person-1.png",
-      seen: "Seen 25mins ago",
-    },
-  ];
   const color = [
     "bg-[#B9FF9E]",
     "bg-[#FFD839]",
     "bg-[#E8F569]",
     "bg-[#94D0E4]",
   ];
-
-  
-
 
   return (
     <>
@@ -86,29 +68,31 @@ export default function MessageInfo() {
                 <div className="relative h-[90%] mt-4 scroll-box overflow-auto">
                   <div className="py-1 rounded-md  ">
                     <ul className="px-1">
-                      {msgSeenEmp.filter((fil)=>fil.role!="admin").map((item, i) => (
-                        <li className="mt-3">
-                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                            <div
-                              className={`w-[50px] h-[50px]  rounded-full ${color[i]} `}
-                            >
-                              <img
-                                className="rounded-full w-full  h-full"
-                                src={item.pic?item.pic:"noprofile.png"}
-                                alt={item.pic}
-                              />
+                      {msgSeenEmp
+                        .filter((fil) => fil.role != "admin")
+                        .map((item, i) => (
+                          <li className="mt-3">
+                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                              <div
+                                className={`w-[50px] h-[50px]  rounded-full ${color[i]} `}
+                              >
+                                <img
+                                  className="rounded-full w-full  h-full"
+                                  src={item.pic ? item.pic : "noprofile.png"}
+                                  alt={item.pic}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-medium  ">
+                                  {item.name}
+                                </p>
+                                <p className="text-[#ABABAB] text-[12px]">
+                                  {item.seenTime.length > 0 ? timeAgo(item.seenTime[0]) : "not seen yet"}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[13px] font-medium  ">
-                                {item.name}
-                              </p>
-                              <p className="text-[#ABABAB] text-[12px]">
-                                {item.seen}
-                              </p>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 </div>

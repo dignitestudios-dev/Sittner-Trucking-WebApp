@@ -75,8 +75,7 @@ export default function Attachment() {
                       msg.type[index]?.includes("image") ? (
                         <li className="mt-3">
                           <a
-                            href={img}
-                            download
+                            href={img.url}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -95,7 +94,7 @@ export default function Attachment() {
                       ) : msg.type[index]?.includes("video") ? (
                         <li className="mt-3">
                           <a
-                            href={img}
+                            href={img.url}
                             download
                             target="_blank"
                             rel="noopener noreferrer"
@@ -115,7 +114,7 @@ export default function Attachment() {
                       ) : msg.type[index]?.includes("spreadsheetml") ? (
                         <li className="mt-3">
                           <a
-                            href={img}
+                            href={img.url}
                             download
                             target="_blank"
                             rel="noopener noreferrer"
@@ -135,7 +134,7 @@ export default function Attachment() {
                       ) : (
                         <li className="mt-3">
                           <a
-                            href={img}
+                            href={img.url}
                             download
                             target="_blank"
                             rel="noopener noreferrer"

@@ -48,14 +48,13 @@ export default function Otp() {
     setTimer(60)    
     const toastId = toast.loading("Sending OTP...");
     try {
-      const res = await fetch(`https://nodejsotp-g0cpgqn37-zackcoles-projects.vercel.app/sendOtp?email=${ForgetEmail}`, {
+      const res = await fetch(`https://nodejsotp-g0cpgqn37-zackcoles-projects.vercel.app/sendOtp?email=${ForgetEmail}`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json"
         },      
-      });
-      
+      });      
       const data = await res.json();
       if (res) {
         setTimer(60)

@@ -185,17 +185,28 @@ export default function MessageBox() {
     setImages((prev) => [...prev, ...newImages]);
   };
 
-  const MessageSeen = () => {
-    if (loc.pathname == "/") {
-      Message.map(async (item, i) => {
+  const MessageSeen = async () => {
+    if (loc.pathname === "/") {
+      for (const item of Message) {
         const scheduledRef = doc(db, "message", item.docId);
         console.log(item, "itemsssMsgs");
-        if (!item.UserMsgSeen.includes(Employee.id)) {
+  
+        const hasSeen = item?.UserMsgSeen?.some(user => user.EmployeeId == Employee.id);
+       console.log(hasSeen,"hasSeend");
+       
+        if (!hasSeen) {
+          const currentTime = new Date();
+          const formattedTime = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }); 
+  
+          const seenData = {
+            seenTime: formattedTime, 
+            EmployeeId: Employee.id,
+          };
           await updateDoc(scheduledRef, {
-            UserMsgSeen: [...item.UserMsgSeen, Employee.id],
+            UserMsgSeen: [...item.UserMsgSeen, seenData],
           });
         }
-      });
+      }
     }
   };
   useEffect(() => {
@@ -223,16 +234,28 @@ export default function MessageBox() {
   }, []);
 
   useEffect(() => {
-    const employeeIds = employee.map(data => data.id); 
-    const messageSeenEmp = Message.filter(item => 
-      item.UserMsgSeen.some(userId => employeeIds.includes(userId)) 
+    const employeeIds = employee.map(data => data.id);
+    const messageSeenEmp = Message.filter(item =>
+      item.UserMsgSeen.some(user => employeeIds.includes(user.EmployeeId))
     );
+    const seenEmployeeData = employee.map(emp => {
+      const seenMessages = messageSeenEmp.filter(msg =>
+        msg.UserMsgSeen.some(user => user.EmployeeId == emp.id)
+      );
+      const seenTimes = seenMessages.map(msg =>
+        msg.UserMsgSeen.find(user => user.EmployeeId == emp.id)?.seenTime
+      ).filter(Boolean); 
   
-    const seenEmployeeData = employee.filter(emp => 
-      messageSeenEmp.some(msg => msg.UserMsgSeen.includes(emp.id))
-    );
+      return {
+        ...emp,
+        seenTime: seenTimes.length > 0 ? seenTimes : null, 
+      };
+    }).filter(emp => emp.seenTime); 
+  
     setMsgSeenEmp(seenEmployeeData);
-  }, [Message]);
+  }, [Message, employee]);
+  
+  
   
   
 
@@ -327,15 +350,18 @@ export default function MessageBox() {
                   </div>
                 )}
                 <div className="w-full py-2">
-                  {msg.message && (
+                  {msg.message && (                    
                     <div
                       className={` ${
                         Employee?.role == "admin"
                           ? "bg-[#0A8A33] text-white"
                           : "bg-[#F4F4F4]"
-                      } w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
+                      } w-full rounded-2xl rounded-tr-none break-words px-2 py-3 text-xs font-normal`}
                     >
+                    <a  href={msg.message.includes("https://")&&msg.message} target="_blank" >
                       {msg.message}
+                    </a>
+
                     </div>
                   )}
                   {msg.images.length > 0 && (
@@ -412,7 +438,7 @@ export default function MessageBox() {
                 <div className="flex items-center gap-1 justify-end">
                   {Employee?.role == "admin" && (
                     <div className="flex items-center gap-2 ">
-                      {
+                      {/* {
                         msgSeenEmp.slice(0,4).filter((fil)=>fil.role!="admin").map((seen,i)=>(
                                                   
                       <div className={`msg-view ${col_Array[i]} w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full`}>
@@ -432,7 +458,7 @@ export default function MessageBox() {
                        <span className="font-[20px]" >{msgSeenEmp.length}+</span>
                     </div>
                     )
-                  }
+                  } */}
                       <img
                         src="/tick-double.png"
                         onClick={() => {
