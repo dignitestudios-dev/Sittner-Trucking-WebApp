@@ -26,7 +26,7 @@ export default function ForgotPassword() {
       const res = await fetch(
         `https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
