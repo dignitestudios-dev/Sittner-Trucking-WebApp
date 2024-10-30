@@ -16,20 +16,27 @@ export default function ForgotPassword() {
   const { setOtp, setForgetEmail, setOtpVal, setLoader, loader } =
     useContext(MyContext);
   const navigate = useNavigate("");
+
   const sendOTP = async (e) => {
     e.preventDefault();
-    const q = query(collection(db, "employee"), where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      return toast.error("No employee found with that email");
-    }
+ 
     setLoader(true);
     setOtpVal("");
     setForgetEmail(email);
     const toastId = toast.loading("Sending OTP...");
+    const q = query(collection(db, "employee"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      return toast.update(toastId, {
+        render: "No employee found with that email.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
     try {   
       const res = await fetch(
-        `https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
+        `https://nodejsotp-g0cpgqn37-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
           method: "GET",
           headers: {
@@ -71,7 +78,6 @@ export default function ForgotPassword() {
     }
   };
 
-  console.log(loader, "loader:");
 
   return (
     <div className="grid sm:grid-cols-1 h-screen lg:grid-cols-2  md:py-10 md:px-10 gap-4 flex items-center ">
