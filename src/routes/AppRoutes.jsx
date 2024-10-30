@@ -23,6 +23,7 @@ import EditNotification from '../pages/notification/editNotification'
 import Employee from '../pages/employee/Employee'
 import AddAdmin from '../pages/admin/addAdmin'
 import Admin from '../pages/admin/Admin'
+import Cookie from '../pages/cookiepolicy/Cookie'
 
 export default function AppRoutes() {
   return (
@@ -42,6 +43,7 @@ export default function AppRoutes() {
         
         <Route path='/term' element={<Layout pages={<TermsServices/>} /> }/>
         <Route path='/privacy' element={<Layout pages={<Privacy/>} /> }/>
+        <Route path='/cookie' element={<Layout pages={<Cookie/>} />} />
    
          {/* Message */}
         <Route path='/' element={<Layout pages={<Message/>} /> }/>

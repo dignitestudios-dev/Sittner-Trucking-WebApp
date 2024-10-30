@@ -57,7 +57,6 @@ export default function EditSchedule() {
 
     const existingImageNames = new Set(images.map((image) => image.name));
     let updatedImg = [];
-
     const img_data = results.filter(
       (item) => item && !existingImageNames.has(item.metadata.name)
     );
@@ -123,20 +122,18 @@ export default function EditSchedule() {
   const HandleScheduled = async (e) => {
     e.preventDefault();
     console.log(images, "checkImages");
-    const scheduledRef = doc(db, "scheduled", loc.state.data.docId);
+    const scheduledRef = doc(db, loc.state.collection, loc.state.data.docId);
     const imageUrls = [];
     const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
-      // Upload images and get URLs
       for (const image of images) {
         const storageRef = ref(storage, `images/${image.name}`);
         await uploadBytesResumable(storageRef, image);
         const url = await getDownloadURL(storageRef);
-        imageUrls.push(url);
+        imageUrls.push({url:url,name:image.name});
         docType.push(image.type);
       }
-
       await updateDoc(scheduledRef, {
         date: SelectedDate,
         time: SelectedTime,
@@ -153,10 +150,9 @@ export default function EditSchedule() {
         isLoading: false,
         autoClose: 5000,
       });
-      navigate("/schedule");
+      loc.state.collection=="look"?navigate("/"):navigate("/schedule") 
     } catch (error) {
       console.error("Failed to schedule:", error);
-      // Update the loading toast to error
       toast.update(loadingToastId, {
         render: "Failed to schedule. Please try again.",
         type: "error",
@@ -169,12 +165,12 @@ export default function EditSchedule() {
   console.log(Scheduled, "getUpdateArray");
   return (
     <div class="bg-[#F7F7F7] h-[90vh] py-5 px-5 ">
-      <NavLink
-        to={"/schedule"}
+        <NavLink
+        to={loc.state.collection=="look"?"/":"/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
-        <IoMdArrowBack size={25} className="mr-2" /> Edit Message
+        <IoMdArrowBack size={25} className="mr-2" /> Create Message
       </NavLink>
 
       <div class="bg-[#FFFFFF] mb-3 h-full border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">

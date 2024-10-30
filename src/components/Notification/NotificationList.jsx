@@ -6,12 +6,12 @@ import Loader from "../../global/Loader";
 
 export default function NotificationList() {
   const [Notification, SetNotification] = useState([]);
-  const { setLoader, loader,RealTimeData } = useContext(MyContext);
-
+  const { setLoader, loader, RealTimeData } = useContext(MyContext);
   const getNotification = () => {
     const employeesRef = collection(db, "notification");
     const employeeQuery = query(employeesRef);
     setLoader(true);
+
     const unsubscribe = onSnapshot(
       employeeQuery,
       (querySnapshot) => {
@@ -19,8 +19,16 @@ export default function NotificationList() {
           docId: doc.id,
           ...doc.data(),
         }));
-        SetNotification(notificationData);
-        setLoader(false); 
+
+        // Sort the notifications by date and time
+        const sortedNotifications = notificationData.sort((a, b) => {
+          const dateA = new Date(`${a.date} ${a.time}`);
+          const dateB = new Date(`${b.date} ${b.time}`);
+          return dateB - dateA; // Sort in descending order
+        });
+
+        SetNotification(sortedNotifications);
+        setLoader(false);
       },
       (error) => {
         console.error("Error fetching notifications: ", error);
@@ -84,20 +92,22 @@ export default function NotificationList() {
                       {item.status == "Scheduled" ? "Scheduled" : "Delivered"}
                     </div>
                   </td>
-                  <td className="px-6 py-10">
-                    <NavLink
-                      to={"/editnotification"}
-                      state={{ data: item }}
-                      className="bg-transparent"
-                    >
-                      <img
-                        src="/whiteedit.png"
-                        className="w-5 lg:w-5"
-                        alt=""
-                        srcset=""
-                      />
-                    </NavLink>
-                  </td>
+                  {item.status == "Scheduled" && (
+                    <td className="px-6 py-10">
+                      <NavLink
+                        to={"/editnotification"}
+                        state={{ data: item }}
+                        className="bg-transparent"
+                      >
+                        <img
+                          src="/whiteedit.png"
+                          className="w-5 lg:w-5"
+                          alt=""
+                          srcset=""
+                        />
+                      </NavLink>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

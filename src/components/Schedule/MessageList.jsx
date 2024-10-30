@@ -9,6 +9,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  orderBy,
 } from "../../firbase/FirebaseInit";
 import Loader from "../../global/Loader";
 import Cookies from "js-cookie";
@@ -26,7 +27,7 @@ export default function MessageList() {
   
   const getEmployees = () => {
     const employeesRef = collection(db, "scheduled");
-    const employeeQuery = query(employeesRef);
+    const employeeQuery = query(employeesRef, orderBy("createdAt", "desc"));
     setLoader(true);
   
     const unsubscribe = onSnapshot(
@@ -36,7 +37,13 @@ export default function MessageList() {
           docId: doc.id,
           ...doc.data(),
         }));
-        setScheduled(employeeData);
+        setScheduled(prevData => {          
+          if (JSON.stringify(prevData) !== JSON.stringify(employeeData)) {
+            return employeeData; 
+          }
+          return prevData; 
+        });
+  
         setLoader(false);
       },
       (error) => {
@@ -44,9 +51,11 @@ export default function MessageList() {
         setLoader(false);
       }
     );
+  
     setUpdateCount((prev) => prev + 1);
     return unsubscribe;
   };
+  
   
 
   
@@ -67,10 +76,9 @@ useEffect(() => {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const notificationDate = new Date(`${data.date} ${data.time}`);
-
       if (notificationDate <= currentDate && data.status === "pending") {
         updates.push(
-          updateDoc(doc.ref, { status: "Sent" }),
+          updateDoc(doc.ref, {status: "Sent"}),
           addDoc(messageRef, {
             time: data?.time,
             message: data?.message,
@@ -128,7 +136,7 @@ useEffect(() => {
                     item.type[i].includes("image") ? (
                       <div>
                         <img
-                          src={img}
+                          src={img.url}
                           alt=""
                           className="rounded-lg h-[80px] "
                         />
@@ -177,7 +185,7 @@ useEffect(() => {
                 </button>
                 <NavLink
                   to={"/editschedule"}
-                  state={{ data: item }}
+                  state={{ data: item,collection:"scheduled" }}
                   className="ml-2 bg-transparent "
                 >
                   <img

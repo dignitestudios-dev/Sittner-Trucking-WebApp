@@ -140,7 +140,7 @@ useEffect(() => {
   return (
     <div class="bg-[#F7F7F7] h-[80vh] py-5 px-5 ">
       <NavLink
-        to={"/"}
+        to={"/employee"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}

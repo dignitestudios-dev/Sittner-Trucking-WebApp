@@ -42,7 +42,7 @@ export default function ViewImage() {
                 >
                   {ModalImageUrl.map((img, i) => (
                     <SwiperSlide key={i}>
-                      <img src={img} className="rounded-lg   " alt="" srcset="" />
+                      <img src={img?.url} className="rounded-lg   " alt="" srcset="" />
                     </SwiperSlide>
                   ))}
                 </Swiper>

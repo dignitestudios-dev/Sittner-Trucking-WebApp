@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import EmployeeList from "../../components/Employee/EmployeeList";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
+import { MyContext } from "../../context/GlobalContext";
 
 export default function Employee() {
+  const {Employee}=useContext(MyContext)
+  const navigate=useNavigate("");
+  console.log(Employee,"empps");
+  
+  useEffect(()=>{
+    if(Employee?.role=="user"){
+       navigate("/profile",{ state: { id: Employee?.id } });
+    }
+   },[Employee])
   return (
     <div class="bg-[#F7F7F7] h-screen px-3 py-3 lg:py-10 lg:px-10 ">
       <div className="flex flex-wrap items-center justify-between">

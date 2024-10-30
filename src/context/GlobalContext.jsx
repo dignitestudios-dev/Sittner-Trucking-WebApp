@@ -32,6 +32,7 @@ export const MyContextProvider = ({ children }) => {
   const [ModalImageUrl,setModalImageUrl]=useState("");
   const [isMessageSeen,setIsMessageSeen]=useState([]);
   const [IsAttachments,setIsAttachments]=useState([]);
+  const [msgSeenEmp,setMsgSeenEmp]=useState([]);
   const [loader,setLoader] =useState(false);
   const [OtpVal,setOtpVal] =useState("");
   const [ForgetEmail,setForgetEmail] =useState("");
@@ -116,7 +117,9 @@ export const MyContextProvider = ({ children }) => {
         setLoader,
         loader,
         setForgetEmail,
-        ForgetEmail
+        ForgetEmail,
+        msgSeenEmp,
+        setMsgSeenEmp
       }}
     >
       {children}

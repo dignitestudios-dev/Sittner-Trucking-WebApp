@@ -1,91 +1,105 @@
 import React, { useContext, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
-import { addDoc, collection, db, getDocs, getDownloadURL, query, ref, storage, uploadBytesResumable, where } from "../../firbase/FirebaseInit";
+import {
+  addDoc,
+  collection,
+  db,
+  getDocs,
+  getDownloadURL,
+  query,
+  ref,
+  storage,
+  uploadBytesResumable,
+  where,
+} from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
 
 export default function CreateSchedule() {
   const navigate = useNavigate("");
-  const { SelectedTime, SelectedDate, Employee } = useContext(MyContext);
+  const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
+    useContext(MyContext);
+  const locationState = useLocation();
   const [message, setMessage] = useState("");
+
   const generateUniqueId = async () => {
     const randomId = Math.floor(100000 + Math.random() * 900000).toString();
-    const existingEmployee = await getDocs(query(collection(db, "scheduled"), where("id", "==", randomId)));    
+    const existingEmployee = await getDocs(
+      query(collection(db, "scheduled"), where("id", "==", randomId))
+    );
     if (!existingEmployee.empty) {
-        return generateUniqueId();
+      return generateUniqueId();
     }
     return randomId;
-};
+  };
+
   const HandleScheduled = async (e) => {
     e.preventDefault();
-    const scheduledRef = collection(db, "scheduled");
+    setLoader(true);
+    const scheduledRef = collection(db, locationState.state.collection);
     const imageUrls = [];
     const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
-        const uniqueId = await generateUniqueId();   
-        for (const image of images) {
-            const storageRef = ref(storage, `images/${uniqueId+image.name}`);
-            await uploadBytesResumable(storageRef, image);
-            const url = await getDownloadURL(storageRef);
-            imageUrls.push(url);
-            docType.push(image.type);
-        }
-
-        // Add the scheduled message to Firestore
-        await addDoc(scheduledRef, {
-            date: SelectedDate,
-            time: SelectedTime,
-            message,
-            id:uniqueId,
-            images: imageUrls,
-            status:"pending",
-            createdAt: new Date(),
-            type:docType,
-            employeeId: Employee.id,
-        });
-
-        // Update the loading toast to success
-        toast.update(loadingToastId, {
-            render: "Scheduled successfully!",
-            type: "success",
-            isLoading: false,
-            autoClose: 5000,
-        })
-            navigate("/schedule")
-
+      const uniqueId = await generateUniqueId();
+      for (const image of images) {
+        const storageRef = ref(storage, `images/${uniqueId + image.name}`);
+        await uploadBytesResumable(storageRef, image);
+        const url = await getDownloadURL(storageRef);
+        imageUrls.push({ url: url, name: image.name });
+        docType.push(image.type);
+      }
+      await addDoc(scheduledRef, {
+        date: SelectedDate,
+        time: SelectedTime,
+        message,
+        id: uniqueId,
+        images: imageUrls,
+        status: "pending",
+        createdAt: new Date(),
+        type: docType,
+        employeeId: Employee.id,
+      });
+      toast.update(loadingToastId, {
+        render: "Scheduled successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      setLoader(false);
+      locationState.state.collection=="look"?navigate("/"):navigate("/schedule")      
     } catch (error) {
-        console.error("Failed to schedule:", error);
-        // Update the loading toast to error
-        toast.update(loadingToastId, {
-            render: "Failed to schedule. Please try again.",
-            type: "error",
-            isLoading: false,
-            autoClose: 5000,
-        });
+      console.error("Failed to schedule:", error);
+      toast.update(loadingToastId, {
+        render: "Failed to schedule. Please try again.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      setLoader(false);
     }
-};
+  };
 
-const [images, setImages] = useState([]);
-const handleImageChange = (e) => {
-    setImages([...e.target.files]); 
-};
+  const [images, setImages] = useState([]);
+  const handleImageChange = (e) => {
+    setImages([...e.target.files]);
+  };
 
   return (
     <div class="bg-[#F7F7F7] h-[100vh] py-5 px-5 ">
       <NavLink
-        to={"/schedule"}
+        to={locationState.state.collection=="look"?"/":"/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
         <IoMdArrowBack size={25} className="mr-2" /> Create Message
       </NavLink>
 
-      <div class="bg-[#FFFFFF] mb-3 h-[70%] border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">
+      <div class="bg-[#FFFFFF] mb-3 h-[80%] border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">
         <form onSubmit={HandleScheduled}>
           <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
             <div className="mb-1 col-span-2">
@@ -110,20 +124,43 @@ const handleImageChange = (e) => {
                   onChange={handleImageChange}
                 />
               </label>
-              <div className={`image-preview grid grid-cols-12 mt-2 gap-2`}>
-                {images.length > 0 ? (
-                    Array.from(images).map((image, index) => (
+              {images.length > 0 && (
+                <div className={`image-preview grid grid-cols-12 mt-2 gap-2`}>
+                  {Array.from(images).map((image, targetIndex) => (
+                    <div key={targetIndex}>
+                      {image.type?.includes("image") ? (
                         <img
-                            key={index}
-                            src={URL.createObjectURL(image)}
-                            alt={`preview-${index}`}
-                            className="w-[55px] h-[55px] "
+                          src={URL.createObjectURL(image)}
+                          alt=""
+                          className="h-[100px] rounded-md w-[100px]"
+                          srcset=""
                         />
-                    ))
-                ) : (
-null
-                )}
-            </div>
+                      ) : image.type.includes("video") ? (
+                        <img
+                          src={"/video.webp"}
+                          alt=""
+                          className="h-[100px] rounded-md w-[100px]"
+                          srcset=""
+                        />
+                      ) : image.type?.includes("spreadsheetml") ? (
+                        <img
+                          src={"/xl.webp"}
+                          alt=""
+                          className="h-[100px] rounded-md w-[100px]"
+                          srcset=""
+                        />
+                      ) : (
+                        <img
+                          src={"/pdf.webp"}
+                          alt=""
+                          className="h-[100px] rounded-md w-[100px]"
+                          srcset=""
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="mb-3 grid grid-cols-1 lg:grid-cols-2 col-span-1">
               <DatePicker />
@@ -133,6 +170,7 @@ null
           <div className="flex items-center gap-5 mt-5">
             <button
               type="submit"
+              disabled={loader?loader:false}
               className="text-white bg-[#0A8A33] rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
             >
               Schedule

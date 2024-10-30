@@ -194,3 +194,15 @@ font-weight: 600 !important;
   width: 100%;
   height: 100%;
 }
+
+.parrafos {
+  font-size: 15px;
+}
+
+.titulos {
+  font-size: 20px;
+}
+
+.renglon {
+  margin-bottom: -7px;
+}

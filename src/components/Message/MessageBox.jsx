@@ -41,7 +41,9 @@ export default function MessageBox() {
     setIsAttachments,
     setLoader,
     loader,
-    isMessageSeen
+    msgSeenEmp,
+    isMessageSeen,
+    setMsgSeenEmp,
   } = useContext(MyContext);
   const [Message, SetMessages] = useState([]);
   const [UserMsg, setUserMsg] = useState("");
@@ -50,8 +52,8 @@ export default function MessageBox() {
   const [sentLoad, setSentLoad] = useState(false);
   const loc = useLocation();
   const msgBodyScroll = useRef();
-  const [EmployeeCount,setEmployeeCount]=useState();
-  
+  const [EmployeeCount, setEmployeeCount] = useState();
+
   useEffect(() => {
     if (sentMessage === 0) {
       setLoader(true);
@@ -89,21 +91,24 @@ export default function MessageBox() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const groupQuery = query(collection(db, "group"));      
+      const groupQuery = query(collection(db, "group"));
       const unsubscribe = onSnapshot(groupQuery, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           setGroupName({ docId: doc.id, ...doc.data() });
         });
       });
 
-      const employeeQuery = query(collection(db, "employee"), where("role", "==", "user"));
+      const employeeQuery = query(
+        collection(db, "employee"),
+        where("role", "==", "user")
+      );
       const snapshot = await getCountFromServer(employeeQuery);
-      setEmployeeCount(snapshot.data().count); 
+      setEmployeeCount(snapshot.data().count);
       return () => unsubscribe();
     };
 
     fetchData();
-  }, []);  
+  }, []);
 
   const generateUniqueId = async () => {
     const randomId = Math.floor(100000 + Math.random() * 900000).toString();
@@ -137,7 +142,7 @@ export default function MessageBox() {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);
         await uploadBytesResumable(storageRef, image);
         const url = await getDownloadURL(storageRef);
-        imageUrls.push(url);
+        imageUrls.push({url:url,name:image.name});
         docType.push(image.type);
       }
       await addDoc(scheduledRef, {
@@ -184,7 +189,7 @@ export default function MessageBox() {
     if (loc.pathname == "/") {
       Message.map(async (item, i) => {
         const scheduledRef = doc(db, "message", item.docId);
-        console.log(item,"itemsssMsgs");
+        console.log(item, "itemsssMsgs");
         if (!item.UserMsgSeen.includes(Employee.id)) {
           await updateDoc(scheduledRef, {
             UserMsgSeen: [...item.UserMsgSeen, Employee.id],
@@ -193,11 +198,45 @@ export default function MessageBox() {
       });
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
     MessageSeen();
-  },[Message])
+  }, [Message]);
 
- 
+  const [employee, setEmployee] = useState([]);
+
+  const getEmploye = () => {
+    const employeesRef = collection(db, "employee");
+    const employeeQuery = query(employeesRef);
+    const unsubscribe = onSnapshot(employeeQuery, (querySnapshot) => {
+      const employeeData = querySnapshot.docs.map((doc) => ({
+        docid: doc.id,
+        ...doc.data(),
+      }));
+      setEmployee(employeeData);
+    });
+    return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = getEmploye();
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const employeeIds = employee.map(data => data.id); 
+    const messageSeenEmp = Message.filter(item => 
+      item.UserMsgSeen.some(userId => employeeIds.includes(userId)) 
+    );
+  
+    const seenEmployeeData = employee.filter(emp => 
+      messageSeenEmp.some(msg => msg.UserMsgSeen.includes(emp.id))
+    );
+    setMsgSeenEmp(seenEmployeeData);
+  }, [Message]);
+  
+  
+
+ const col_Array=["bg-[#E8F569]","bg-[#B9FF9E]","bg-[#94D0E4]"];
 
   return (
     <div className="bg-[#FFFFFF] w-full  h-[80%] lg:h-[630px]  relative rounded-[24px]">
@@ -206,24 +245,19 @@ export default function MessageBox() {
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div>
-
-            {
-                      GroupName.groupimg?(
-                        <img
-                src={GroupName.groupimg}
-                class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
-                alt=""
-              />
-                      ):(
-                        <img
-                src={"noprofile.png"}
-                class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
-                alt=""
-              />
-                      )
-                    }
-
-             
+              {GroupName.groupimg ? (
+                <img
+                  src={GroupName.groupimg}
+                  class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                  alt=""
+                />
+              ) : (
+                <img
+                  src={"noprofile.png"}
+                  class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                  alt=""
+                />
+              )}
             </div>
             <div
               className="ml-2 cursor-pointer "
@@ -299,15 +333,13 @@ export default function MessageBox() {
                         Employee?.role == "admin"
                           ? "bg-[#0A8A33] text-white"
                           : "bg-[#F4F4F4]"
-                      }   w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
+                      } w-full rounded-2xl rounded-tr-none px-2 py-3 text-xs font-normal`}
                     >
                       {msg.message}
                     </div>
                   )}
                   {msg.images.length > 0 && (
-                    <div
-                      className={`w-full py-3 grid grid-cols-${msg.images.length} gap-2`}
-                    >
+                    <div className={`w-full py-3 grid grid-cols-${msg.images.length} gap-2`} >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <div
@@ -315,7 +347,7 @@ export default function MessageBox() {
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
                             <img
-                              src={img?img:"noprofile.png"}
+                              src={img.url ? img.url : "/noprofile.png"}
                               className="cursor-pointer rounded-md h-[80px] w-[80px]"
                               onClick={() => {
                                 setModalImageUrl(msg.images);
@@ -333,7 +365,7 @@ export default function MessageBox() {
                               className="cursor-pointer rounded-md "
                               onClick={() => {}}
                               controls
-                              src={img}
+                              src={img.url}
                             />
                           </div>
                         ) : msg.type[index]?.includes("spreadsheetml") ? (
@@ -342,7 +374,7 @@ export default function MessageBox() {
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
                             <a
-                              href={img}
+                              href={img.url}
                               download
                               target="_blank"
                               rel="noopener noreferrer"
@@ -360,7 +392,7 @@ export default function MessageBox() {
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
                             <a
-                              href={img}
+                              href={img.url}
                               download
                               target="_blank"
                               rel="noopener noreferrer"
@@ -379,31 +411,28 @@ export default function MessageBox() {
                 </div>
                 <div className="flex items-center gap-1 justify-end">
                   {Employee?.role == "admin" && (
-                    <div className="flex items-center ">
-                      <div className="msg-view bg-[#E8F569] w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full">
+                    <div className="flex items-center gap-2 ">
+                      {
+                        msgSeenEmp.slice(0,4).filter((fil)=>fil.role!="admin").map((seen,i)=>(
+                                                  
+                      <div className={`msg-view ${col_Array[i]} w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full`}>
                         <img
-                          src="/person1.png"
-                          className="w-full h-full"
+                          src={seen.pic?seen.pic:"/noprofile.png"}
+                          className="w-full h-full rounded-full "
                           alt=""
                           srcset=""
                         />
                       </div>
-                      <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#B9FF9E] rounded-full">
-                        <img
-                          src="/person2.png"
-                          className="w-full h-full"
-                          alt=""
-                          srcset=""
-                        />
-                      </div>
-                      <div className="msg-view w-[30px] h-[30px] flex p-1 items-center justify-center bg-[#94D0E4] rounded-full">
-                        <img
-                          src="/person3.png"
-                          className="w-full  h-full"
-                          alt=""
-                          srcset=""
-                        />
-                      </div>
+                     
+                       ))
+                      }
+                       {
+                    msgSeenEmp.length>3&&(
+                      <div className={`msg-view bg-[#0A8A33] text-white w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full`}>
+                       <span className="font-[20px]" >{msgSeenEmp.length}+</span>
+                    </div>
+                    )
+                  }
                       <img
                         src="/tick-double.png"
                         onClick={() => {
@@ -415,6 +444,7 @@ export default function MessageBox() {
                       />
                     </div>
                   )}
+                 
                   <span className=" text-[10px] font-normal leading-[10px] text-[#797C7B]">
                     {msg?.time}
                   </span>
@@ -430,7 +460,7 @@ export default function MessageBox() {
           {images.length > 0 && (
             <div className="shadow-xl bg-slate-100 px-2 py-2 w-[90%] mx-auto flex items-center gap-5 nowrap scroll-box  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
-                <div key={targetIndex} >
+                <div key={targetIndex}>
                   <div className="flex justify-end px-3 pb-2">
                     <button
                       className="bg-transparent"
@@ -441,7 +471,7 @@ export default function MessageBox() {
                         setImages(newArray);
                       }}
                     >
-                      <IoMdClose  className="text-red-500"/>
+                      <IoMdClose className="text-red-500" />
                     </button>
                   </div>
 

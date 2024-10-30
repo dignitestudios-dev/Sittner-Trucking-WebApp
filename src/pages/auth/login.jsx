@@ -7,7 +7,7 @@ import { auth,collection,db,getDocs,onAuthStateChanged,query,signInWithEmailAndP
 import { toast } from "react-toastify";
 import Cookies from 'js-cookie';
 export default function Login() {
-  const { Employee,setEmployee } = useContext(MyContext);
+  const { Employee,setEmployee,loader,setLoader } = useContext(MyContext);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +21,7 @@ export default function Login() {
 
   const Login = async (e) => {
     e.preventDefault();
+    setLoader(true)
     try {
         const employeesRef = collection(db, "employee");
         const employeeQuery = query(
@@ -29,18 +30,19 @@ export default function Login() {
             where("password", "==", password)
         ); 
         const querySnapshot = await getDocs(employeeQuery);
-        const employeeData = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-        console.log(employeeData, "employeeData");
-
+        const employeeData = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));        
         if (employeeData.length > 0) {
             setEmployee(employeeData[0]);          
             Cookies.set('employe', JSON.stringify(employeeData[0]));    
-        } else {
+            setLoader(false)
+        } else {  
+          setLoader(false)
             toast.error("Invalid email or password.");
             console.log("No employee found with the provided credentials.");
         }
     } catch (error) {
-        toast.error("Error fetching employee data."); // Show toast for general errors
+        toast.error("Error fetching employee data."); 
+        setLoader(false)
         console.error("Error fetching employee data:", error);             
     } 
 };
@@ -134,6 +136,7 @@ export default function Login() {
           <div>
             <button
               type="submit"
+              disabled={loader?loader:false}
               className="text-white bg-[#0A8A33]  rounded-lg  w-full  px-5 py-2.5 text-center"
             >
               Login

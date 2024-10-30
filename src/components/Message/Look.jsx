@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LookBehind from "./LookBehind";
 import LookAhead from "./LookAhead";
 import { toast } from "react-toastify";
-import { collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
+import { addDoc, collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
+import { MyContext } from "../../context/GlobalContext";
 export default function Look() {
   const [IsBehind, setIsBehind] = useState(true);
-
+  const {Employee}=useContext(MyContext) 
   const [notifications, setNotifications] = useState([]);
   const [PendNot, setPendNot] = useState([]);
   const [DelNot, setDelNot] = useState([]);
 
   useEffect(() => {
     const notificationsRef = collection(db, "look");
+    const messageRef = collection(db, "message");
     const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
       const currentDate = new Date().toLocaleDateString("en-US");
       const currentTime = new Date().toLocaleTimeString([], {
@@ -29,17 +31,24 @@ export default function Look() {
         const now = new Date(`${currentDate} ${currentTime}`);
 
         fetchedNotifications.push({ docId: doc.id, ...data });
-
         if (notificationDate <= now && data.status !== "Delivered") {
           updates.push(updateDoc(doc.ref, { status: "Delivered" }));
+          addDoc(messageRef, {
+            time: data?.time,
+            message: data?.message,
+            UserMsgSeen: [],
+            images: data?.images,
+            id: data.id,
+            type: data?.type,
+            createdAt: new Date(),
+            employeeId: Employee?.id,
+          })
         }
       });
 
       if (updates.length > 0) {
         await Promise.all(updates);
       }
-
-      // Sort and update state
       fetchedNotifications.sort((a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`));
       setNotifications(fetchedNotifications);
     });

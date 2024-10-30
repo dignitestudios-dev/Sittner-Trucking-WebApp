@@ -8,7 +8,7 @@ import { addDoc, collection, db } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 
 export default function CreateNotification() {
-  const { SelectedTime, SelectedDate,Employee } = useContext(MyContext);
+  const { SelectedTime, SelectedDate,Employee,loader,setLoader } = useContext(MyContext);
   const navigate = useNavigate("");
   const [Notification, SetNotification] = useState({
     title: "",
@@ -25,6 +25,7 @@ export default function CreateNotification() {
 
   const UploadNotification = (e) => {
     e.preventDefault();
+    setLoader(true)
     const myPromise = new Promise(async (resolve, reject) => {
         try {
             await addDoc(collection(db, "notification"), {
@@ -47,6 +48,7 @@ export default function CreateNotification() {
         success: (data) => data,
         error: (error) => error,
     }).then(() => {
+      setLoader(false)
         navigate("/notification");
     });
   };
@@ -100,6 +102,7 @@ export default function CreateNotification() {
           <div className="flex items-center gap-5 mt-5">
             <button
               type="submit"
+              disabled={loader?loader:false}
               className="text-white bg-[#0A8A33]  rounded-lg  w-[150px] h-[50px]  px-5 py-2.5 text-center"
             >
               Save

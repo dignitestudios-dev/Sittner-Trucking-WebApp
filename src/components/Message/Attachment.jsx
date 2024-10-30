@@ -86,7 +86,7 @@ export default function Attachment() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[13px] font-medium  ">
-                                  Important Picture.jpg
+                                  {img.name}
                                 </p>
                               </div>
                             </div>
@@ -106,7 +106,7 @@ export default function Attachment() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[13px] font-medium  ">
-                                  Important Video.mp4
+                                  {img.name}
                                 </p>
                               </div>
                             </div>
@@ -126,7 +126,7 @@ export default function Attachment() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[13px] font-medium  ">
-                                  Excel File.xls
+                                  {img.name}
                                 </p>
                               </div>
                             </div>
@@ -146,7 +146,7 @@ export default function Attachment() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[13px] font-medium  ">
-                                  Document File.pdf
+                                  {img.name}
                                 </p>
                               </div>
                             </div>
@@ -156,13 +156,14 @@ export default function Attachment() {
                     )}
                   </>
                 ))}
-
-                <button
-                  onClick={() => setIsViewAll(true)}
-                  className="bg-transparent text-[13px] font-medium text-[#007AFF] space-x-4 mt-5 underline"
-                >
-                  View all
-                </button>
+                {IsAttachments.length > 4 && (
+                  <button
+                    onClick={() => setIsViewAll(true)}
+                    className="bg-transparent text-[13px] font-medium text-[#007AFF] space-x-4 mt-5 underline"
+                  >
+                    View all
+                  </button>
+                )}
               </ul>
             </div>
           </div>

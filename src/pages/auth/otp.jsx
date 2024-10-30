@@ -6,7 +6,7 @@ import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
 
 export default function Otp() {
-  const {OtpVal,Otp,setOtp,ForgetEmail,setOtpVal}=useContext(MyContext);
+  const {OtpVal,Otp,setOtp,ForgetEmail,setOtpVal,setLoader,loader}=useContext(MyContext);
   const navigate=useNavigate("");
   
    useEffect(()=>{
@@ -31,19 +31,24 @@ export default function Otp() {
       intervalId = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
-    } else {
-      setOtp(""); 
-    }
+    } 
     return () => clearInterval(intervalId);
   }, [timer]);
   
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOtp(""); 
+    }, 120000);
+    return () => clearTimeout(timer);
+}, [timer]);
+
   const ResendOTP = async (e) => {
     e.preventDefault();
-    setTimer(60)
-    setOtpVal("")
+    setTimer(60)    
     const toastId = toast.loading("Sending OTP...");
     try {
-      const res = await fetch(`http://localhost:4000/sendOTP?email=${ForgetEmail}`, {
+      const res = await fetch(`node-js-otp-send.vercel.app/sendOTP?email=${ForgetEmail}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +66,9 @@ export default function Otp() {
           isLoading: false,
           autoClose: 3000
         });
+        
       } else {
+        
         toast.update(toastId, {
           render: "Failed to send OTP.",
           type: "error",
@@ -70,6 +77,7 @@ export default function Otp() {
         });
       }
     } catch (error) {
+      
       toast.update(toastId, {
         render: "An error occurred.",
         type: "error",
@@ -106,6 +114,7 @@ export default function Otp() {
         </p>
         <div className="mt-6 flex justify-center">
           <button
+          
             onClick={HandleSubmit}
             className="text-white bg-[#0A8A33] lg:w-[370px] rounded-lg    px-5 py-2.5 text-center"
           >

@@ -37,7 +37,7 @@ export default function ViewAllModal() {
                             msg.type[index]?.includes("image") ? (
                               <li className="mt-3">
                                 <a
-                                  href={img}
+                                  href={img.url}
                                   download
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -51,7 +51,7 @@ export default function ViewAllModal() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[13px] font-medium  ">
-                                        Important Picture.jpg
+                                        {img.name}
                                       </p>
                                     </div>
                                   </div>
@@ -60,7 +60,7 @@ export default function ViewAllModal() {
                             ) : msg.type[index]?.includes("video") ? (
                               <li className="mt-3">
                                 <a
-                                  href={img}
+                                  href={img.url}
                                   download
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -74,7 +74,7 @@ export default function ViewAllModal() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[13px] font-medium  ">
-                                        Important Video.mp4
+                                        {img.name}
                                       </p>
                                     </div>
                                   </div>
@@ -94,7 +94,7 @@ export default function ViewAllModal() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[13px] font-medium  ">
-                                        Excel File.xls
+                                      {img.name}
                                       </p>
                                     </div>
                                   </div>
@@ -103,7 +103,7 @@ export default function ViewAllModal() {
                             ) : (
                               <li className="mt-3">
                                 <a
-                                  href={img}
+                                  href={img?.name}
                                   download
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -117,7 +117,7 @@ export default function ViewAllModal() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[13px] font-medium  ">
-                                        Document File.pdf
+                                       {img?.name}
                                       </p>
                                     </div>
                                   </div>
