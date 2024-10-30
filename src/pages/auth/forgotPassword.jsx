@@ -23,6 +23,7 @@ export default function ForgotPassword() {
     setForgetEmail(email);
     const toastId = toast.loading("Sending OTP...");
     try {
+      window.open(`https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`)
       const res = await fetch(
         `https://nodejsotp-e03zn32vm-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
