@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
@@ -17,6 +17,12 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 
 const Controls = () => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
+  const { viewImage} = useContext(MyContext);
+  useEffect(()=>{
+    if(viewImage){
+      zoomOut()
+    }
+  },[])
 
   return (
     <div className="tools flex gap-2">
@@ -30,8 +36,6 @@ const Controls = () => {
 export default function ViewImage() {
   const { viewImage, setIviewImage, ModalImageUrl } = useContext(MyContext);
 
-
-  
   return (
     <>
       {viewImage ? (
