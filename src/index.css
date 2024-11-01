@@ -185,6 +185,8 @@ font-weight: 600 !important;
 
   /* Center slide text vertically */
   display: flex;
+  flex-direction: column;
+  
   justify-content: center;
   align-items: center;
 }

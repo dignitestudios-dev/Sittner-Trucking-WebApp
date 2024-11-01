@@ -23,6 +23,8 @@ export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
     useContext(MyContext);
+    console.log(SelectedDate,"currnet data");
+  
   const locationState = useLocation();
   const [message, setMessage] = useState("");
 
@@ -45,6 +47,8 @@ export default function CreateSchedule() {
     const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
+      console.log(SelectedDate,SelectedTime,"selectedDatess");
+      
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);

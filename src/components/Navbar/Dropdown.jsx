@@ -24,6 +24,7 @@ export default function Dropdown() {
         Promise.all(updates)
           .then(() => {
             console.log("All notifications updated successfully.");
+            setNotificationCount(0)
           })
           .catch(error => {
             console.error("Error updating notifications: ", error);

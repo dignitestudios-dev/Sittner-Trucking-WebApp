@@ -62,11 +62,18 @@ export default function LookAhead({ pendingNotifications }) {
                           key={index}
                           className="rounded-xl flex justify-center  py-1 bg-[#F4F4F4] text-xs font-normal"
                         >
+                          <a
+                            href={img.url}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                           <img
                             src={img.url ? img.url : "/noprofile.png"}
                             className="cursor-pointer rounded-md h-[30px] w-[30px]"
                             alt=""
                           />
+                          </a>
                         </div>
                       ) : item.type[index]?.includes("video") ? (
                         <div

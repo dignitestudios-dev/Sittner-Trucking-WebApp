@@ -63,9 +63,9 @@ export default function EmployeeList() {
               <th scope="col" className="px-6 py-3 ">
                 Contact
               </th>
-              <th scope="col" className="px-6 py-3 ">
+              {/* <th scope="col" className="px-6 py-3 ">
                 Address
-              </th>
+              </th> */}
               <th scope="col" className="px-6 py-3 ">
                 Action
               </th>
@@ -104,11 +104,11 @@ export default function EmployeeList() {
                   <td className="px-6 text-[13px] font-normal text-[#181818]">
                     {item.contact}
                   </td>
-                  <td className="px-6 text-[13px] w-[200px] lg:w-auto font-normal text-[#181818]">
+                  {/* <td className="px-6 text-[13px] w-[200px] lg:w-auto font-normal text-[#181818]">
                     <p className="w-[200px] overflow-auto text-nowrap lg:w-auto">
                       {item.address}
                     </p>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-6" onClick={()=>{
                     setDeleteDocId(item.docId)
                     setDeleteEmpId(item.id)

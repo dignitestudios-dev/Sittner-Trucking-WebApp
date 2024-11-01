@@ -45,7 +45,7 @@ export default function NotificationList() {
   }, [RealTimeData]);
 
   return (
-    <div className="bg-[#FFFFFF] border rounded-[10px] border-[#E4E4E4] mt-6 px-3 py-3 lg:py-5 lg:px-5">
+    <div className="bg-[#FFFFFF] border rounded-[10px] h-[70vh] scroll-box  overflow-auto border-[#E4E4E4] mt-6 px-3 py-3 lg:py-5 lg:px-5">
       <div className="relative overflow-x-auto">
         {loader ? (
           <Loader />

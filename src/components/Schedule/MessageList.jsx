@@ -66,7 +66,12 @@ export default function MessageList() {
 
 useEffect(() => {
   const checkAndSendNotifications = async (empData) => {
-    const currentDate = new Date();
+    const currentDate = new Date().toLocaleDateString("en-US");
+      const currentTime = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
     const notificationsRef = collection(db, "scheduled");
     const messageRef = collection(db, "message");
 
@@ -75,10 +80,35 @@ useEffect(() => {
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const notificationDate = new Date(`${data.date} ${data.time}`);
-      if (notificationDate <= currentDate && data.status === "pending") {
+      
+      // Options for formatting
+      const options = {
+        timeZone: "America/Denver", // Ensure the timezone is set to Mountain Time
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true, // Change to true for AM/PM format
+      };
+    
+      // Create notification date in Mountain Time
+      const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
+    
+      // Create current date in Mountain Time
+      const now = new Date();
+      
+      // Format both dates for logging
+      const formattedNotificationDate = new Intl.DateTimeFormat("en-US", options).format(notificationDate).replace(/,/g, '');
+      const formattedCurrentDate = new Intl.DateTimeFormat("en-US", options).format(now).replace(/,/g, '');
+    
+      console.log(formattedNotificationDate, formattedCurrentDate, "scheduledtime");
+    
+      // Compare the actual Date objects, not the formatted strings
+      if (notificationDate <= now && data.status === "pending") {
         updates.push(
-          updateDoc(doc.ref, {status: "Sent"}),
+          updateDoc(doc.ref, { status: "Sent" }),
           addDoc(messageRef, {
             time: data?.time,
             message: data?.message,
@@ -92,6 +122,7 @@ useEffect(() => {
         );
       }
     });
+    
 
     await Promise.all(updates);
   };
@@ -111,7 +142,7 @@ useEffect(() => {
 
 
   return (
-    <div className="bg-[#FFFFFF] border rounded-[10px] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-6  lg:px-10">
+    <div className="bg-[#FFFFFF] border  scroll-box  overflow-auto h-[70vh]  rounded-[10px] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-6  lg:px-10">
       {loader ? (
         <Loader />
       ) : scheduled.length === 0 ? (

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { collection, db, getDocs, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
-
+import { toast } from "react-toastify";
 export default function DropdownList() {
   const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
@@ -12,46 +12,78 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
-    const getNots=()=>{
-      const notificationsRef = collection(db, "notification");
-      const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-          const currentDate = new Date();
-          const currentTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-          const fetchedNotifications = [];
-          querySnapshot.forEach((doc) => {
-              const data = doc.data();
-              const notificationDate = new Date(data.date + ' ' + data.time); 
-              fetchedNotifications.push({ id: doc.id, ...data });   
-              if (notificationDate <= currentDate && data.status !== "Delivered") {
-                  updateDoc(doc.ref, { 
+  const getCurrentMountainDateTime = () => {
+    const now = new Date();
+  
+    // Create a new date object for Mountain Time
+    const mountainTimeNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Denver" }));
+  
+    return mountainTimeNow; // This will return the date object in Mountain Time
+  };
+  
+  // Example usage
+  const mountainDateTime = getCurrentMountainDateTime();
+
+  const getNots = () => {
+    const notificationsRef = collection(db, "notification");
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+        const fetchedNotifications = [];
+        
+        // Get current date and time in Mountain Time
+        const mountainTimeNow = getCurrentMountainDateTime();
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
+            const formattedNotificationDate = notificationDate.getTime();
+            const formattedCurrentDate = mountainTimeNow.getTime(); 
+
+            fetchedNotifications.push({ id: doc.id, ...data });
+            console.log(data, formattedNotificationDate, formattedCurrentDate, "data coming");
+
+            if (formattedNotificationDate < formattedCurrentDate && data.status == "Scheduled") {
+                updateDoc(doc.ref, {
                     status: "Delivered",
-                    seen:"pending"
-                  });
-                  setRealTimeData(prev=>prev+1)
-              }
-          });
-          const sortedNotifications = fetchedNotifications.sort((a, b) => {
-              const dateA = new Date(a.date + ' ' + a.time);
-              const dateB = new Date(b.date + ' ' + b.time);
-              return dateB - dateA;
-          });
+                    seen: "pending"
+                }).then(() => {
+                  toast.success(`Notification delivered: ${data.message}`, {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                });
+            }
+        });
 
-          setNotifications(sortedNotifications);
-      });
-      return unsubscribe;
-    }
-    
-    useEffect(() => {
-      const unsubscribe = getNots();
-      const intervalId = setInterval(() => {
-          getNots();
-      }, 30000);
+        const sortedNotifications = fetchedNotifications.sort((a, b) => {
+            const dateA = new Date(a.date + ' ' + a.time).getTime();
+            const dateB = new Date(b.date + ' ' + b.time).getTime();
+            return dateB - dateA; // Sort in descending order
+        });
 
-      return () => {
-          clearInterval(intervalId);
-          unsubscribe();
-      };
-  }, []);
+        setNotifications(sortedNotifications);
+    });
+
+    return unsubscribe;
+};
+
+useEffect(() => {
+    const unsubscribe = getNots();
+    const intervalId = setInterval(() => {
+        getNots();
+    }, 30000);
+
+    return () => {
+        clearInterval(intervalId);
+        unsubscribe();
+    };
+}, []);
+
+  
 
 
   useEffect(() => {
@@ -64,7 +96,7 @@ export default function DropdownList() {
     });
     console.log(pendingNotifications,"pending");
     
-    if (deliveredNotifications.length<0) {
+    if (pendingNotifications.length<0) {
       setNotificationCount(0);
     } else {
       setNotificationCount(pendingNotifications.length); 

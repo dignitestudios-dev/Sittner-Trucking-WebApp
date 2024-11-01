@@ -5,7 +5,7 @@ import MessageList from "../../components/Schedule/MessageList";
 import DeleteSchedule from "../../components/Schedule/DeleteSchedule";
 export default function Schedule() {
   return (
-    <div class="bg-[#F7F7F7] h-screen py-3 px-3  lg:py-10 lg:px-10 ">
+    <div class="bg-[#F7F7F7] h-[100%] py-3 px-3  lg:py-10 lg:px-10 ">
       <div className="flex flex-wrap items-center justify-between">
         <div>
           <NavLink className="font-semibold text-[24px] mb-5 leading-[29px] flex items-center">

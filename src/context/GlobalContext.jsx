@@ -3,7 +3,7 @@ export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
   const currentTime = new Date();
-  const formattedTime = `${currentTime.getHours() % 12 || 12}:${String(currentTime.getMinutes()).padStart(2, '0')}:${String(currentTime.getSeconds()).padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`;
+  const formattedTime = `${currentTime.getHours() % 12 || 12}:${String(currentTime.getMinutes()).padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`;
 
   const [PasswordSuccessFullChange, setPasswordSuccessFullChange] = useState(false);
   const [ChangePassword, setIsChangePassword] = useState(false);
@@ -28,8 +28,32 @@ export const MyContextProvider = ({ children }) => {
   const [DeleteEmpId,setDeleteEmpId]=useState();
   const [DeleteDocId,setDeleteDocId]=useState();
   const [NotificationCount,setNotificationCount]=useState(0);
-  const [SelectedDate,setSelectDate]=useState(new Date().toLocaleDateString());
-  const [SelectedTime,setSelectTime]=useState(formattedTime);
+  const [SelectedDate,setSelectDate]=useState();
+  const [SelectedTime,setSelectTime]=useState();
+  useEffect(() => {
+    const currentTime = new Date();
+    
+    // Mountain Time ke liye date aur time format karna
+    const options = { timeZone: 'America/Denver' };
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      ...options,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(currentTime);
+
+    const formattedTime = new Intl.DateTimeFormat('en-US', {
+      ...options,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(currentTime);
+
+    setSelectDate(formattedDate);
+    setSelectTime(formattedTime);
+  }, []);
+   
+
   const [GroupName,setGroupName]=useState("");
   const [ModalImageUrl,setModalImageUrl]=useState("");
   const [isMessageSeen,setIsMessageSeen]=useState([]);

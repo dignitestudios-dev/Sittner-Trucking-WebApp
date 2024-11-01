@@ -14,6 +14,7 @@ export default function CreateNotification() {
     title: "",
     description: "",
   });
+console.log(SelectedTime,SelectedDate,"datees");
 
   const HandleInput = (e) => {
     const { name, value } = e.target;

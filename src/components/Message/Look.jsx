@@ -2,11 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import LookBehind from "./LookBehind";
 import LookAhead from "./LookAhead";
 import { toast } from "react-toastify";
-import { addDoc, collection, db, getDocs, onSnapshot, updateDoc } from "../../firbase/FirebaseInit";
+import {
+  addDoc,
+  collection,
+  db,
+  getDocs,
+  onSnapshot,
+  updateDoc,
+} from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 export default function Look() {
   const [IsBehind, setIsBehind] = useState(true);
-  const {Employee}=useContext(MyContext) 
+  const { Employee } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [PendNot, setPendNot] = useState([]);
   const [DelNot, setDelNot] = useState([]);
@@ -25,13 +32,36 @@ export default function Look() {
       const fetchedNotifications = [];
       const updates = [];
 
-      querySnapshot.docs.forEach(doc => {
+      querySnapshot.docs.forEach((doc) => {
         const data = doc.data();
-        const notificationDate = new Date(`${data.date} ${data.time}`);
-        const now = new Date(`${currentDate} ${currentTime}`);
+          
+        const options = {
+          timeZone: "America/Denver",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          weekday: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        };
+      
+        const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
 
+        // Create current date in Mountain Time
+        const now = new Date();
+        
+        // Format both dates for logging
+        const formattedNotificationDate = new Intl.DateTimeFormat("en-US", options).format(notificationDate).replace(/,/g, '');
+        const formattedCurrentDate = new Intl.DateTimeFormat("en-US", options).format(now).replace(/,/g, '');
+      
+        console.log(formattedNotificationDate, formattedCurrentDate, "scheduledtime");
+      
         fetchedNotifications.push({ docId: doc.id, ...data });
-        if (notificationDate <= now && data.status !== "Delivered") {
+      
+        // Comparison between Date objects
+        if (formattedNotificationDate <= formattedCurrentDate && data.status == "pending") {
           updates.push(updateDoc(doc.ref, { status: "Delivered" }));
           addDoc(messageRef, {
             time: data?.time,
@@ -42,14 +72,18 @@ export default function Look() {
             type: data?.type,
             createdAt: new Date(),
             employeeId: Employee?.id,
-          })
+          });
         }
       });
+      
 
       if (updates.length > 0) {
         await Promise.all(updates);
       }
-      fetchedNotifications.sort((a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`));
+      fetchedNotifications.sort(
+        (a, b) =>
+          new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
+      );
       setNotifications(fetchedNotifications);
     });
     return unsubscribe;
@@ -66,7 +100,6 @@ export default function Look() {
     setPendNot(pendingNotifications);
     setDelNot(deliveredNotifications);
   }, [notifications]);
-
 
   return (
     <div className="bg-[#FFFFFF] h-[630px]  rounded-[24px]">
@@ -88,7 +121,11 @@ export default function Look() {
           Look Ahead
         </button>
       </div>
-      {IsBehind ? <LookBehind deliveredNotifications={DelNot} /> : <LookAhead pendingNotifications={PendNot} />}
+      {IsBehind ? (
+        <LookBehind deliveredNotifications={DelNot} />
+      ) : (
+        <LookAhead pendingNotifications={PendNot} />
+      )}
     </div>
   );
 }
