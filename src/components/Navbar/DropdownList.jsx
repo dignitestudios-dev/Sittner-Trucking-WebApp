@@ -14,11 +14,9 @@ export default function DropdownList() {
 
   const getCurrentMountainDateTime = () => {
     const now = new Date();
-  
-    // Create a new date object for Mountain Time
+
     const mountainTimeNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Denver" }));
-  
-    return mountainTimeNow; // This will return the date object in Mountain Time
+    return mountainTimeNow; 
   };
   
   // Example usage
@@ -29,7 +27,6 @@ export default function DropdownList() {
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
         const fetchedNotifications = [];
         
-        // Get current date and time in Mountain Time
         const mountainTimeNow = getCurrentMountainDateTime();
 
         querySnapshot.forEach((doc) => {
@@ -37,28 +34,26 @@ export default function DropdownList() {
             const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
             const formattedNotificationDate = notificationDate.getTime();
             const formattedCurrentDate = mountainTimeNow.getTime(); 
-
             fetchedNotifications.push({ id: doc.id, ...data });
-            console.log(data, formattedNotificationDate, formattedCurrentDate, "data coming");
-
             if (formattedNotificationDate < formattedCurrentDate && data.status == "Scheduled") {
                 updateDoc(doc.ref, {
                     status: "Delivered",
                     seen: "pending"
                 }).then(() => {
-                  toast.success(`Notification delivered: ${data.message}`, {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                  if(Employee.role=="user"){
+                    toast.success(`Notification delivered: ${data.message}`, {
+                      position: "top-right",
+                      autoClose: 3000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                  });
+                  }                
                 });
             }
         });
-
         const sortedNotifications = fetchedNotifications.sort((a, b) => {
             const dateA = new Date(a.date + ' ' + a.time).getTime();
             const dateB = new Date(b.date + ' ' + b.time).getTime();

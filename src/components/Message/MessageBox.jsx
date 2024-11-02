@@ -145,9 +145,15 @@ export default function MessageBox() {
         imageUrls.push({url:url,name:image.name});
         docType.push(image.type);
       }
+      const options = { timeZone: 'America/Denver' };
       await addDoc(scheduledRef, {
         date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
+        time:new Intl.DateTimeFormat('en-US', {
+          ...options,
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        }).format(new Date()),
         message: UserMsg,
         id: uniqueId,
         images: imageUrls,
@@ -196,8 +202,14 @@ export default function MessageBox() {
        
         if (!hasSeen) {
           const currentTime = new Date();
-          const formattedTime = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }); 
-  
+          const options = { timeZone: 'America/Denver' };
+          const formattedTime =new Intl.DateTimeFormat('en-US', {
+            ...options,
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          }).format(currentTime);
+            
           const seenData = {
             seenTime: formattedTime, 
             EmployeeId: Employee.id,
