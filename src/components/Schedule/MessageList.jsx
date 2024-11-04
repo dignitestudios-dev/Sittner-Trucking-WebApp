@@ -13,11 +13,12 @@ import {
 } from "../../firbase/FirebaseInit";
 import Loader from "../../global/Loader";
 import Cookies from "js-cookie";
+import moment from "moment";
+import 'moment-timezone';
 export default function MessageList() {
   const {
     DeleteSchedule,
     setIsDeleteSchedule,
-    DeleteProfile,
     setIsDeleteProfile,
     setLoader,
     loader,
@@ -64,52 +65,30 @@ export default function MessageList() {
     return () => unsubscribe();
   }, []);
 
-useEffect(() => {
-  const checkAndSendNotifications = async (empData) => {
-    const currentDate = new Date().toLocaleDateString("en-US");
-      const currentTime = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-    const notificationsRef = collection(db, "scheduled");
-    const messageRef = collection(db, "message");
+  useEffect(() => {
+    const checkAndSendNotifications = async (empData) => {
+      const notificationsRef = collection(db, "scheduled");
+      const messageRef = collection(db, "message");
 
-    const querySnapshot = await getDocs(notificationsRef);
-    const updates = [];
+      const querySnapshot = await getDocs(notificationsRef);
+      const updates = [];
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      
-      // Options for formatting
-      const options = {
-        timeZone: "America/Denver", // Ensure the timezone is set to Mountain Time
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true, // Change to true for AM/PM format
-      };
-    
-      // Create notification date in Mountain Time
-      const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
-    
-      // Create current date in Mountain Time
-      const now = new Date();
-      
-      // Format both dates for logging
-      const formattedNotificationDate = new Intl.DateTimeFormat("en-US", options).format(notificationDate).replace(/,/g, '');
-      const formattedCurrentDate = new Intl.DateTimeFormat("en-US", options).format(now).replace(/,/g, '');
-    
-      console.log(formattedNotificationDate, formattedCurrentDate, "scheduledtime");
-    
-      // Compare the actual Date objects, not the formatted strings
-      if (notificationDate <= now && data.status === "pending") {
-        updates.push(
-          updateDoc(doc.ref, { status: "Sent" }),
-          addDoc(messageRef, {
+      const now = moment.tz("America/Denver"); 
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
+
+        console.log(
+          notificationDate.format("ddd MMM DD YYYY HH:mm:ss"),
+          now.format("ddd MMM DD YYYY HH:mm:ss"),
+          "scheduledtime"
+        );
+
+        if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
+          updates.push(updateDoc(doc.ref, { status: "Sent" }));
+          updates.push(addDoc(messageRef, {
             time: data?.time,
             message: data?.message,
             UserMsgSeen: [],
@@ -118,26 +97,23 @@ useEffect(() => {
             type: data?.type,
             createdAt: new Date(),
             employeeId: empData?.id,
-          })
-        );
-      }
-    });
-    
+          }));
+        }
+      });
 
-    await Promise.all(updates);
-  };
+      await Promise.all(updates);
+    };
 
-  const cookieData = Cookies.get("employe");
-  if (cookieData) {
-    const empData = JSON.parse(cookieData);
-    const intervalId = setInterval(() => {
-      checkAndSendNotifications(empData);
-    }, 5000); 
+    const cookieData = Cookies.get("employe");
+    if (cookieData) {
+      const empData = JSON.parse(cookieData);
+      const intervalId = setInterval(() => {
+        checkAndSendNotifications(empData);
+      }, 5000); 
 
-    return () => clearInterval(intervalId);
-  }
-}, [updateCount]);
-
+      return () => clearInterval(intervalId);
+    }
+  }, [updateCount]);
   
 
 

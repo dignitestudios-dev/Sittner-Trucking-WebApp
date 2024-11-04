@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import LookBehind from "./LookBehind";
 import LookAhead from "./LookAhead";
-import { toast } from "react-toastify";
 import {
   addDoc,
   collection,
-  db,
-  getDocs,
+  db,  
   onSnapshot,
   updateDoc,
 } from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
+import moment from "moment";
+import 'moment-timezone';
 export default function Look() {
   const [IsBehind, setIsBehind] = useState(true);
   const { Employee } = useContext(MyContext);
@@ -22,46 +22,28 @@ export default function Look() {
     const notificationsRef = collection(db, "look");
     const messageRef = collection(db, "message");
     const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
-      const currentDate = new Date().toLocaleDateString("en-US");
-      const currentTime = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-
       const fetchedNotifications = [];
       const updates = [];
-
+  
       querySnapshot.docs.forEach((doc) => {
         const data = doc.data();
-          
-        const options = {
-          timeZone: "America/Denver",
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        };
-      
-        const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
-
-        // Create current date in Mountain Time
-        const now = new Date();
-        
-        // Format both dates for logging
-        const formattedNotificationDate = new Intl.DateTimeFormat("en-US", options).format(notificationDate).replace(/,/g, '');
-        const formattedCurrentDate = new Intl.DateTimeFormat("en-US", options).format(now).replace(/,/g, '');
-      
+  
+        // Create the notification date in Mountain Time using moment
+        const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
+  
+        // Get the current time in Mountain Time
+        const now = moment.tz("America/Denver");
+  
+        // Format both dates for logging purposes
+        const formattedNotificationDate = notificationDate.format("ddd MMM DD YYYY HH:mm:ss");
+        const formattedCurrentDate = now.format("ddd MMM DD YYYY HH:mm:ss");
+  
         console.log(formattedNotificationDate, formattedCurrentDate, "scheduledtime");
-      
+  
         fetchedNotifications.push({ docId: doc.id, ...data });
-      
-        // Comparison between Date objects
-        if (formattedNotificationDate <= formattedCurrentDate && data.status == "pending") {
+  
+        // Check if the notification date is less than or equal to current time (Mountain Time)
+        if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
           updates.push(updateDoc(doc.ref, { status: "Delivered" }));
           addDoc(messageRef, {
             time: data?.time,
@@ -75,20 +57,21 @@ export default function Look() {
           });
         }
       });
-      
-
+  
       if (updates.length > 0) {
         await Promise.all(updates);
       }
+  
       fetchedNotifications.sort(
-        (a, b) =>
-          new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
+        (a, b) => new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
       );
       setNotifications(fetchedNotifications);
     });
+  
     return unsubscribe;
   }, [IsBehind]);
-
+  
+  
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"

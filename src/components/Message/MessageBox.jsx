@@ -193,34 +193,46 @@ export default function MessageBox() {
 
   const MessageSeen = async () => {
     if (loc.pathname === "/") {
-      for (const item of Message) {
-        const scheduledRef = doc(db, "message", item.docId);
-        console.log(item, "itemsssMsgs");
-  
-        const hasSeen = item?.UserMsgSeen?.some(user => user.EmployeeId == Employee.id);
-       console.log(hasSeen,"hasSeend");
-       
-        if (!hasSeen) {
-          const currentTime = new Date();
-          const options = { timeZone: 'America/Denver' };
-          const formattedTime =new Intl.DateTimeFormat('en-US', {
-            ...options,
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-          }).format(currentTime);
-            
-          const seenData = {
-            seenTime: formattedTime, 
-            EmployeeId: Employee.id,
-          };
-          await updateDoc(scheduledRef, {
-            UserMsgSeen: [...item.UserMsgSeen, seenData],
-          });
+        for (const item of Message) {
+            const scheduledRef = doc(db, "message", item.docId);
+            console.log(item, "itemsssMsgs");
+
+            const hasSeen = item?.UserMsgSeen?.some(user => user.EmployeeId == Employee.id);
+            console.log(hasSeen, "hasSeend");
+
+            if (!hasSeen) {
+                const currentTime = new Date();
+                const options = { timeZone: 'America/Denver' };
+
+                // Format the date and time
+                const formattedDate = new Intl.DateTimeFormat('en-US', {
+                    ...options,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                }).format(currentTime);
+
+                const formattedTime = new Intl.DateTimeFormat('en-US', {
+                    ...options,
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                }).format(currentTime);
+
+                // Combine date and time
+                const seenData = {
+                    seenTime: `${formattedDate} ${formattedTime}`, 
+                    EmployeeId: Employee.id,
+                };
+                
+                await updateDoc(scheduledRef, {
+                    UserMsgSeen: [...item.UserMsgSeen, seenData],
+                });
+            }
         }
-      }
     }
-  };
+};
+
   useEffect(() => {
     MessageSeen();
   }, [Message]);
@@ -245,27 +257,29 @@ export default function MessageBox() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const employeeIds = employee.map(data => data.id);
-    const messageSeenEmp = Message.filter(item =>
-      item.UserMsgSeen.some(user => employeeIds.includes(user.EmployeeId))
-    );
-    const seenEmployeeData = employee.map(emp => {
-      const seenMessages = messageSeenEmp.filter(msg =>
-        msg.UserMsgSeen.some(user => user.EmployeeId == emp.id)
-      );
-      const seenTimes = seenMessages.map(msg =>
-        msg.UserMsgSeen.find(user => user.EmployeeId == emp.id)?.seenTime
-      ).filter(Boolean); 
+  // useEffect(() => {
+  //   const employeeIds = employee.map(data => data.id);
+  //   const messageSeenEmp = Message.filter(item =>
+  //     item.UserMsgSeen.some(user => employeeIds.includes(user.EmployeeId))
+  //   );
+  //   const seenEmployeeData = employee.map(emp => {
+  //     const seenMessages = messageSeenEmp.filter(msg =>
+  //       msg.UserMsgSeen.some(user => user.EmployeeId == emp.id)
+  //     );
+    
+  //     const seenTimes = seenMessages.map(msg =>
+  //       msg.UserMsgSeen.find(user => user.EmployeeId == emp.id)?.seenTime
+  //     ).filter(Boolean); 
   
-      return {
-        ...emp,
-        seenTime: seenTimes.length > 0 ? seenTimes : null, 
-      };
-    }).filter(emp => emp.seenTime); 
-  
-    setMsgSeenEmp(seenEmployeeData);
-  }, [Message, employee]);
+  //     return {
+  //       ...emp,
+  //       seenTime: seenTimes.length > 0 ? seenTimes : null, 
+  //     };
+  //   }).filter(emp => emp.seenTime); 
+  //   console.log(seenEmployeeData,messageSeenEmp,employeeIds,"testtting");
+      
+  //   setMsgSeenEmp(seenEmployeeData);
+  // }, [Message, employee,isMessageSeen]);
   
   
   
@@ -473,11 +487,26 @@ export default function MessageBox() {
                   } */}
                       <img
                         src="/tick-double.png"
-                        onClick={() => {
+                        onClick={() => {                        
+                          const seenEmployeeData = msg.UserMsgSeen.map(user => ({
+                              EmployeeId: user.EmployeeId,
+                              seenTime: user.seenTime 
+                          }));                          
+                          const seenEmployeeIds = seenEmployeeData.map(user => user.EmployeeId);                      
+                          const getMsgSeenEmp = employee.map(emp => {
+                              const seenRecord = seenEmployeeData.find(user => user.EmployeeId === emp.id);
+                              return {
+                                  ...emp,
+                                  seenTime: seenRecord ? seenRecord.seenTime : null 
+                              };
+                          }).filter(emp => seenEmployeeIds.includes(emp.id));
+                      
                           setIsMessageSeen(msg.UserMsgSeen);
+                          setMsgSeenEmp(getMsgSeenEmp);
                           setIsMessageInfo(true);
-                        }}
-                        className="w-5 cursor-pointer ml-1 "
+                      }}
+                      
+                        className="w-5 cursor-pointer ml-1"
                         alt=""
                       />
                     </div>

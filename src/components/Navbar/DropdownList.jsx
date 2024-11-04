@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { collection, db, getDocs, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
+import moment from "moment";
+import 'moment-timezone';
 export default function DropdownList() {
   const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
@@ -11,61 +13,54 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-
-  const getCurrentMountainDateTime = () => {
-    const now = new Date();
-
-    const mountainTimeNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Denver" }));
-    return mountainTimeNow; 
-  };
-  
-  // Example usage
-  const mountainDateTime = getCurrentMountainDateTime();
-
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-        const fetchedNotifications = [];
-        
-        const mountainTimeNow = getCurrentMountainDateTime();
-
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const notificationDate = new Date(`${data.date} ${data.time} GMT-0600`);
-            const formattedNotificationDate = notificationDate.getTime();
-            const formattedCurrentDate = mountainTimeNow.getTime(); 
-            fetchedNotifications.push({ id: doc.id, ...data });
-            if (formattedNotificationDate < formattedCurrentDate && data.status == "Scheduled") {
-                updateDoc(doc.ref, {
-                    status: "Delivered",
-                    seen: "pending"
-                }).then(() => {
-                  if(Employee.role=="user"){
-                    toast.success(`Notification delivered: ${data.message}`, {
-                      position: "top-right",
-                      autoClose: 3000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                  });
-                  }                
-                });
+      const fetchedNotifications = [];
+      const now = moment.tz("America/Denver");
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
+        console.log("Notification scheduled date and time:", notificationDate.format());  
+  
+        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+          console.log("Updating notification:", doc.id); 
+          updateDoc(doc.ref, {
+            status: "Delivered",
+            seen: "pending"
+          }).then(() => {
+            if (Employee.role === "user") {
+              toast.success(`Notification delivered: ${data.message}`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
             }
-        });
-        const sortedNotifications = fetchedNotifications.sort((a, b) => {
-            const dateA = new Date(a.date + ' ' + a.time).getTime();
-            const dateB = new Date(b.date + ' ' + b.time).getTime();
-            return dateB - dateA; // Sort in descending order
-        });
-
-        setNotifications(sortedNotifications);
+          });
+        }
+  
+        // Add the notification data to the array
+        fetchedNotifications.push({ id: doc.id, ...data });
+      });
+  
+      // Sort the notifications by date, most recent first
+      const sortedNotifications = fetchedNotifications.sort((a, b) => {
+        const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
+        const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
+        return dateB - dateA; // Sorting in descending order
+      });
+  
+      // Set the state with sorted notifications
+      setNotifications(sortedNotifications);
     });
-
+  
     return unsubscribe;
-};
-
+  };
+  
 useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
