@@ -6,17 +6,14 @@ import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
 import { MyContext } from "../../context/GlobalContext";
 import {
-  collection,
   db,
   doc,
   getDownloadURL,
   getMetadata,
-  list,
   listAll,
   ref,
   storage,
   updateDoc,
-  updateMetadata,
   uploadBytesResumable,
 } from "../../firbase/FirebaseInit";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
@@ -131,7 +128,7 @@ export default function EditSchedule() {
         const storageRef = ref(storage, `images/${image.name}`);
         await uploadBytesResumable(storageRef, image);
         const url = await getDownloadURL(storageRef);
-        imageUrls.push({url:url,name:image.name});
+        imageUrls.push({ url: url, name: image.name });
         docType.push(image.type);
       }
       await updateDoc(scheduledRef, {
@@ -150,7 +147,7 @@ export default function EditSchedule() {
         isLoading: false,
         autoClose: 5000,
       });
-      loc.state.collection=="look"?navigate("/"):navigate("/schedule") 
+      loc.state.collection == "look" ? navigate("/") : navigate("/schedule");
     } catch (error) {
       console.error("Failed to schedule:", error);
       toast.update(loadingToastId, {
@@ -165,8 +162,8 @@ export default function EditSchedule() {
   console.log(Scheduled, "getUpdateArray");
   return (
     <div class="bg-[#F7F7F7] h-[90vh] py-5 px-5 ">
-        <NavLink
-        to={loc.state.collection=="look"?"/":"/schedule"}
+      <NavLink
+        to={loc.state.collection == "look" ? "/" : "/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
@@ -247,7 +244,7 @@ export default function EditSchedule() {
               Update Message
             </button>
             <NavLink
-              to={"/schedule"}
+              to={locationState.state.collection == "look" ? "/" : "/schedule"}
               className="bg-[#F1F1F1] font-bold rounded-lg  lg:w-[150px] h-[50px]  px-5 py-2.5 text-sm  lg:text-base text-center"
             >
               Cancel

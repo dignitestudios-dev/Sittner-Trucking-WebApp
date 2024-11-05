@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
@@ -32,7 +33,6 @@ export const MyContextProvider = ({ children }) => {
   const [SelectedTime,setSelectTime]=useState();
   useEffect(() => {
     const currentTime = new Date();
-    
     // Mountain Time ke liye date aur time format karna
     const options = { timeZone: 'America/Denver' };
     const formattedDate = new Intl.DateTimeFormat('en-US', {
@@ -75,7 +75,20 @@ export const MyContextProvider = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [displaySize]);
   
-
+const NotificationCall=()=>{
+  if (Employee.role=="user") {
+    toast.success(`New Notification From Admin`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }
+ 
+}
 
   return (
     <MyContext.Provider
@@ -145,10 +158,12 @@ export const MyContextProvider = ({ children }) => {
         setForgetEmail,
         ForgetEmail,
         msgSeenEmp,
-        setMsgSeenEmp
+        setMsgSeenEmp,
+        NotificationCall
       }}
     >
       {children}
     </MyContext.Provider>
   );
 };
+

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import 'moment-timezone';
 export default function DropdownList() {
-  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee } = useContext(MyContext);
+  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee,NotificationCall } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
 
@@ -21,28 +21,15 @@ export default function DropdownList() {
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
-        console.log("Notification scheduled date and time:", notificationDate.format());  
   
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
           console.log("Updating notification:", doc.id); 
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending"
-          }).then(() => {
-            if (Employee.role === "user") {
-              toast.success(`Notification delivered: ${data.message}`, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              });
-            }
-          });
+          })          
+          NotificationCall();
         }
-  
         // Add the notification data to the array
         fetchedNotifications.push({ id: doc.id, ...data });
       });

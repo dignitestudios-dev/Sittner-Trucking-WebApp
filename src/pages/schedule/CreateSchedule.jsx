@@ -18,7 +18,6 @@ import {
 } from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
-
 export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
@@ -180,7 +179,7 @@ export default function CreateSchedule() {
               Schedule
             </button>
             <NavLink
-              to={"/schedule"}
+              to={locationState.state.collection=="look"?"/":"/schedule"}
               className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
             >
               Cancel
