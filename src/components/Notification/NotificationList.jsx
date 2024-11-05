@@ -11,7 +11,6 @@ export default function NotificationList() {
     const employeesRef = collection(db, "notification");
     const employeeQuery = query(employeesRef);
     setLoader(true);
-
     const unsubscribe = onSnapshot(
       employeeQuery,
       (querySnapshot) => {
@@ -19,12 +18,10 @@ export default function NotificationList() {
           docId: doc.id,
           ...doc.data(),
         }));
-
-        // Sort the notifications by date and time
         const sortedNotifications = notificationData.sort((a, b) => {
           const dateA = new Date(`${a.date} ${a.time}`);
           const dateB = new Date(`${b.date} ${b.time}`);
-          return dateB - dateA; // Sort in descending order
+          return dateB - dateA;
         });
 
         SetNotification(sortedNotifications);
@@ -49,6 +46,11 @@ export default function NotificationList() {
       <div className="relative overflow-x-auto">
         {loader ? (
           <Loader />
+        ) 
+        : Notification.length === 0 ? (
+          <div className="text-center text-gray-500 mt-4">
+            No Notifications items available.
+          </div>
         ) : (
           <table className="w-full text-sm text-left  text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-[#787F8C] uppercase bg-[#F3F5F7]">

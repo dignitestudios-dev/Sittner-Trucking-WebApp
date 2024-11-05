@@ -31,6 +31,7 @@ export const MyContextProvider = ({ children }) => {
   const [NotificationCount,setNotificationCount]=useState(0);
   const [SelectedDate,setSelectDate]=useState();
   const [SelectedTime,setSelectTime]=useState();
+  
   useEffect(() => {
     const currentTime = new Date();
     // Mountain Time ke liye date aur time format karna
@@ -87,7 +88,6 @@ const NotificationCall=()=>{
       progress: undefined,
     });
   }
- 
 }
 
   return (

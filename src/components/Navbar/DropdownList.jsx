@@ -30,18 +30,14 @@ export default function DropdownList() {
           })          
           NotificationCall();
         }
-        // Add the notification data to the array
         fetchedNotifications.push({ id: doc.id, ...data });
       });
   
-      // Sort the notifications by date, most recent first
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
         const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
-        return dateB - dateA; // Sorting in descending order
+        return dateB - dateA; 
       });
-  
-      // Set the state with sorted notifications
       setNotifications(sortedNotifications);
     });
   
