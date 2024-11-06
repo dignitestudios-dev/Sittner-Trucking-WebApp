@@ -77,17 +77,7 @@ export const MyContextProvider = ({ children }) => {
   }, [displaySize]);
   
 const NotificationCall=()=>{
-  if (Employee.role=="user") {
-    toast.success(`New Notification From Admin`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
+
 }
 
   return (

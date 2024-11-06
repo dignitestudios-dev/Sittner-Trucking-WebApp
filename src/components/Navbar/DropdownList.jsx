@@ -8,11 +8,28 @@ export default function DropdownList() {
   const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee,NotificationCall } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
+  const [pushNotification, setpushNotification] = useState(false);
+
 
   const DropdownRef = useRef(null);
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
+
+ useEffect(()=>{
+  if (Employee.role=="user") {
+    toast.success(`New Notification From Admin`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }
+ },[pushNotification])
+
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
@@ -23,12 +40,13 @@ export default function DropdownList() {
         const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
   
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-          console.log("Updating notification:", doc.id); 
+
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending"
-          })          
-          NotificationCall();
+          })
+          setpushNotification(!pushNotification)
+                 
         }
         fetchedNotifications.push({ id: doc.id, ...data });
       });
