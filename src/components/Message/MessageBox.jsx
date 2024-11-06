@@ -288,7 +288,7 @@ export default function MessageBox() {
  const col_Array=["bg-[#E8F569]","bg-[#B9FF9E]","bg-[#94D0E4]"];
 
   return (
-    <div className="bg-[#FFFFFF] w-full h-[12%] md:h-[80%] lg:h-[630px]   relative rounded-[24px]">
+    <div className="bg-[#FFFFFF] w-full  md:h-[80%] lg:h-[630px]   relative rounded-[24px]">
       {/* Message Head */}
       <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">

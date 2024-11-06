@@ -33,7 +33,7 @@ export default function Message() {
 
 
   return (
-    <div className="h-[90%]   py-2 px-2 lg:px-10 lg:py-6 ">
+    <div className="h-[90%]   pt-2 pb-[2rem] px-2 lg:px-10 lg:py-6 ">
       {LookScreen && (
         <NavLink
           onClick={() => setLookScreen(false)}
