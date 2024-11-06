@@ -36,7 +36,7 @@ export default function ForgotPassword() {
     }
     try {   
       const res = await fetch(
-        `https://nodejsotp-g0cpgqn37-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
+        `https://nodejsotp-6wqif5iib-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
         {
           method: "GET",
           headers: {

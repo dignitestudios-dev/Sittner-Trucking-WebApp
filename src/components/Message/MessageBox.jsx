@@ -288,22 +288,22 @@ export default function MessageBox() {
  const col_Array=["bg-[#E8F569]","bg-[#B9FF9E]","bg-[#94D0E4]"];
 
   return (
-    <div className="bg-[#FFFFFF] w-full  md:h-[80%] lg:h-[630px]   relative rounded-[24px]">
+    <div className="bg-[#FFFFFF] w-full h-[85vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
-      <div className="chathead px-5 py-5 border-b border-[#E1E1E1]">
+      <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-5 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div>
               {GroupName.groupimg ? (
                 <img
                   src={GroupName.groupimg}
-                  class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                  class="rounded-[50%] object-cover cursor-pointer  w-[30px] h-[30px] lg:w-[50px] lg:h-[50px]"
                   alt=""
                 />
               ) : (
                 <img
                   src={"noprofile.png"}
-                  class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+                  class="rounded-[50%] object-cover cursor-pointer w-[30px] h-[30px] lg:w-[50px] lg:h-[50px]"
                   alt=""
                 />
               )}
@@ -317,7 +317,7 @@ export default function MessageBox() {
                   : setLookAhedDraw(true))
               }
             >
-              <h2 className="font-semibold text-base  lg:text-2xl leading-[29px]">
+              <h2 className="font-semibold text-base   lg:text-2xl lg:leading-[29px]">
                 {GroupName.group_name}
               </h2>
               <p className="text-[#8A8A8A] text-[13px] font-normal">
@@ -333,7 +333,7 @@ export default function MessageBox() {
                   setSideDraw(true);
                 }}
               >
-                <MdOutlineFilePresent className="text-2xl" />
+                <MdOutlineFilePresent className="text-base lg:text-2xl" />
               </button>
             </div>
           )}
@@ -345,8 +345,8 @@ export default function MessageBox() {
         ref={msgBodyScroll}
         className={`chat-body ${
           Employee?.role == "admin"
-            ? "h-[70%] lg:h-[440px]"
-            : "h-[70%] lg:h-[440px]"
+            ? "h-[80%] lg:h-[440px]"
+            : "h-[80%] lg:h-[440px]"
         }  scroll-box  overflow-auto`}
       >
         {/* Day Timer */}
@@ -523,7 +523,7 @@ export default function MessageBox() {
       </div>
       {/* Send Message */}
       {Employee?.role == "admin" && (
-        <div className="pb-2 absolute w-full bottom-0">
+        <div className="pb-2 h-[10%] w-full bottom-0">
           {images.length > 0 && (
             <div className="shadow-xl bg-slate-100 px-2 py-2 w-[90%] mx-auto flex items-center gap-5 nowrap scroll-box  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
