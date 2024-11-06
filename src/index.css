@@ -7,9 +7,9 @@
 * {
   font-family: "Inter", sans-serif !important;
 }
+
 body{
   background-color: #F7F7F7;
-  overflow-x: hidden !important;
 }
 .chat-body{
   overflow-anchor: auto !important;
@@ -167,6 +167,9 @@ font-weight: 600 !important;
   .otp-component>div>input{
   width: 45px !important;
   height: 50px !important;
+  }
+  *{
+    font-size: 16px !important;
   }
 }
 
