@@ -343,7 +343,7 @@ export default function MessageBox() {
       {/* Message Body */}
       <div
         ref={msgBodyScroll}
-        className={`chat-body ${
+        className={`md:chat-body ${
           Employee?.role == "admin"
             ? "h-[80%] lg:h-[440px]"
             : "h-[80%] lg:h-[440px]"
