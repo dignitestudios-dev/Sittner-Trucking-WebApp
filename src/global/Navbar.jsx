@@ -13,7 +13,7 @@ export default function Navbar() {
 
 
   return (
-    <div class="flex items-center justify-between h-16 bg-white border-b border-gray-200">
+    <div class="flex items-center justify-between h-16 bg-white  border-b border-gray-200">
       <div className="flex items-center w-full justify-end pr-4">
         {Employee?.role == "user" && (
           <div className="flex justify-end">
@@ -46,11 +46,11 @@ export default function Navbar() {
               alt=""
             />
             <div>
-              <h2 className="font-medium ml-2 text-[13px] leading-[15px]">
+              <h2 className="font-medium ml-2 text-[14px] leading-[15px]">
                 {" "}
                 {Employee?.name}
                 <br />
-                <span className="text-[#9E9E9E]">
+                <span className="text-[#9E9E9E] text-[12px]">
                   {Employee?.role == "admin" ? "Admin" : "Employee"}
                 </span>
               </h2>

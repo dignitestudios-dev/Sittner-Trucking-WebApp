@@ -142,16 +142,16 @@ export default function MessageBox() {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);
         await uploadBytesResumable(storageRef, image);
         const url = await getDownloadURL(storageRef);
-        imageUrls.push({url:url,name:image.name});
+        imageUrls.push({ url: url, name: image.name });
         docType.push(image.type);
       }
-      const options = { timeZone: 'America/Denver' };
+      const options = { timeZone: "America/Denver" };
       await addDoc(scheduledRef, {
         date: new Date().toLocaleDateString(),
-        time:new Intl.DateTimeFormat('en-US', {
+        time: new Intl.DateTimeFormat("en-US", {
           ...options,
-          hour: 'numeric',
-          minute: '2-digit',
+          hour: "numeric",
+          minute: "2-digit",
           hour12: true,
         }).format(new Date()),
         message: UserMsg,
@@ -193,45 +193,47 @@ export default function MessageBox() {
 
   const MessageSeen = async () => {
     if (loc.pathname === "/") {
-        for (const item of Message) {
-            const scheduledRef = doc(db, "message", item.docId);
-            console.log(item, "itemsssMsgs");
+      for (const item of Message) {
+        const scheduledRef = doc(db, "message", item.docId);
+        console.log(item, "itemsssMsgs");
 
-            const hasSeen = item?.UserMsgSeen?.some(user => user.EmployeeId == Employee.id);
-            console.log(hasSeen, "hasSeend");
+        const hasSeen = item?.UserMsgSeen?.some(
+          (user) => user.EmployeeId == Employee.id
+        );
+        console.log(hasSeen, "hasSeend");
 
-            if (!hasSeen) {
-                const currentTime = new Date();
-                const options = { timeZone: 'America/Denver' };
+        if (!hasSeen) {
+          const currentTime = new Date();
+          const options = { timeZone: "America/Denver" };
 
-                // Format the date and time
-                const formattedDate = new Intl.DateTimeFormat('en-US', {
-                    ...options,
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                }).format(currentTime);
+          // Format the date and time
+          const formattedDate = new Intl.DateTimeFormat("en-US", {
+            ...options,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(currentTime);
 
-                const formattedTime = new Intl.DateTimeFormat('en-US', {
-                    ...options,
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                }).format(currentTime);
+          const formattedTime = new Intl.DateTimeFormat("en-US", {
+            ...options,
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          }).format(currentTime);
 
-                // Combine date and time
-                const seenData = {
-                    seenTime: `${formattedDate} ${formattedTime}`, 
-                    EmployeeId: Employee.id,
-                };
-                
-                await updateDoc(scheduledRef, {
-                    UserMsgSeen: [...item.UserMsgSeen, seenData],
-                });
-            }
+          // Combine date and time
+          const seenData = {
+            seenTime: `${formattedDate} ${formattedTime}`,
+            EmployeeId: Employee.id,
+          };
+
+          await updateDoc(scheduledRef, {
+            UserMsgSeen: [...item.UserMsgSeen, seenData],
+          });
         }
+      }
     }
-};
+  };
 
   useEffect(() => {
     MessageSeen();
@@ -266,29 +268,25 @@ export default function MessageBox() {
   //     const seenMessages = messageSeenEmp.filter(msg =>
   //       msg.UserMsgSeen.some(user => user.EmployeeId == emp.id)
   //     );
-    
+
   //     const seenTimes = seenMessages.map(msg =>
   //       msg.UserMsgSeen.find(user => user.EmployeeId == emp.id)?.seenTime
-  //     ).filter(Boolean); 
-  
+  //     ).filter(Boolean);
+
   //     return {
   //       ...emp,
-  //       seenTime: seenTimes.length > 0 ? seenTimes : null, 
+  //       seenTime: seenTimes.length > 0 ? seenTimes : null,
   //     };
-  //   }).filter(emp => emp.seenTime); 
+  //   }).filter(emp => emp.seenTime);
   //   console.log(seenEmployeeData,messageSeenEmp,employeeIds,"testtting");
-      
+
   //   setMsgSeenEmp(seenEmployeeData);
   // }, [Message, employee,isMessageSeen]);
-  
-  
-  
-  
 
- const col_Array=["bg-[#E8F569]","bg-[#B9FF9E]","bg-[#94D0E4]"];
+  const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
 
   return (
-    <div className="bg-[#FFFFFF] w-full h-[80vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
+    <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
       <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-3 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">
@@ -376,7 +374,7 @@ export default function MessageBox() {
                   </div>
                 )}
                 <div className="w-full py-2">
-                  {msg.message && (                    
+                  {msg.message && (
                     <div
                       className={` ${
                         Employee?.role == "admin"
@@ -384,14 +382,20 @@ export default function MessageBox() {
                           : "bg-[#F4F4F4] "
                       } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
                     >
-                    <a  href={msg.message.includes("https://")&&msg.message} target="_blank" >
-                      {msg.message}
-                    </a>
+                      <a
+                        href={msg.message.includes("https://") && msg.message}
+                        target="_blank"
+                      >
+                        {msg.message}
+                      </a>
                     </div>
                   )}
                   {msg.images.length > 0 && (
-                    <div className={`w-full py-3 flex items-center  ${
-                        Employee?.role == "admin"&&"justify-end"}  flex-wrap gap-2`} >
+                    <div
+                      className={`w-full py-3 flex items-center  ${
+                        Employee?.role == "admin" && "justify-end"
+                      }  flex-wrap gap-2`}
+                    >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <div
@@ -402,7 +406,11 @@ export default function MessageBox() {
                               src={img.url ? img.url : "/noprofile.png"}
                               className="cursor-pointer rounded-md h-[80px] w-auto"
                               onClick={() => {
-                                setModalImageUrl(msg.images);
+                                const updatedImages = [
+                                  img,
+                                  ...msg.images.filter((_, i) => i !== index),
+                                ]; 
+                                setModalImageUrl(updatedImages);
                                 setIviewImage(true);
                               }}
                               alt=""
@@ -487,31 +495,40 @@ export default function MessageBox() {
                   } */}
                       <img
                         src="/tick-double.png"
-                        onClick={() => {                        
-                          const seenEmployeeData = msg.UserMsgSeen.map(user => ({
+                        onClick={() => {
+                          const seenEmployeeData = msg.UserMsgSeen.map(
+                            (user) => ({
                               EmployeeId: user.EmployeeId,
-                              seenTime: user.seenTime 
-                          }));                          
-                          const seenEmployeeIds = seenEmployeeData.map(user => user.EmployeeId);                      
-                          const getMsgSeenEmp = employee.map(emp => {
-                              const seenRecord = seenEmployeeData.find(user => user.EmployeeId === emp.id);
+                              seenTime: user.seenTime,
+                            })
+                          );
+                          const seenEmployeeIds = seenEmployeeData.map(
+                            (user) => user.EmployeeId
+                          );
+                          const getMsgSeenEmp = employee
+                            .map((emp) => {
+                              const seenRecord = seenEmployeeData.find(
+                                (user) => user.EmployeeId === emp.id
+                              );
                               return {
-                                  ...emp,
-                                  seenTime: seenRecord ? seenRecord.seenTime : null 
+                                ...emp,
+                                seenTime: seenRecord
+                                  ? seenRecord.seenTime
+                                  : null,
                               };
-                          }).filter(emp => seenEmployeeIds.includes(emp.id));
-                      
+                            })
+                            .filter((emp) => seenEmployeeIds.includes(emp.id));
+
                           setIsMessageSeen(msg.UserMsgSeen);
                           setMsgSeenEmp(getMsgSeenEmp);
                           setIsMessageInfo(true);
-                      }}
-                      
+                        }}
                         className="w-5 cursor-pointer ml-1"
                         alt=""
                       />
                     </div>
                   )}
-                 
+
                   <span className=" text-[10px] font-normal leading-[10px] text-[#797C7B]">
                     {msg?.time}
                   </span>

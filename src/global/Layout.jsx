@@ -44,7 +44,7 @@ const Layout = ({ pages }) => {
   
 
   return (
-    <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
+    <div className="w-screen h-[90vh] md:h-screen flex justify-start items-start overflow-hidden">
       <div
         onClick={toggleModal}
         className={`w-screen h-screen fixed top-0 left-0 transition-all duration-500  ${
@@ -62,7 +62,7 @@ const Layout = ({ pages }) => {
       </div>
 
       <div className="w-full relative lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)]   overflow-y-auto overflow-x-hidden">
-        <div className="sticky top-0 left-0 w-full h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99]">
+        <div className="sticky  h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99]">
           <button
             onClick={() => setisOpen((prev) => !prev)}
             className="lg:hidden block"
@@ -71,7 +71,9 @@ const Layout = ({ pages }) => {
           </button>
           <Navbar />
         </div>
+        <div className="" >
         {pages}
+        </div>
         <DropdownList />
         <LogOut />
      

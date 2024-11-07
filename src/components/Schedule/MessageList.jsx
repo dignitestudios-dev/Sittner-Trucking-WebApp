@@ -168,7 +168,7 @@ export default function MessageList() {
                     alt=""
                     srcset=""
                   />
-                  {item.date}
+                  {moment.tz(`${item.date}`, "MM/DD/YYYY h:mm A", "America/Denver").format("MMM/DD/YYYY ")  }
                 </span>
                 <span className="flex items-center ml-3 text-[#5C5C5C] text-xs">
                   <img src="/clock.png" className="w-5 mr-2" alt="" srcset="" />
