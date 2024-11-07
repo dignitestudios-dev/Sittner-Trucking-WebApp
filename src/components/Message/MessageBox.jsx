@@ -290,7 +290,7 @@ export default function MessageBox() {
   return (
     <div className="bg-[#FFFFFF] w-full h-[80vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
-      <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-5 border-b border-[#E1E1E1]">
+      <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-3 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div>
@@ -366,7 +366,7 @@ export default function MessageBox() {
                 key={i}
                 className={`left-side ${
                   Employee?.role == "admin" && "ms-auto"
-                } mb-3 px-3 py-3 msg-list w-auto lg:max-w-[30%]`}
+                } mb-3 px-3 py-3 msg-list w-auto lg:max-w-[100%]`}
               >
                 {Employee?.role == "user" && (
                   <div className="username mb-3">
@@ -380,14 +380,13 @@ export default function MessageBox() {
                     <div
                       className={` ${
                         Employee?.role == "admin"
-                          ? "bg-[#0A8A33] text-white"
+                          ? "bg-[#0A8A33] text-white ms-auto"
                           : "bg-[#F4F4F4]"
-                      } w-full rounded-2xl rounded-tr-none break-words px-2 py-3 text-xs font-normal`}
+                      } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
                     >
                     <a  href={msg.message.includes("https://")&&msg.message} target="_blank" >
                       {msg.message}
                     </a>
-
                     </div>
                   )}
                   {msg.images.length > 0 && (

@@ -200,7 +200,7 @@ export default function EditSchedule() {
               </label>
             </div>
             <div className="mb-3 col-span-2">
-              <div className="grid grid-cols-10 gap-2">
+              <div className="flex items-center flex-wrap gap-2">
                 {ImagesPath.map((img, i) => (
                   <div key={i}>
                     <label htmlFor={`file${i}`}>
@@ -244,7 +244,7 @@ export default function EditSchedule() {
               Update Message
             </button>
             <NavLink
-              to={locationState.state.collection == "look" ? "/" : "/schedule"}
+              to={loc.state.collection == "look" ? "/" : "/schedule"}
               className="bg-[#F1F1F1] font-bold rounded-lg  lg:w-[150px] h-[50px]  px-5 py-2.5 text-sm  lg:text-base text-center"
             >
               Cancel
