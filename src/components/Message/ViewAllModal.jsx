@@ -31,7 +31,7 @@ export default function ViewAllModal() {
                 <div className="relative h-[90%] mt-4 scroll-box overflow-auto">
                   <div className="py-1 rounded-md  ">
                     <ul className="">
-                      {IsAttachments?.map((msg, i) => (
+                      {[...IsAttachments]?.reverse()?.map((msg, i) => (
                         <>
                           {msg.images.map((img, index) =>
                             msg.type[index]?.includes("image") ? (
@@ -50,7 +50,7 @@ export default function ViewAllModal() {
                                       />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-[13px] font-medium  ">
+                                      <p className="text-[13px] font-medium  break-words pe-2 ">
                                         {img.name}
                                       </p>
                                     </div>

@@ -128,14 +128,14 @@ export default function CreateSchedule() {
                 />
               </label>
               {images.length > 0 && (
-                <div className={`image-preview grid grid-cols-12 mt-2 gap-2`}>
+                <div className={`image-preview flex items-center flex-wrap mt-2 gap-2`}>
                   {Array.from(images).map((image, targetIndex) => (
                     <div key={targetIndex}>
                       {image.type?.includes("image") ? (
                         <img
                           src={URL.createObjectURL(image)}
                           alt=""
-                          className="h-[100px] rounded-md w-[100px]"
+                          className="h-[100px] rounded-md w-auto"
                           srcset=""
                         />
                       ) : image.type.includes("video") ? (

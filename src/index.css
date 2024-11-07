@@ -10,7 +10,14 @@
 
 body{
   background-color: #F7F7F7;
+  overflow: auto; /* Allow scrolling */
+  touch-action: auto; /* Allow default touch behaviors like scrolling */
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
 .chat-body{
   overflow-anchor: auto !important;
   overscroll-behavior: contain;
@@ -97,6 +104,7 @@ input:focus{
 }
 
 .react-ios-time-picker-container{
+  
   background-color: #FFFFFF !important;
 }
 .react-ios-time-picker-selected-overlay{
@@ -158,6 +166,15 @@ font-weight: 600 !important;
 
 .bg-view-image{
   background-color: rgba(0, 0, 0, 0.8);
+}
+
+.react-ios-time-picker-hour{
+  overflow-anchor: auto !important;
+  overscroll-behavior: contain !important; 
+}
+
+.react-ios-time-picker-popup-overlay {
+  overflow: hidden !important;
 }
 
 @media screen and (max-width: 560px) {

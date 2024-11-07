@@ -131,13 +131,13 @@ export default function MessageList() {
             key={i}
             className="flex mb-2 items-center justify-between border-b-2 py-4 border-[#F4F4F4]"
           >
-            <div className="msg w-[80%]  ">
+            <div className="msg w-[100%] md:w-[80%]  ">
               {item.message && (
                 <p className="text-base font-normal text-[#18181880]">
                   {item.message}
                 </p>
               )}
-              <div className="grid grid-cols-3 gap-2 lg:gap-2 mt-2  lg:grid-cols-10">
+              <div className="flex items-center flex-wrap gap-2 lg:gap-2 mt-2  lg:grid-cols-10">
                 {item?.images?.length > 0 &&
                   item?.images?.map((img, i) =>
                     item.type[i].includes("image") ? (
@@ -145,7 +145,7 @@ export default function MessageList() {
                         <img
                           src={img.url}
                           alt=""
-                          className="rounded-lg h-[80px] "
+                          className="rounded-lg w-auto h-[80px] "
                         />
                       </div>
                     ) : (
@@ -159,7 +159,8 @@ export default function MessageList() {
                     )
                   )}
               </div>
-              <div className="flex items-center mt-3 ">
+              <div className="flex items-center justify-between mt-3 ">
+                <div className="flex items-center">
                 <span className="flex items-center text-[#5C5C5C] text-xs">
                   <img
                     src="/agenda.png"
@@ -173,10 +174,45 @@ export default function MessageList() {
                   <img src="/clock.png" className="w-5 mr-2" alt="" srcset="" />
                   {item.time}
                 </span>
+                </div>
+                <div  > 
+                {
+            item.status != "pending" ? (
+              <span className="bg-[#41C54E26] flex md:hidden text-[#41C54E] text-xs font-medium me-2 px-4 py-2 rounded-full  ">
+                Sent
+              </span>
+            ) : (
+              <div className="flex items-center">
+                <button
+                  className="bg-transparent"
+                  onClick={() => {
+                    setIsDeleteProfile(item);
+                    setIsDeleteSchedule(!DeleteSchedule);
+                  }}
+                >
+                  <img src="/trash.png" className="w-5" alt="" srcset="" />
+                </button>
+                <NavLink
+                  to={"/editschedule"}
+                  state={{ data: item,collection:"scheduled" }}
+                  className="ml-2 bg-transparent "
+                >
+                  <img
+                    src="/whiteedit.png"
+                    state={{ data: item }}
+                    className="w-5"
+                    alt=""
+                    srcset=""
+                  />
+                </NavLink>
+              </div>
+            )}
+              </div>
               </div>
             </div>
-            {item.status != "pending" ? (
-              <span className="bg-[#41C54E26] text-[#41C54E] text-xs font-medium me-2 px-4 py-2 rounded-full  ">
+            {
+            item.status != "pending" ? (
+              <span className="bg-[#41C54E26] hidden md:block text-[#41C54E] text-xs font-medium me-2 px-4 py-2 rounded-full  ">
                 Sent
               </span>
             ) : (

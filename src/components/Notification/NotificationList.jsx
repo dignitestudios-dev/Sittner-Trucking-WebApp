@@ -89,7 +89,7 @@ export default function NotificationList() {
                         item.status == "Scheduled"
                           ? "bg-[#FF99001F] text-[#FF9900]"
                           : "text-[#41C54E] bg-[#41C54E26]"
-                      }  w-[100px] text-center  text-xs font-bold me-2 px-4 py-2 rounded-full`}
+                      } w-[120px] md:w-[100px] text-center  text-xs font-bold me-2 px-4 py-2 rounded-full`}
                     >
                       {item.status == "Scheduled" ? "Scheduled" : "Delivered"}
                     </div>

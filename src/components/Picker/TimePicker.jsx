@@ -30,7 +30,7 @@ export const ModernTimePicker = ({time}) => {
       <img
         src="/clock.png"
         alt=""
-        className="absolute bottom-[23%] ml-2 w-5"
+        className="absolute  bottom-[23%] ml-2 w-5"
         srcset=""
       />
     </div>

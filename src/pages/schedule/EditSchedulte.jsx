@@ -211,7 +211,7 @@ export default function EditSchedule() {
                         <img
                           src={img.downloadURL}
                           alt=""
-                          className="h-[100px] rounded-md"
+                          className="h-[100px] w-auto rounded-md"
                         />
                       ) : (
                         <img

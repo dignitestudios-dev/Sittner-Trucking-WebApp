@@ -69,7 +69,7 @@ export default function Attachment() {
           >
             <div className="py-1 rounded-md mt-1 ">
               <ul className="max-w-md  dark:divide-gray-700">
-                {IsAttachments?.slice(0, 5)?.map((msg, i) => (
+                {[...IsAttachments]?.slice(0, 5)?.reverse()?.map((msg, i) => (
                   <>
                     {msg.images.map((img, index) =>
                       msg.type[index]?.includes("image") ? (

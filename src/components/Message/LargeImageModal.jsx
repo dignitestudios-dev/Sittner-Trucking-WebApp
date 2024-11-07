@@ -25,7 +25,7 @@ const Controls = () => {
   },[])
 
   return (
-    <div className="tools flex gap-2">
+    <div className="tools flex gap-2 mb-2">
       <button className="text-[30px]" onClick={() => zoomIn()}>+</button>
       <button className="text-[30px]"  onClick={() => zoomOut()}>-</button>
       <button className="text-[20px]"  onClick={() => resetTransform()}>Reset</button>
@@ -66,15 +66,26 @@ export default function ViewImage() {
       initialPositionX={200}
       initialPositionY={100}
     >
-      {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-        <>         
-          <TransformComponent>
-          <img src={img?.url} className="rounded-lg   " alt="" srcset="" />
-          </TransformComponent>
-          <Controls />
-        
-        </>
-      )}
+    {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+  <>
+    <div style={{ overflow: 'hidden', position: 'relative', width: '100%', height: '100%' }}>
+      <TransformComponent> 
+        <img 
+          src={img?.url} 
+          className="rounded-lg" 
+          alt="" 
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',  // Ensure the image fits without stretching or overflowing
+          }}
+        />
+      </TransformComponent>
+    </div>
+    <Controls />
+  </>
+)}
+
        
     </TransformWrapper>
                   

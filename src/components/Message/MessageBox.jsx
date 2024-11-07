@@ -288,7 +288,7 @@ export default function MessageBox() {
  const col_Array=["bg-[#E8F569]","bg-[#B9FF9E]","bg-[#94D0E4]"];
 
   return (
-    <div className="bg-[#FFFFFF] w-full h-[85vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
+    <div className="bg-[#FFFFFF] w-full h-[80vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
       <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-5 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">
@@ -391,7 +391,7 @@ export default function MessageBox() {
                     </div>
                   )}
                   {msg.images.length > 0 && (
-                    <div className={`w-full py-3 grid grid-cols-${msg.images.length} gap-2`} >
+                    <div className={`w-full py-3 flex items-center justify-end flex-wrap gap-2`} >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <div
@@ -400,7 +400,7 @@ export default function MessageBox() {
                           >
                             <img
                               src={img.url ? img.url : "/noprofile.png"}
-                              className="cursor-pointer rounded-md h-[80px] w-[80px]"
+                              className="cursor-pointer rounded-md h-[80px] w-auto"
                               onClick={() => {
                                 setModalImageUrl(msg.images);
                                 setIviewImage(true);
