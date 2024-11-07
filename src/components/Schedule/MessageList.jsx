@@ -216,7 +216,7 @@ export default function MessageList() {
                 Sent
               </span>
             ) : (
-              <div className="flex items-center">
+              <div className="hidden md:flex items-center">
                 <button
                   className="bg-transparent"
                   onClick={() => {

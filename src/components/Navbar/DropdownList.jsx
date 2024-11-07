@@ -8,16 +8,14 @@ export default function DropdownList() {
   const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee,NotificationCall } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
-  const [pushNotification, setpushNotification] = useState(false);
-
-
+  const [pushNotification, setpushNotification] = useState(0);
   const DropdownRef = useRef(null);
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
 
  useEffect(()=>{
-  if (Employee.role=="user") {
+  if (Employee.role=="user"&&pushNotification>0) {
     toast.success(`New Notification From Admin`, {
       position: "top-right",
       autoClose: 3000,
@@ -27,6 +25,7 @@ export default function DropdownList() {
       draggable: true,
       progress: undefined,
     });
+    setpushNotification(false)
   }
  },[pushNotification])
 
@@ -45,7 +44,7 @@ export default function DropdownList() {
             status: "Delivered",
             seen: "pending"
           })
-          setpushNotification(!pushNotification)
+          setpushNotification(prev=>prev+1)
                  
         }
         fetchedNotifications.push({ id: doc.id, ...data });
