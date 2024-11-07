@@ -346,7 +346,7 @@ export default function MessageBox() {
         className={`md:chat-body ${
           Employee?.role == "admin"
             ? "h-[80%] lg:h-[440px]"
-            : "h-[80%] lg:h-[440px]"
+            : "h-[80%] lg:h-[540px]"
         }  scroll-box  overflow-auto`}
       >
         {/* Day Timer */}
@@ -381,7 +381,7 @@ export default function MessageBox() {
                       className={` ${
                         Employee?.role == "admin"
                           ? "bg-[#0A8A33] text-white ms-auto"
-                          : "bg-[#F4F4F4]"
+                          : "bg-[#F4F4F4] "
                       } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
                     >
                     <a  href={msg.message.includes("https://")&&msg.message} target="_blank" >
@@ -390,7 +390,8 @@ export default function MessageBox() {
                     </div>
                   )}
                   {msg.images.length > 0 && (
-                    <div className={`w-full py-3 flex items-center justify-end flex-wrap gap-2`} >
+                    <div className={`w-full py-3 flex items-center  ${
+                        Employee?.role == "admin"&&"justify-end"}  flex-wrap gap-2`} >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <div
