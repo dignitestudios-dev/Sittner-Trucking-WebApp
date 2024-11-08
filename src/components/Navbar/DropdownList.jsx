@@ -18,6 +18,8 @@ export default function DropdownList() {
   const VITE_APP_VAPID_KEY ="BIWIKlADH2RkqJDKZkb2jM9U2XHa1H_lzZCf2V3fjv7K4kpxa3uAyhWImg-9pe-D8ZFcpWp1gDdUt9vVCAoia7U";
   async function requestPermission() {
     const permission = await Notification.requestPermission();
+    console.log(permission,"permissions");
+    
     if (permission === "granted") {
       const token = await getToken(messaging, {
         vapidKey: VITE_APP_VAPID_KEY,
@@ -47,6 +49,21 @@ export default function DropdownList() {
   }
  },[pushNotification])
 
+ useEffect(() => {
+  onMessage(messaging, (payload) => {
+    console.log("New message: ", payload);
+    toast.success(payload.notification.title, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  });
+}, [])
+
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
@@ -57,17 +74,7 @@ export default function DropdownList() {
         const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
   
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-          onMessage(messaging, (payload) => {
-            toast.success(payload.notification.title, {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          });
+        
           setNotTitle(data?.description)
           updateDoc(doc.ref, {
             status: "Delivered",
