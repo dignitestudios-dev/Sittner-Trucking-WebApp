@@ -13,66 +13,79 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
+ // Function to display toast notification
+ const showToast = () => {
+  toast.success(`New Notification From Admin`, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
 
- useEffect(()=>{
-  if (Employee.role=="user"&&pushNotification>0) {
-    toast.success(`New Notification From Admin`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+// Function to get notifications from Firestore
+const getNotifications = () => {
+  const notificationsRef = collection(db, "notification");
+  const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+    const fetchedNotifications = [];
+    const now = moment.tz("America/Denver");
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const notificationDate = moment.tz(
+        `${data.date} ${data.time}`,
+        "MM/DD/YYYY h:mm A",
+        "America/Denver"
+      );
+
+      if (
+        notificationDate.isSameOrBefore(now) &&
+        data.status === "Scheduled"
+      ) {
+        // Update status and trigger toast if new notification
+        updateDoc(doc.ref, { status: "Delivered", seen: "pending" });
+        setpushNotification((prev) => prev + 1);
+      }
+
+      fetchedNotifications.push({ id: doc.id, ...data });
     });
-  }
- },[pushNotification])
 
-  const getNots = () => {
-    const notificationsRef = collection(db, "notification");
-    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-      const fetchedNotifications = [];
-      const now = moment.tz("America/Denver");
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
-  
-        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-
-          updateDoc(doc.ref, {
-            status: "Delivered",
-            seen: "pending"
-          })
-          setpushNotification(prev=>prev+1)
-                 
-        }
-        fetchedNotifications.push({ id: doc.id, ...data });
-      });
-  
-      const sortedNotifications = fetchedNotifications.sort((a, b) => {
-        const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
-        const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
-        return dateB - dateA; 
-      });
-      setNotifications(sortedNotifications);
+    // Sort notifications by date
+    const sortedNotifications = fetchedNotifications.sort((a, b) => {
+      const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
+      const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
+      return dateB - dateA;  // descending order
     });
-  
-    return unsubscribe;
-  };
-  
+
+    setNotifications(sortedNotifications);
+  });
+
+  return unsubscribe;
+};
+
 useEffect(() => {
-    const unsubscribe = getNots();
-    const intervalId = setInterval(() => {
-        getNots();
-    }, 30000);
+  // Call notification fetch
+  const unsubscribe = getNotifications();
 
-    return () => {
-        clearInterval(intervalId);
-        unsubscribe();
-    };
+  // Poll for new notifications every 30 seconds (can adjust)
+  const intervalId = setInterval(() => {
+    getNotifications();
+  }, 30000);  // 30 seconds interval for checking new notifications
+
+  return () => {
+    clearInterval(intervalId);
+    unsubscribe();
+  };
 }, []);
 
-  
+useEffect(() => {
+  if (pushNotification > 0) {
+    showToast();  // Trigger toast when there's a new notification
+  }
+}, [pushNotification]);  // Dependency on pushNotification to trigger toast
 
 
   useEffect(() => {

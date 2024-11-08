@@ -27,7 +27,7 @@ export default function LogOut() {
                                 <div className="px-6 py-6 flex flex-col items-center">
                                     <IoExit size={40} color="#EE3131"/>
                                     <h3 className="font-semibold text-[20px] leading-[29px] mb-3 capitalize" >Logout</h3>
-                                    <p className="text-[#565656] text-[13px] text-center font-medium leading-[13px] " >Are you sure you want to log out of your account?</p>
+                                    <p className="text-[#565656] text-[13px] text-center font-medium leading-[15px] " >Are you sure you want to log out of your account?</p>
                                     <div className="flex items-center w-full mt-2 justify-between" >
                                         <button className={`flex text-xs w-[140px] text-center bg-[#ECECEC] h-[44px] flex items-center justify-center rounded-[8px] font-semibold mt-3 px-4 py-2   `} 
                                          onClick={() => setIsLogOut(false)}
