@@ -128,7 +128,7 @@ useEffect(() => {
                 <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
                     <div className="flex space-x-4 ">
                         <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-bold">New Messages From Admin</p>
+                            <p className="text-[13px] font-bold">{notification?.title}</p>
                             <p className="text-[13px] text-[#909090] font-normal">{notification.description}</p>
                         </div>
                         <div className="flex flex-col items-end">
