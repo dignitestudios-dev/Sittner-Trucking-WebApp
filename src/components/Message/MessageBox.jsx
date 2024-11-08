@@ -288,7 +288,7 @@ export default function MessageBox() {
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
-      <div className="chathead h-[10%] px-2 lg:px-5 py-2 lg:py-3 border-b border-[#E1E1E1]">
+      <div className="chathead h-[10%] px-2 md:px-5 py-2 md:py-3 border-b border-[#E1E1E1]">
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div>
