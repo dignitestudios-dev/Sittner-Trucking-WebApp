@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
-import { collection, db, getDocs, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
+import { collection, db, getDocs, messaging, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import moment from "moment";
 import 'moment-timezone';
+import { getToken } from "firebase/messaging";
 export default function DropdownList() {
   const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee,NotificationCall } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
@@ -14,6 +15,23 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
+  const VITE_APP_VAPID_KEY ="BIWIKlADH2RkqJDKZkb2jM9U2XHa1H_lzZCf2V3fjv7K4kpxa3uAyhWImg-9pe-D8ZFcpWp1gDdUt9vVCAoia7U";
+  async function requestPermission() {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      const token = await getToken(messaging, {
+        vapidKey: VITE_APP_VAPID_KEY,
+      });
+      console.log("Token generated : ", token);
+    } else if (permission === "denied") {
+
+      alert("You denied for the notification");
+    }
+  }
+
+  useEffect(() => {
+    requestPermission();
+  }, []);
 
  useEffect(()=>{
   if (Employee.role=="user"&&pushNotification>0) {
@@ -39,6 +57,17 @@ export default function DropdownList() {
         const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
   
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+          onMessage(messaging, (payload) => {
+            toast.success(payload.notification.title, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          });
           setNotTitle(data?.description)
           updateDoc(doc.ref, {
             status: "Delivered",

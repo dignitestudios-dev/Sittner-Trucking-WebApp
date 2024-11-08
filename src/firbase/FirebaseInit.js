@@ -33,7 +33,7 @@ import {
    listAll,
    getMetadata
 } from "firebase/storage";
-
+import { getMessaging } from "firebase/messaging";
 const firebaseConfig = {
   apiKey: "AIzaSyCzOvI5pg2eP-R3VgT353AdhvERIe2thpA",
   authDomain: "jbst-dispatch-app-b62fd.firebaseapp.com",
@@ -49,7 +49,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore();
 const storage = getStorage();
+const messaging = getMessaging(app);
 export {
+  messaging,
   auth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
