@@ -176,6 +176,19 @@ font-weight: 600 !important;
 .react-ios-time-picker-popup-overlay {
   overflow: hidden !important;
 }
+.react-ios-time-picker-hour::-webkit-scrollbar-track,
+.react-ios-time-picker-minute::-webkit-scrollbar-track,
+.react-ios-time-picker-hour-format::-webkit-scrollbar-track {
+  background-color: transparent !important; /* Make the track transparent */
+}
+
+/* Optional: Customize scrollbar thumb for better visibility */
+.react-ios-time-picker-hour::-webkit-scrollbar-thumb,
+.react-ios-time-picker-minute::-webkit-scrollbar-thumb,
+.react-ios-time-picker-hour-format::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Dark thumb (you can adjust this color) */
+  border-radius: 10px;
+}
 
 @media screen and (max-width: 560px) {
   .otp-component>div {
@@ -188,8 +201,16 @@ font-weight: 600 !important;
   *{
     font-size: 16px !important;
   }
-  body{
+  /* body{
     overflow: hidden;
+  } */
+  .react-ios-time-picker-hour,.react-ios-time-picker-minute,.react-ios-time-picker-hour-format{
+    overflow-y:scroll !important;
+    height: 200px !important;
+    touch-action: none;
+    overflow-anchor: auto !important;
+    overscroll-behavior: contain !important; 
+    transform: translateY(0) !important;
   }
 }
 

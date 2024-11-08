@@ -44,7 +44,7 @@ const Layout = ({ pages }) => {
   
 
   return (
-    <div className="w-screen h-[90vh] md:h-screen flex justify-start items-start overflow-hidden">
+    <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
       <div
         onClick={toggleModal}
         className={`w-screen h-screen fixed top-0 left-0 transition-all duration-500  ${

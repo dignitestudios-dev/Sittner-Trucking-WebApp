@@ -25,7 +25,6 @@ export default function DropdownList() {
       draggable: true,
       progress: undefined,
     });
-    setpushNotification(false)
   }
  },[pushNotification])
 
