@@ -17,52 +17,51 @@ export default function DropdownList() {
   };
   const VITE_APP_VAPID_KEY ="BIWIKlADH2RkqJDKZkb2jM9U2XHa1H_lzZCf2V3fjv7K4kpxa3uAyhWImg-9pe-D8ZFcpWp1gDdUt9vVCAoia7U";
   async function requestPermission() {
-    const permission = await Notification.requestPermission();
-    console.log(permission,"permissions");
-    
-    if (permission === "granted") {
-      const token = await getToken(messaging, {
-        vapidKey: VITE_APP_VAPID_KEY,
-      });
-      console.log("Token generated : ", token);
-    } else if (permission === "denied") {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getToken(messaging, {
+          vapidKey: VITE_APP_VAPID_KEY,
+        });
 
-      alert("You denied for the notification");
+        console.log("Token generated:", token);
+        alert("Token generated");
+      } else {
+        console.warn("Notification permission denied");
+        alert("Notification denied");
+      }
+    } catch (error) {
+      console.error("Failed to get token:", error);
     }
   }
 
+  // useEffect(() => {
+  //   requestPermission();
+  // }, []);
+
   useEffect(() => {
     requestPermission();
+    onMessage(messaging, (payload) => {
+      toast.success(payload.notification.title, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    });
   }, []);
 
- useEffect(()=>{
-  if (Employee.role=="user"&&pushNotification>0) {
-    toast.success(NotTitle, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
- },[pushNotification])
-
- useEffect(() => {
-  onMessage(messaging, (payload) => {
-    console.log("New message: ", payload);
-    toast.success(payload.notification.title, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  });
-}, [])
+  useEffect(() => {
+    if (Employee.role == "user" && pushNotification > 0) {
+      toast.success(NotTitle, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [pushNotification]);
 
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
@@ -71,66 +70,71 @@ export default function DropdownList() {
       const now = moment.tz("America/Denver");
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
-  
-        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-        
-          setNotTitle(data?.description)
-          updateDoc(doc.ref, {
-            status: "Delivered",
-            seen: "pending"
-          })
-          setpushNotification(prev=>prev+1)
-                 
+        const notificationDate = moment.tz(
+          `${data.date} ${data.time}`,
+          "MM/DD/YYYY h:mm A",
+          "America/Denver"
+        );
+
+        if (
+          notificationDate.isSameOrBefore(now) &&
+          data.status === "Scheduled"
+        ) {
+          setPushNotification((prev) => prev + 1);
+          updateDoc(doc.ref, { status: "Delivered", seen: "pending" });
         }
         fetchedNotifications.push({ id: doc.id, ...data });
       });
-  
+
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
-        const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
-        const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
-        return dateB - dateA; 
+        const dateA = moment
+          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .valueOf();
+        const dateB = moment
+          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .valueOf();
+        return dateB - dateA;
       });
+
       setNotifications(sortedNotifications);
     });
-  
+
     return unsubscribe;
   };
-  
-useEffect(() => {
-    const unsubscribe = getNots();
-    const intervalId = setInterval(() => {
-        getNots();
-    }, 30000);
-
-    return () => {
-        clearInterval(intervalId);
-        unsubscribe();
-    };
-}, []);
-
-  
-
 
   useEffect(() => {
-    const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
-    const pendingNotifications = notifications.filter(notification => notification.seen == "pending");
+    const unsubscribe = getNots();
+    const intervalId = setInterval(() => getNots(), 30000);
+    return () => {
+      clearInterval(intervalId);
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const deliveredNotifications = notifications.filter(
+      (notification) => notification.status === "Delivered"
+    );
+    const pendingNotifications = notifications.filter(
+      (notification) => notification.seen == "pending"
+    );
     const employeeCreatedAt = new Date(Employee.createdat);
-    const oldNot = deliveredNotifications.filter(notification => {
-        const notificationDate = new Date(`${notification.date} ${notification.time}`);
-        return notificationDate > employeeCreatedAt;
+    const oldNot = deliveredNotifications.filter((notification) => {
+      const notificationDate = new Date(
+        `${notification.date} ${notification.time}`
+      );
+      return notificationDate > employeeCreatedAt;
     });
-    console.log(pendingNotifications,"pending");
-    
-    if (pendingNotifications.length<0) {
+    console.log(pendingNotifications, "pending");
+
+    if (pendingNotifications.length < 0) {
       setNotificationCount(0);
     } else {
-      setNotificationCount(pendingNotifications.length); 
+      setNotificationCount(pendingNotifications.length);
     }
 
     setDevNotifications(oldNot);
   }, [notifications]);
-
 
 
   return (
