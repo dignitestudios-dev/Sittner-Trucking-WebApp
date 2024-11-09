@@ -1,20 +1,43 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
 import { MyContext } from "../../context/GlobalContext";
-import { addDoc, collection, db } from "../../firbase/FirebaseInit";
+import { addDoc, collection, db, doc, getDoc } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 
 export default function CreateNotification() {
   const { SelectedTime, SelectedDate,Employee,loader,setLoader } = useContext(MyContext);
   const navigate = useNavigate("");
+  const [tokens, setTokens] = useState([]);
   const [Notification, SetNotification] = useState({
     title: "",
     description: "",
   });
-console.log(SelectedTime,SelectedDate,"datees");
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        const fcmTokenRef = doc(db, "fcmTokens", "tokenList");
+        const fcmTokenDoc = await getDoc(fcmTokenRef);
+
+        if (fcmTokenDoc.exists()) {
+          const tokensArray = fcmTokenDoc.data().tokens || [];
+          console.log("Tokens array:", tokensArray); 
+          setTokens(tokensArray); 
+        } else {
+          console.log("No tokens document found");
+        }
+      } catch (error) {
+        console.error("Error fetching tokens:", error);
+      }
+    };
+
+    fetchTokens(); 
+
+
+  }, []);
 
   const HandleInput = (e) => {
     const { name, value } = e.target;
@@ -27,21 +50,39 @@ console.log(SelectedTime,SelectedDate,"datees");
   const UploadNotification = (e) => {
     e.preventDefault();
     setLoader(true)
+    const notificationData={
+      token:tokens,
+      title:Notification.title,
+      body:Notification.description,
+      time:SelectedTime,
+      date:SelectedDate,
+      scheduleTime:SelectedDate + " " + SelectedTime,
+      status:"Scheduled",
+      Employee:Employee,
+      seen:""
+    }
+ 
     const myPromise = new Promise(async (resolve, reject) => {
-        try {
-            await addDoc(collection(db, "notification"), {
-                title:Notification.title,
-                description:Notification.description,
-                time:SelectedTime,
-                date:SelectedDate,
-                status:"Scheduled",
-                author:Employee,
-                seen:""
-            });
-            resolve("Notification Created")
-        } catch (error) {
-            reject(error.message);
+      try {
+
+        const response = await fetch('https://nodejsotp-7akwb62w0-zackcoles-projects.vercel.app/send-notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(notificationData), 
+        });
+  
+        // Check if the response is successful
+        if (!response.ok) {
+          throw new Error('Failed to create notification');
         }
+  
+        const data = await response.json(); // Assuming the server returns JSON
+        resolve(data.message || 'Notification Created');
+      } catch (error) {
+        reject(error.message || 'An error occurred');
+      }
     });
 
     toast.promise(myPromise, {

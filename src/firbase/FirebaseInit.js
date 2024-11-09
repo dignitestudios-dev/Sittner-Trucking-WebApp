@@ -20,7 +20,8 @@ import {
   orderBy,
   Timestamp,
   writeBatch,
-  getCountFromServer 
+  getCountFromServer ,
+  setDoc
 } from "firebase/firestore";
 import {
   getStorage,
@@ -79,5 +80,6 @@ export {
    orderBy,
    Timestamp,
    writeBatch,
-   getCountFromServer 
+   getCountFromServer ,
+   setDoc
 };

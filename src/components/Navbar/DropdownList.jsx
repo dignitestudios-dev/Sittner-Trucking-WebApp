@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
-import { collection, db, getDocs, messaging, onSnapshot, query, updateDoc } from "../../firbase/FirebaseInit";
+import { addDoc, collection, db, doc, getDoc, getDocs, messaging, onSnapshot, query, setDoc, updateDoc } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import moment from "moment";
 import 'moment-timezone';
@@ -20,21 +20,40 @@ export default function DropdownList() {
     try {
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
+        // Get the token from FCM
         const token = await getToken(messaging, {
           vapidKey: VITE_APP_VAPID_KEY,
         });
-
+  
         console.log("Token generated:", token);
-        alert("Token generated");
+  
+        if (token) {
+          const fcmTokenRef = doc(db, "fcmTokens", "tokenList"); 
+       
+          const fcmTokenDoc = await getDoc(fcmTokenRef);
+  
+          if (fcmTokenDoc.exists()) {
+          
+            await updateDoc(fcmTokenRef, {
+              tokens: arrayUnion(token), 
+            });
+            console.log("Token added to Firestore");
+          } else {
+         
+            await setDoc(fcmTokenRef, {
+              tokens: [token],
+            });
+            console.log("Token added to Firestore");
+          }
+        }
       } else {
         console.warn("Notification permission denied");
         alert("Notification denied");
       }
     } catch (error) {
-      console.error("Failed to get token:", error);
+      console.error("Failed to get token or update Firestore:", error);
     }
   }
-
   // useEffect(() => {
   //   requestPermission();
   // }, []);
@@ -80,7 +99,7 @@ export default function DropdownList() {
           notificationDate.isSameOrBefore(now) &&
           data.status === "Scheduled"
         ) {
-          setPushNotification((prev) => prev + 1);
+          setpushNotification((prev) => prev + 1);
           updateDoc(doc.ref, { status: "Delivered", seen: "pending" });
         }
         fetchedNotifications.push({ id: doc.id, ...data });
