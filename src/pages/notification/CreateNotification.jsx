@@ -50,39 +50,21 @@ export default function CreateNotification() {
   const UploadNotification = (e) => {
     e.preventDefault();
     setLoader(true)
-    const notificationData={
-      token:tokens,
-      title:Notification.title,
-      body:Notification.description,
-      time:SelectedTime,
-      date:SelectedDate,
-      scheduleTime:SelectedDate + " " + SelectedTime,
-      status:"Scheduled",
-      Employee:Employee,
-      seen:""
-    }
- 
     const myPromise = new Promise(async (resolve, reject) => {
-      try {
-
-        const response = await fetch('https://nodejsotp-7akwb62w0-zackcoles-projects.vercel.app/send-notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(notificationData), 
-        });
-  
-        // Check if the response is successful
-        if (!response.ok) {
-          throw new Error('Failed to create notification');
+        try {
+            await addDoc(collection(db, "notification"), {
+                title:Notification.title,
+                description:Notification.description,
+                time:SelectedTime,
+                date:SelectedDate,
+                status:"Scheduled",
+                author:Employee,
+                seen:""
+            });
+            resolve("Notification Created")
+        } catch (error) {
+            reject(error.message);
         }
-  
-        const data = await response.json(); // Assuming the server returns JSON
-        resolve(data.message || 'Notification Created');
-      } catch (error) {
-        reject(error.message || 'An error occurred');
-      }
     });
 
     toast.promise(myPromise, {
@@ -94,6 +76,7 @@ export default function CreateNotification() {
         navigate("/notification");
     });
   };
+
 
   return (
     <div class="bg-[#F7F7F7] h-[80vh] py-5 px-5 ">

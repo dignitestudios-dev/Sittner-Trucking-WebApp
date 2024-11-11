@@ -1,12 +1,31 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
-import { addDoc, collection, db, doc, getDoc, getDocs, messaging, onSnapshot, query, setDoc, updateDoc } from "../../firbase/FirebaseInit";
+import {
+  addDoc,
+  collection,
+  db,
+  doc,
+  getDoc,
+  getDocs,
+  messaging,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+} from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 import moment from "moment";
-import 'moment-timezone';
+import "moment-timezone";
 import { getToken, onMessage } from "firebase/messaging";
 export default function DropdownList() {
-  const { IsDropdownOpen, setIsDropdown,setNotificationCount,setRealTimeData,Employee,NotificationCall } = useContext(MyContext);
+  const {
+    IsDropdownOpen,
+    setIsDropdown,
+    setNotificationCount,
+    setRealTimeData,
+    Employee,
+    NotificationCall,
+  } = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
   const [pushNotification, setpushNotification] = useState(0);
@@ -15,72 +34,6 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-  const VITE_APP_VAPID_KEY ="BIWIKlADH2RkqJDKZkb2jM9U2XHa1H_lzZCf2V3fjv7K4kpxa3uAyhWImg-9pe-D8ZFcpWp1gDdUt9vVCAoia7U";
-  async function requestPermission() {
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        // Get the token from FCM
-        const token = await getToken(messaging, {
-          vapidKey: VITE_APP_VAPID_KEY,
-        });
-  
-        console.log("Token generated:", token);
-  
-        if (token) {
-          const fcmTokenRef = doc(db, "fcmTokens", "tokenList"); 
-       
-          const fcmTokenDoc = await getDoc(fcmTokenRef);
-  
-          if (fcmTokenDoc.exists()) {
-          
-            await updateDoc(fcmTokenRef, {
-              tokens: arrayUnion(token), 
-            });
-            console.log("Token added to Firestore");
-          } else {
-         
-            await setDoc(fcmTokenRef, {
-              tokens: [token],
-            });
-            console.log("Token added to Firestore");
-          }
-        }
-      } else {
-        console.warn("Notification permission denied");
-        alert("Notification denied");
-      }
-    } catch (error) {
-      console.error("Failed to get token or update Firestore:", error);
-    }
-  }
-  // useEffect(() => {
-  //   requestPermission();
-  // }, []);
-
-  useEffect(() => {
-    requestPermission();
-    onMessage(messaging, (payload) => {
-      toast.success(payload.notification.title, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    if (Employee.role == "user" && pushNotification > 0) {
-      toast.success(NotTitle, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, [pushNotification]);
 
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
@@ -97,14 +50,26 @@ export default function DropdownList() {
 
         if (
           notificationDate.isSameOrBefore(now) &&
-          data.status === "Scheduled"
+          data.status == "Scheduled"
         ) {
-          setpushNotification((prev) => prev + 1);
-          updateDoc(doc.ref, { status: "Delivered", seen: "pending" });
-        }
+          updateDoc(doc.ref, {
+            status: "Delivered",
+            seen: "pending",
+          });
+   
+            toast.success("New Notification from admin", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        
         fetchedNotifications.push({ id: doc.id, ...data });
       });
-
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -114,7 +79,6 @@ export default function DropdownList() {
           .valueOf();
         return dateB - dateA;
       });
-
       setNotifications(sortedNotifications);
     });
 
@@ -123,7 +87,10 @@ export default function DropdownList() {
 
   useEffect(() => {
     const unsubscribe = getNots();
-    const intervalId = setInterval(() => getNots(), 30000);
+    const intervalId = setInterval(() => {
+      getNots();
+    }, 30000);
+
     return () => {
       clearInterval(intervalId);
       unsubscribe();
@@ -155,7 +122,6 @@ export default function DropdownList() {
     setDevNotifications(oldNot);
   }, [notifications]);
 
-
   return (
     <>
       {IsDropdownOpen && (
@@ -180,34 +146,40 @@ export default function DropdownList() {
               Notifications
             </h3>
             {DevNotifications.length === 0 ? (
-                <p className="text-center text-gray-500 mt-4">No notifications available.</p>
+              <p className="text-center text-gray-500 mt-4">
+                No notifications available.
+              </p>
             ) : (
-            <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
-            {DevNotifications.map((notification) => (
-                <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
+              <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
+                {DevNotifications.map((notification) => (
+                  <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
                     <div className="flex space-x-4 ">
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-bold">{notification?.title}</p>
-                            <p className="text-[13px] text-[#909090] font-normal">{notification.description}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-bold">
+                          {notification?.title}
+                        </p>
+                        <p className="text-[13px] text-[#909090] font-normal">
+                          {notification.description}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <p className="text-xs text-[#717171] font-medium">
+                          {notification.time}
+                        </p>
+                        <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
+                          <span className="">
+                            {notification.seen === "pending" && (
+                              <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
+                                {notification.seen === "pending" ? "1" : ""}
+                              </div>
+                            )}
+                          </span>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <p className="text-xs text-[#717171] font-medium">{notification.time}</p>
-                            <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
-                                <span className="">
-                                  {
-                                    notification.seen === "pending"&&(
-                                      <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
-                                        {notification.seen === "pending" ? "1" : ""}
-                                    </div>
-                                    )
-                                  }
-                                </span>
-                            </div>
-                        </div>
+                      </div>
                     </div>
-                </li>
-            ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
