@@ -13,7 +13,7 @@ import {
   setDoc,
   updateDoc,
 } from "../../firbase/FirebaseInit";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import moment from "moment";
 import "moment-timezone";
@@ -27,25 +27,22 @@ export default function DropdownList() {
     Employee,
     NotificationCall,
   } = useContext(MyContext);
+
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
-  const [pushNotification, setpushNotification] = useState(0);
-  const [NotTitle, setNotTitle] = useState("");
   const [UserRole, setUserRole] = useState("");
-
+  const [pushNotification, setPushNotification] = useState(0); // For tracking notifications
+  const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
+
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-  const [newNotification, setNewNotification] = useState(false);  // A new state to trigger toast
 
-  // This effect listens for changes in pushNotification count or new notifications
+  // This effect listens for the `pushNotification` count or new notifications
   useEffect(() => {
-    console.log(newNotification,"Notification Status");
-    if (newNotification && UserRole == "user") {
-      console.log(UserRole,"UserRole");
-      
-      toast.success("New", {
+    if (pushNotification > 0 && UserRole === "user") {
+      toast.success(NotTitle || "New Notification", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -54,40 +51,48 @@ export default function DropdownList() {
         draggable: true,
         progress: undefined,
       });
-      setNewNotification(false);  // Reset the notification state after showing toast
     }
-  }, [newNotification]);
+  }, [pushNotification, NotTitle, UserRole]);
 
   const getNots = () => {
-    const cookieData = Cookies.get('employe'); 
+    const cookieData = Cookies.get("employe");
     const data = JSON.parse(cookieData);
-    console.log(data,"data----------->");
-    
-    setUserRole(data?.role)
+    console.log("data----------->", data);
+
+    setUserRole(data?.role);
+
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
       const now = moment.tz("America/Denver");
+
       querySnapshot.forEach((doc) => {
+        console.log("querySnapshot running");
         const data = doc.data();
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-          // Only trigger toast for new notifications
-          setNotTitle(data?.description);
+
+        if (
+          notificationDate.isSameOrBefore(now) &&
+          data.status === "Scheduled"
+        ) {
+          // New notification logic
+          setNotTitle(data?.description); // Set the title to be used in the toast
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending",
           });
 
-          // setPushNotification((prev) => prev + 1);
-          setNewNotification(true);  // Trigger toast
+          setPushNotification((prev) => prev + 1); // Increment pushNotification counter
         }
+
         fetchedNotifications.push({ id: doc.id, ...data });
       });
+
+      console.log("out of querySnapshot");
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -104,6 +109,7 @@ export default function DropdownList() {
   };
 
   useEffect(() => {
+    console.log("subscripbing");
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
@@ -120,7 +126,7 @@ export default function DropdownList() {
       (notification) => notification.status === "Delivered"
     );
     const pendingNotifications = notifications.filter(
-      (notification) => notification.seen == "pending"
+      (notification) => notification.seen === "pending"
     );
     const employeeCreatedAt = new Date(Employee.createdat);
     const oldNot = deliveredNotifications.filter((notification) => {
@@ -129,14 +135,11 @@ export default function DropdownList() {
       );
       return notificationDate > employeeCreatedAt;
     });
-    console.log(pendingNotifications, "pending");
 
-    if (pendingNotifications.length < 0) {
-      setNotificationCount(0);
-    } else {
-      setNotificationCount(pendingNotifications.length);
-    }
-
+    // Update notification count
+    setNotificationCount(
+      pendingNotifications.length < 0 ? 0 : pendingNotifications.length
+    );
     setDevNotifications(oldNot);
   }, [notifications]);
 
