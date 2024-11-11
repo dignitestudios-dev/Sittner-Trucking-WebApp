@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import {
   addDoc,
@@ -13,6 +13,7 @@ import {
   setDoc,
   updateDoc,
 } from "../../firbase/FirebaseInit";
+import Cookies from 'js-cookie';
 import { toast } from "react-toastify";
 import moment from "moment";
 import "moment-timezone";
@@ -26,26 +27,25 @@ export default function DropdownList() {
     Employee,
     NotificationCall,
   } = useContext(MyContext);
-
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
   const [pushNotification, setpushNotification] = useState(0);
   const [NotTitle, setNotTitle] = useState("");
-  const [newNotification, setNewNotification] = useState(false);  // A new state to trigger toast
+  const [UserRole, setUserRole] = useState("");
+
   const DropdownRef = useRef(null);
-
-  const toggleModal = useCallback(() => {
+  const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
-  }, [IsDropdownOpen, setIsDropdown]);
-
-
+  };
+  const [newNotification, setNewNotification] = useState(false);  // A new state to trigger toast
 
   // This effect listens for changes in pushNotification count or new notifications
   useEffect(() => {
-    if (newNotification) {
-      console.log(Employee,"employees information");
+    console.log(newNotification,"Notification Status");
+    if (newNotification && UserRole == "user") {
+      console.log(UserRole,"UserRole");
       
-      toast.success(NotTitle, {
+      toast.success("New", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -56,15 +56,18 @@ export default function DropdownList() {
       });
       setNewNotification(false);  // Reset the notification state after showing toast
     }
-  }, [newNotification, NotTitle]);
+  }, [newNotification]);
 
-  // Fetch notifications
-  const getNots = useCallback(() => {
+  const getNots = () => {
+    const cookieData = Cookies.get('employe'); 
+    const data = JSON.parse(cookieData);
+    console.log(data,"data----------->");
+    
+    setUserRole(data?.role)
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
       const now = moment.tz("America/Denver");
-
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
@@ -72,21 +75,19 @@ export default function DropdownList() {
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-        
+          // Only trigger toast for new notifications
           setNotTitle(data?.description);
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending",
           });
 
-          setPushNotification((prev) => prev + 1);
-          setNewNotification(true);  
+          // setPushNotification((prev) => prev + 1);
+          setNewNotification(true);  // Trigger toast
         }
         fetchedNotifications.push({ id: doc.id, ...data });
       });
-
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -96,47 +97,48 @@ export default function DropdownList() {
           .valueOf();
         return dateB - dateA;
       });
-
       setNotifications(sortedNotifications);
     });
 
     return unsubscribe;
-  }, []);
+  };
 
-  // Initialize notifications
   useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
-    }, 30000); // Update every 30 seconds, adjust as needed
+    }, 30000);
 
     return () => {
       clearInterval(intervalId);
       unsubscribe();
     };
-  }, [getNots]);
+  }, []);
 
-  // Filter delivered and pending notifications
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
     const pendingNotifications = notifications.filter(
-      (notification) => notification.seen === "pending"
+      (notification) => notification.seen == "pending"
     );
     const employeeCreatedAt = new Date(Employee.createdat);
-    
     const oldNot = deliveredNotifications.filter((notification) => {
-      const notificationDate = new Date(`${notification.date} ${notification.time}`);
+      const notificationDate = new Date(
+        `${notification.date} ${notification.time}`
+      );
       return notificationDate > employeeCreatedAt;
     });
-
     console.log(pendingNotifications, "pending");
 
-    setNotificationCount(pendingNotifications.length > 0 ? pendingNotifications.length : 0);
-    setDevNotifications(oldNot);
-  }, [notifications, Employee.createdat]);
+    if (pendingNotifications.length < 0) {
+      setNotificationCount(0);
+    } else {
+      setNotificationCount(pendingNotifications.length);
+    }
 
+    setDevNotifications(oldNot);
+  }, [notifications]);
 
   return (
     <>
