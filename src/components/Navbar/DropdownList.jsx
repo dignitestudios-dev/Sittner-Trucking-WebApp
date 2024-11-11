@@ -39,7 +39,6 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
-  // This effect listens for the `pushNotification` count or new notifications
   useEffect(() => {
     if (pushNotification > 0 && UserRole === "user") {
       toast.success(NotTitle || "New Notification", {
@@ -52,7 +51,7 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [pushNotification, NotTitle, UserRole]);
+  }, [pushNotification]);
 
   const getNots = () => {
     const cookieData = Cookies.get("employe");
@@ -86,7 +85,7 @@ export default function DropdownList() {
             seen: "pending",
           });
 
-          setPushNotification((prev) => prev + 1); // Increment pushNotification counter
+          setPushNotification(pushNotification + 1);
         }
 
         fetchedNotifications.push({ id: doc.id, ...data });
