@@ -195,12 +195,12 @@ export default function MessageBox() {
     if (loc.pathname === "/") {
       for (const item of Message) {
         const scheduledRef = doc(db, "message", item.docId);
-        console.log(item, "itemsssMsgs");
+      
 
         const hasSeen = item?.UserMsgSeen?.some(
           (user) => user.EmployeeId == Employee.id
         );
-        console.log(hasSeen, "hasSeend");
+
 
         if (!hasSeen) {
           const currentTime = new Date();

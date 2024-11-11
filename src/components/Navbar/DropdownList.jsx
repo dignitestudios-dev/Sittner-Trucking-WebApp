@@ -37,15 +37,10 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-  const [newNotification, setNewNotification] = useState(false);  // A new state to trigger toast
-
-  // This effect listens for changes in pushNotification count or new notifications
+  const [newNotification, setNewNotification] = useState(false); 
   useEffect(() => {
-    console.log(newNotification,"Notification Status");
-    if (newNotification && UserRole == "user") {
-      console.log(UserRole,"UserRole");
-      
-      toast.success("New", {
+    if (newNotification && Employee.role == "user") {
+      toast.success(NotTitle, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -56,14 +51,13 @@ export default function DropdownList() {
       });
       setNewNotification(false);  // Reset the notification state after showing toast
     }
-  }, [newNotification]);
+  }, [newNotification, NotTitle]);
 
   const getNots = () => {
     const cookieData = Cookies.get('employe'); 
     const data = JSON.parse(cookieData);
-    console.log(data,"data----------->");
     
-    setUserRole(data?.role)
+    setUserRole(data)
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];

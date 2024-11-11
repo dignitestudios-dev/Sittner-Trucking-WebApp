@@ -7,8 +7,6 @@ import { MyContext } from "../../context/GlobalContext";
 export default function Employee() {
   const {Employee}=useContext(MyContext)
   const navigate=useNavigate("");
-  console.log(Employee,"empps");
-  
   useEffect(()=>{
     if(Employee?.role=="user"){
        navigate("/profile",{ state: { id: Employee?.id } });

@@ -17,7 +17,6 @@ export default function EditNotification() {
     description: "",
   });
 
-  console.log(loc?.state?.data, "data");
   useEffect(() => {
     SetNotification({
       title: loc?.state?.data?.title,

@@ -79,13 +79,6 @@ export default function MessageList() {
         const data = doc.data();
         
         const notificationDate = moment.tz(`${data.date} ${data.time}`, "MM/DD/YYYY h:mm A", "America/Denver");
-
-        console.log(
-          notificationDate.format("ddd MMM DD YYYY HH:mm:ss"),
-          now.format("ddd MMM DD YYYY HH:mm:ss"),
-          "scheduledtime"
-        );
-
         if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
           updates.push(updateDoc(doc.ref, { status: "Sent" }));
           updates.push(addDoc(messageRef, {

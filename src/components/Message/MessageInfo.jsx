@@ -9,11 +9,7 @@ export default function MessageInfo() {
 
   function timeAgo(dateString) {
     const momentDate = moment.tz(dateString, "MM/DD/YYYY h:mm A", "America/Denver");
-    
-    console.log("Moment Date:", momentDate.format());
-    console.log("Timezone:", momentDate.tz());
-    console.log(momentDate.fromNow(), "momentDatee");
-  
+
     return momentDate.fromNow();
   }
   

@@ -48,7 +48,6 @@ export default function ForgotPassword() {
 
       const data = await res.json();
       if (res) {
-        console.log(data, "data");
         setOtp(data.result.otp);
         toast.update(toastId, {
           render: "OTP sent successfully!",

@@ -43,7 +43,6 @@ export default function EmployeeList() {
     return () => unsubscribe();
   }, []);
 
-  console.log(employee);
   
 
   return (

@@ -38,7 +38,6 @@ export default function Login() {
         } else {  
           setLoader(false)
             toast.error("Invalid email or password.");
-            console.log("No employee found with the provided credentials.");
         }
     } catch (error) {
         toast.error("Error fetching employee data."); 

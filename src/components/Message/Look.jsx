@@ -38,7 +38,6 @@ export default function Look() {
         const formattedNotificationDate = notificationDate.format("ddd MMM DD YYYY HH:mm:ss");
         const formattedCurrentDate = now.format("ddd MMM DD YYYY HH:mm:ss");
   
-        console.log(formattedNotificationDate, formattedCurrentDate, "scheduledtime");
   
         fetchedNotifications.push({ docId: doc.id, ...data });
   
