@@ -56,16 +56,15 @@ export default function DropdownList() {
             status: "Delivered",
             seen: "pending",
           });
-   
-            toast.success("New Notification from admin", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
+          return      toast.success("New Notification from admin", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
           }
         
         fetchedNotifications.push({ id: doc.id, ...data });
