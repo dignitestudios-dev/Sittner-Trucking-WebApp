@@ -40,6 +40,7 @@ export default function DropdownList() {
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
       const now = moment.tz("America/Denver");
+  
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
@@ -47,28 +48,35 @@ export default function DropdownList() {
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-
-        if (
-          notificationDate.isSameOrBefore(now) &&
-          data.status == "Scheduled"
-        ) {
+  
+        // Check if the notification's time is less than or equal to current time and is scheduled
+        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+          // Toast only when the scheduled notification time is now or past
+          if (Employee.role=="user") {
+            toast.success("New Notification from admin", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+       
+  
+          // Update the notification status and seen status after showing the toast
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending",
           });
-          return      toast.success("New Notification from admin", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-          }
-        
+        }
+  
+        // Push notification data to the fetched notifications array
         fetchedNotifications.push({ id: doc.id, ...data });
       });
+  
+      // Sort notifications based on their date and time
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -78,23 +86,25 @@ export default function DropdownList() {
           .valueOf();
         return dateB - dateA;
       });
+  
       setNotifications(sortedNotifications);
     });
-
+  
     return unsubscribe;
   };
-
+  
   useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
     }, 30000);
-
+  
     return () => {
       clearInterval(intervalId);
       unsubscribe();
     };
   }, []);
+  
 
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
