@@ -35,6 +35,20 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
+  useEffect(()=>{
+    if (Employee.role=="user"&&pushNotification>0) {
+      toast.success(NotTitle, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+   },[pushNotification])
+
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
@@ -47,26 +61,17 @@ export default function DropdownList() {
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-
         if (
           notificationDate.isSameOrBefore(now) &&
           data.status == "Scheduled"
         ) {
+          setNotTitle(data?.description)
           updateDoc(doc.ref, {
             status: "Delivered",
-            seen: "pending",
-          });
-            toast.success("New Notification from admin", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          }
-        
+            seen: "pending"
+          })
+          setpushNotification(prev=>prev+1)
+          }       
         fetchedNotifications.push({ id: doc.id, ...data });
       });
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
