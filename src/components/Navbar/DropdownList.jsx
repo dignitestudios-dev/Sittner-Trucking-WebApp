@@ -26,17 +26,23 @@ export default function DropdownList() {
     Employee,
     NotificationCall,
   } = useContext(MyContext);
+
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
   const [pushNotification, setpushNotification] = useState(0);
   const [NotTitle, setNotTitle] = useState("");
+  const [newNotification, setNewNotification] = useState(false);  // A new state to trigger toast
   const DropdownRef = useRef(null);
-  const toggleModal = () => {
-    setIsDropdown(!IsDropdownOpen);
-  };
 
-  useEffect(()=>{
-    if (Employee.role=="user"&&pushNotification>0) {
+  const toggleModal = useCallback(() => {
+    setIsDropdown(!IsDropdownOpen);
+  }, [IsDropdownOpen, setIsDropdown]);
+
+
+
+  // This effect listens for changes in pushNotification count or new notifications
+  useEffect(() => {
+    if (newNotification && Employee.role === "user") {
       toast.success(NotTitle, {
         position: "top-right",
         autoClose: 3000,
@@ -46,14 +52,17 @@ export default function DropdownList() {
         draggable: true,
         progress: undefined,
       });
+      setNewNotification(false);  // Reset the notification state after showing toast
     }
-   },[pushNotification])
+  }, [newNotification, NotTitle]);
 
-  const getNots = () => {
+  // Fetch notifications
+  const getNots = useCallback(() => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
       const now = moment.tz("America/Denver");
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
@@ -61,19 +70,21 @@ export default function DropdownList() {
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-        if (
-          notificationDate.isSameOrBefore(now) &&
-          data.status == "Scheduled"
-        ) {
-          setNotTitle(data?.description)
+
+        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+        
+          setNotTitle(data?.description);
           updateDoc(doc.ref, {
             status: "Delivered",
-            seen: "pending"
-          })
-          setpushNotification(prev=>prev+1)
-          }       
+            seen: "pending",
+          });
+
+          setPushNotification((prev) => prev + 1);
+          setNewNotification(true);  
+        }
         fetchedNotifications.push({ id: doc.id, ...data });
       });
+
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -83,48 +94,47 @@ export default function DropdownList() {
           .valueOf();
         return dateB - dateA;
       });
+
       setNotifications(sortedNotifications);
     });
 
     return unsubscribe;
-  };
+  }, []);
 
+  // Initialize notifications
   useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
-    }, 30000);
+    }, 30000); // Update every 30 seconds, adjust as needed
 
     return () => {
       clearInterval(intervalId);
       unsubscribe();
     };
-  }, []);
+  }, [getNots]);
 
+  // Filter delivered and pending notifications
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
     const pendingNotifications = notifications.filter(
-      (notification) => notification.seen == "pending"
+      (notification) => notification.seen === "pending"
     );
     const employeeCreatedAt = new Date(Employee.createdat);
+    
     const oldNot = deliveredNotifications.filter((notification) => {
-      const notificationDate = new Date(
-        `${notification.date} ${notification.time}`
-      );
+      const notificationDate = new Date(`${notification.date} ${notification.time}`);
       return notificationDate > employeeCreatedAt;
     });
+
     console.log(pendingNotifications, "pending");
 
-    if (pendingNotifications.length < 0) {
-      setNotificationCount(0);
-    } else {
-      setNotificationCount(pendingNotifications.length);
-    }
-
+    setNotificationCount(pendingNotifications.length > 0 ? pendingNotifications.length : 0);
     setDevNotifications(oldNot);
-  }, [notifications]);
+  }, [notifications, Employee.createdat]);
+
 
   return (
     <>
