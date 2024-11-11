@@ -190,6 +190,10 @@ font-weight: 600 !important;
   border-radius: 10px;
 }
 
+.Toastify__toast-container {
+  z-index: 99999 !important;  
+}
+
 @media screen and (max-width: 560px) {
   .otp-component>div {
     gap: 5px;

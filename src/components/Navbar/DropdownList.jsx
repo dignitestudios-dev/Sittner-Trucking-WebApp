@@ -35,12 +35,31 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
+
+  let lastToastTime = 0;
+  const toastInterval = 1000; // Minimum time between toasts (in ms)
+  
+  const showNotification = () => {
+    const currentTime = Date.now();
+    if (currentTime - lastToastTime > toastInterval) {
+      toast.success("New Notification from admin", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      lastToastTime = currentTime;
+    }
+  };
+
   const getNots = () => {
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
-      const now = moment.tz("America/Denver");
-  
+      const now = moment.tz("America/Denver");  
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
@@ -48,37 +67,18 @@ export default function DropdownList() {
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-  
-        // Check if the notification's time is less than or equal to current time and is scheduled
-        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
-          // Toast only when the scheduled notification time is now or past
-          alert("outisde")
+        if (notificationDate.isSameOrBefore(now) && data.status == "Scheduled") {    
           if (Employee.role=="user") {
-            alert("inside user")
-            // toast.success("New Notification from admin", {
-            //   position: "top-right",
-            //   autoClose: 3000,
-            //   hideProgressBar: false,
-            //   closeOnClick: true,
-            //   pauseOnHover: true,
-            //   draggable: true,
-            //   progress: undefined,
-            // });
-          }
-       
-  
-          // Update the notification status and seen status after showing the toast
+            showNotification(); 
+          }       
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: "pending",
           });
         }
-  
-        // Push notification data to the fetched notifications array
+
         fetchedNotifications.push({ id: doc.id, ...data });
-      });
-  
-      // Sort notifications based on their date and time
+      });  
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
