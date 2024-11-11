@@ -56,7 +56,6 @@ export default function DropdownList() {
             status: "Delivered",
             seen: "pending",
           });
-   
             toast.success("New Notification from admin", {
               position: "top-right",
               autoClose: 3000,
