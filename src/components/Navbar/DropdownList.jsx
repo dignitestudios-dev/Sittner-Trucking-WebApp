@@ -52,16 +52,18 @@ export default function DropdownList() {
         // Check if the notification's time is less than or equal to current time and is scheduled
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
           // Toast only when the scheduled notification time is now or past
+          alert("outisde")
           if (Employee.role=="user") {
-            toast.success("New Notification from admin", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
+            alert("inside user")
+            // toast.success("New Notification from admin", {
+            //   position: "top-right",
+            //   autoClose: 3000,
+            //   hideProgressBar: false,
+            //   closeOnClick: true,
+            //   pauseOnHover: true,
+            //   draggable: true,
+            //   progress: undefined,
+            // });
           }
        
   
