@@ -43,6 +43,8 @@ export default function DropdownList() {
   // This effect listens for changes in pushNotification count or new notifications
   useEffect(() => {
     if (newNotification && Employee.role === "user") {
+      console.log(Employee,"employees information");
+      
       toast.success(NotTitle, {
         position: "top-right",
         autoClose: 3000,
