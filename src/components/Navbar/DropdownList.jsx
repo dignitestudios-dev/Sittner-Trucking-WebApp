@@ -51,7 +51,7 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [pushNotification]);
+  }, [pushNotification,NotTitle]);
 
   const getNots = () => {
     const cookieData = Cookies.get("employe");
