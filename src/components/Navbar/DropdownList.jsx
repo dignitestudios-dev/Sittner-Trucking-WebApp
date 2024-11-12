@@ -38,7 +38,7 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
   useEffect(() => {
-    if (pushNotification > 0 && UserRole === "user") {
+    if (pushNotification > 0 || UserRole == "user") {
       toast.success(NotTitle || "New Notification", {
         position: "top-right",
         autoClose: 3000,
