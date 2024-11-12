@@ -51,7 +51,7 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [pushNotification,NotTitle]);
+  }, [pushNotification]);
 
   const getNots = () => {
     const cookieData = Cookies.get("employe");
@@ -120,7 +120,7 @@ export default function DropdownList() {
     };
   }, []);
 
-  useEffect(() => {    
+  useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
@@ -131,14 +131,16 @@ export default function DropdownList() {
       );
       return notificationDate > employeeCreatedAt;
     });
-  
-    const unseenNotifications = deliveredNotifications?.filter((notification) => {
-      const hasSeen = notification?.seen?.some(
-        (seen) => seen.EmployeeId === Employee.id
-      );
-      return !hasSeen;  
-    });
-    setNotificationCount(unseenNotifications.length); 
+
+    const unseenNotifications = deliveredNotifications?.filter(
+      (notification) => {
+        const hasSeen = notification?.seen?.some(
+          (seen) => seen.EmployeeId === Employee.id
+        );
+        return !hasSeen;
+      }
+    );
+    setNotificationCount(unseenNotifications.length);
     setDevNotifications(oldNot);
   }, [notifications, Employee.id]);
 
