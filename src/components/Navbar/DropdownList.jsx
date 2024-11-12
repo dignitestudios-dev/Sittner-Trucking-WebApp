@@ -34,6 +34,7 @@ export default function DropdownList() {
   const [pushNotification, setPushNotification] = useState(0); 
   const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
+  const hasMounted = useRef(false);  // to track if component has mounted
   const [loading, setLoading] = useState(true);
   const previousNotificationCount = useRef(NotificationCount);  // Track previous notification count
   const toggleModal = () => {
@@ -103,50 +104,54 @@ export default function DropdownList() {
     };
   }, []);
 
-  // Handle Notification Count updates and showing the toast
   useEffect(() => {
+    // Filter out delivered notifications
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === 'Delivered'
     );
-    const employeeCreatedAt = new Date(Employee.createdat);
-    const oldNot = deliveredNotifications.filter((notification) => {
-      const notificationDate = new Date(
-        `${notification.date} ${notification.time}`
+  
+    // Filter out unseen notifications for the current employee
+    const unseenNotifications = deliveredNotifications.filter((notification) => {
+      const hasSeen = notification?.seen?.some(
+        (seen) => seen.EmployeeId === Employee.id
       );
-      return notificationDate > employeeCreatedAt;
+      return !hasSeen;
     });
-
-    const unseenNotifications = deliveredNotifications?.filter(
-      (notification) => {
-        const hasSeen = notification?.seen?.some(
-          (seen) => seen.EmployeeId === Employee.id
-        );
-        return !hasSeen;
-      } 
-    );
+  
+    // Set notification count and update cookies
     setNotificationCount(unseenNotifications.length);
     Cookies.set('notficationCount', unseenNotifications.length);    
-    setDevNotifications(oldNot);
-    // Get the description of the most recent unseen notification
-    
-    if (unseenNotifications.length > previousNotificationCount.current&&Employee.role=="user") {
-      const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
-      toast.success(newNotificationTitle || 'New Notification', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+  
+    // Update developer notifications (if required, logic depends on your need)
+    setDevNotifications(deliveredNotifications);  // Or filter based on your criteria
+  
+    // Check if component has mounted to avoid triggering toast on first render
+    if (hasMounted.current) {
+      // Only show toast if unseen notifications count has increased
+      if (unseenNotifications.length > previousNotificationCount.current) {
+        const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
+  
+        // Trigger the toast notification
+        toast.success(newNotificationTitle, {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } else {
+      // Prevent toast during the first mount/render
+      hasMounted.current = true;
     }
-
-    // Update previousNotificationCount to the current NotificationCount
+  
+    // Track previous notification count to detect new notifications
     previousNotificationCount.current = unseenNotifications.length;
-
-  }, [notifications, Employee.id, NotTitle]); // Add NotTitle in dependencies as it's used in toast
-
+  
+  }, [notifications, Employee.id]);
+  
   return (
     <>
       {IsDropdownOpen && (
