@@ -145,7 +145,7 @@ export default function DropdownList() {
     // Update previousNotificationCount to the current NotificationCount
     previousNotificationCount.current = unseenNotifications.length;
 
-  }, [NotTitle]); // Add NotTitle in dependencies as it's used in toast
+  }, [notifications, Employee.id, NotTitle]); // Add NotTitle in dependencies as it's used in toast
 
   return (
     <>
