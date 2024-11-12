@@ -23,7 +23,7 @@ export default function DropdownList() {
     IsDropdownOpen,
     setIsDropdown,
     setNotificationCount,
-    setRealTimeData,
+    NotificationCount,
     Employee,
     NotificationCall,
   } = useContext(MyContext);
@@ -34,86 +34,68 @@ export default function DropdownList() {
   const [pushNotification, setPushNotification] = useState(0); 
   const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const previousNotificationCount = useRef(NotificationCount);  // Track previous notification count
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
 
-  useEffect(() => {
-    console.log("NotTitle:", NotTitle);
-    console.log("UserRole:", UserRole);
-    console.log("pushNotification:", pushNotification);
-    if (NotTitle !== "" && UserRole === "user") {
-      toast.success(NotTitle || "New Notification", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, [NotTitle, UserRole, pushNotification]);
-  
-  const [loading, setLoading] = useState(true);
 
+  // Fetch notifications
   const getNots = () => {
-    const cookieData = Cookies?.get("employe");
+    const cookieData = Cookies?.get('employe');
     const data = JSON.parse(cookieData || null);
-  
+
     setUserRole(data?.role);
-    setLoading(true); 
-  
-    const notificationsRef = collection(db, "notification");
+    setLoading(true);
+
+    const notificationsRef = collection(db, 'notification');
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
-      const now = moment.tz("America/Denver");
-  
+      const now = moment.tz('America/Denver');
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
-          "MM/DD/YYYY h:mm A",
-          "America/Denver"
+          'MM/DD/YYYY h:mm A',
+          'America/Denver'
         );
-  
-        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+
+        if (notificationDate.isSameOrBefore(now) && data.status === 'Scheduled') {
           setNotTitle(data?.description);
           updateDoc(doc.ref, {
-            status: "Delivered",
+            status: 'Delivered',
             seen: [],
           });
-          setPushNotification(prev => prev + 1); // Update notification count
         }
-  
+
         fetchedNotifications.push({ id: doc.id, ...data });
       });
-  
+
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
-          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .tz(`${a.date} ${a.time}`, 'MM/DD/YYYY h:mm A', 'America/Denver')
           .valueOf();
         const dateB = moment
-          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .tz(`${b.date} ${b.time}`, 'MM/DD/YYYY h:mm A', 'America/Denver')
           .valueOf();
         return dateB - dateA;
       });
-  
+
       setNotifications(sortedNotifications);
+      setPushNotification(prev => prev + 1); // Update notification count
       setLoading(false); // Set loading to false after fetching is done
     });
-  
+
     return unsubscribe;
   };
-  
-    
-
 
   useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
-    }, 30000);
+    }, 30000); // Fetch every 30 seconds
 
     return () => {
       clearInterval(intervalId);
@@ -121,9 +103,10 @@ export default function DropdownList() {
     };
   }, []);
 
+  // Handle Notification Count updates and showing the toast
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
-      (notification) => notification.status === "Delivered"
+      (notification) => notification.status === 'Delivered'
     );
     const employeeCreatedAt = new Date(Employee.createdat);
     const oldNot = deliveredNotifications.filter((notification) => {
@@ -142,8 +125,26 @@ export default function DropdownList() {
       }
     );
     setNotificationCount(unseenNotifications.length);
+    Cookies.set('notficationCount', unseenNotifications.length);    
     setDevNotifications(oldNot);
-  }, [notifications, Employee.id]);
+
+    // Only show toast if NotificationCount is greater than the previous value
+    if (unseenNotifications.length > previousNotificationCount.current) {
+      toast.success(NotTitle || 'New Notification', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+
+    // Update previousNotificationCount to the current NotificationCount
+    previousNotificationCount.current = unseenNotifications.length;
+
+  }, [notifications, Employee.id, NotTitle]); // Add NotTitle in dependencies as it's used in toast
 
   return (
     <>
