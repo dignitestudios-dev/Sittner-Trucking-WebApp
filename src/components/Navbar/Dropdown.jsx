@@ -4,32 +4,31 @@ import { MyContext } from "../../context/GlobalContext";
 import { collection, db, getDocs, onSnapshot, query, updateDoc, where } from "../../firbase/FirebaseInit";
 
 export default function Dropdown() {
-  const { IsDropdownOpen, setIsDropdown, NotificationCount,setNotificationCount } = useContext(MyContext);
+  const { IsDropdownOpen, setIsDropdown, NotificationCount,setNotificationCount,Employee } = useContext(MyContext);
   const [count, setCount] = useState(0);
-
-  const handleDrop = () => {
-    setIsDropdown(prev => !prev);
-    setCount(prev => prev + 1);
-
+  const handleDrop = async () => {
+    try {
+      setIsDropdown(prev => !prev);
+      setCount(prev => prev + 1);
       const notificationsRef = collection(db, "notification");
-      const pendingNotificationsQuery = query(
-        notificationsRef,
-        where("seen", "==", "pending")
-      );
-      getDocs(pendingNotificationsQuery).then(querySnapshot => {
-        const updates = querySnapshot.docs.map(doc => 
-          updateDoc(doc.ref, { seen: "seen" })
-        );
-  
-        Promise.all(updates)
-          .then(() => {
-            setNotificationCount(0)
-          })
-          .catch(error => {
-            console.error("Error updating notifications: ", error);
+      const pendingNotificationsQuery = notificationsRef;
+      const querySnapshot = await getDocs(pendingNotificationsQuery);
+      const updates = querySnapshot.docs.map(async (doc) => {
+        const seenArray = doc.data()?.seen || [];
+        const hasSeen = seenArray.some(user => user.EmployeeId === Employee.id);
+        if (!hasSeen) {
+          const seenData = { EmployeeId: Employee.id };
+          await updateDoc(doc.ref, {
+            seen: [...seenArray, seenData], 
           });
+        }
       });
-   
+  
+      await Promise.all(updates);
+      setNotificationCount(0);
+    } catch (error) {
+      console.error("Error updating notifications: ", error);
+    }
   };
   
 

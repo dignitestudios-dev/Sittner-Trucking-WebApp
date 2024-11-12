@@ -68,9 +68,13 @@ const handleAddMember = async (e) => {
         return toast("Password must be at least 6 characters");
     }
   
-    if (contact.value?.length < 10) {
+    if (contact.value?.length < 10 ) {
         return toast("Contact must be at least 10 characters");
     }
+    if (contact.value?.length > 11) {
+      return toast("Contact must not be more than 11 characters");
+  }
+  
     const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", member?.email)));
     const existingEmployeeByNumber = await getDocs(query(collection(db, "employee"), where("contact", "==", contact.value)));
     if (!existingEmployeeByEmail.empty) {
@@ -84,6 +88,7 @@ const handleAddMember = async (e) => {
             const uniqueId = await generateUniqueId();          
             const storageRef = ref(storage, `member/${uniqueId}`);
             const uploadTask = uploadBytesResumable(storageRef, image);
+            
             uploadTask.on(
                 "state_changed",
                 null,
@@ -91,7 +96,21 @@ const handleAddMember = async (e) => {
                     reject(error.message);
                 },
                 async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    // Convert to Mountain Time Zone (MST/MDT)
+                    const options = {
+                        timeZone: 'America/Denver',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                    };
+                    const formatter = new Intl.DateTimeFormat('en-US', options);
+                    const createdAtMountainTime = formatter.format(new Date());
+    
+                    // Adding the new document
                     await addDoc(collection(db, "employee"), {
                         contact: contact.value,
                         address: member?.address,
@@ -100,10 +119,10 @@ const handleAddMember = async (e) => {
                         password: member?.password,
                         role: member?.role,
                         id: uniqueId, 
-                        createdat:new Date().toLocaleString(),
+                        createdat: createdAtMountainTime,
                         pic: image ? downloadURL : "",
                     });
-
+    
                     resolve("Member Created");
                 }
             );
@@ -111,7 +130,7 @@ const handleAddMember = async (e) => {
             reject(error.message);
         }
     });
-
+    
     toast.promise(myPromise, {
         pending: "Adding member...",
         success: (data) => data,

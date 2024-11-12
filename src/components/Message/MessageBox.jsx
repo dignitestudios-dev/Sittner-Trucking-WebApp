@@ -195,17 +195,12 @@ export default function MessageBox() {
     if (loc.pathname === "/") {
       for (const item of Message) {
         const scheduledRef = doc(db, "message", item.docId);
-      
-
         const hasSeen = item?.UserMsgSeen?.some(
           (user) => user.EmployeeId == Employee.id
         );
-
-
         if (!hasSeen) {
           const currentTime = new Date();
           const options = { timeZone: "America/Denver" };
-
           // Format the date and time
           const formattedDate = new Intl.DateTimeFormat("en-US", {
             ...options,
@@ -213,7 +208,6 @@ export default function MessageBox() {
             month: "2-digit",
             day: "2-digit",
           }).format(currentTime);
-
           const formattedTime = new Intl.DateTimeFormat("en-US", {
             ...options,
             hour: "numeric",

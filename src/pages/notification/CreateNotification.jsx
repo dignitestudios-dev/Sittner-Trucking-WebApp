@@ -59,7 +59,7 @@ export default function CreateNotification() {
                 date:SelectedDate,
                 status:"Scheduled",
                 author:Employee,
-                seen:""
+                seen:[]
             });
             resolve("Notification Created")
         } catch (error) {
