@@ -143,9 +143,9 @@ export default function DropdownList() {
     Cookies.set('notficationCount', unseenNotifications.length);    
     setDevNotifications(oldNot);
   
-    if (unseenNotifications.length > previousNotificationCount.current) {
+    if (unseenNotifications.length > previousNotificationCount.current&&UserRole=="user") {
       const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
-      Employee.role=="user"&&toast.success(newNotificationTitle || 'New Notification', {
+      toast.success(newNotificationTitle || 'New Notification', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
