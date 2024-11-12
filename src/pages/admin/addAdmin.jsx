@@ -71,6 +71,7 @@ const handleAddMember = async (e) => {
         return toast("Contact must be at least 10 characters");
     }
     const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", Admin?.email)));
+    console.log(existingEmployeeByEmail,"exist")
     const existingEmployeeByNumber = await getDocs(query(collection(db, "employee"), where("contact", "==", contact.value)));
     if (!existingEmployeeByEmail.empty) {
         return toast("Email is already in use");

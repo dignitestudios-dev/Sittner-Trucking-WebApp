@@ -31,14 +31,12 @@ export default function DropdownList() {
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
   const [UserRole, setUserRole] = useState("");
-  const [pushNotification, setPushNotification] = useState(0); // For tracking notifications
+  const [pushNotification, setPushNotification] = useState(0); 
   const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
-
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-
   useEffect(() => {
     if (pushNotification > 0 && UserRole === "user") {
       toast.success(NotTitle || "New Notification", {
