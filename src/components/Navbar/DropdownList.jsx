@@ -38,60 +38,11 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
 
-
-  const getNots = () => {
-    const cookieData = Cookies?.get("employe");
-    const data = JSON.parse(cookieData||null);
-
-    setUserRole(data?.role);
-
-    const notificationsRef = collection(db, "notification");
-    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-      const fetchedNotifications = [];
-      const now = moment.tz("America/Denver");
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const notificationDate = moment.tz(
-          `${data.date} ${data.time}`,
-          "MM/DD/YYYY h:mm A",
-          "America/Denver"
-        );
-
-        if (
-          notificationDate.isSameOrBefore(now) &&
-          data.status === "Scheduled"
-        ) {
-          // New notification logic
-          setNotTitle(data?.description); // Set the title to be used in the toast
-          updateDoc(doc.ref, {
-            status: "Delivered",
-            seen: [],
-          });
-          console.log("pushNotification updated >>>", pushNotification);
-          setPushNotification(pushNotification + 1);
-        }
-
-        fetchedNotifications.push({ id: doc.id, ...data });
-      });
-
-      const sortedNotifications = fetchedNotifications.sort((a, b) => {
-        const dateA = moment
-          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
-          .valueOf();
-        const dateB = moment
-          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
-          .valueOf();
-        return dateB - dateA;
-      });
-      setNotifications(sortedNotifications);
-    });
-
-    return unsubscribe;
-  };
-    
   useEffect(() => {
-    if (NotTitle !="" && UserRole == "user") {
+    console.log("NotTitle:", NotTitle);
+    console.log("UserRole:", UserRole);
+    console.log("pushNotification:", pushNotification);
+    if (NotTitle !== "" && UserRole === "user") {
       toast.success(NotTitle || "New Notification", {
         position: "top-right",
         autoClose: 3000,
@@ -102,7 +53,60 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [NotTitle]);
+  }, [NotTitle, UserRole, pushNotification]);
+  
+  const [loading, setLoading] = useState(true);
+
+  const getNots = () => {
+    const cookieData = Cookies?.get("employe");
+    const data = JSON.parse(cookieData || null);
+  
+    setUserRole(data?.role);
+    setLoading(true); 
+  
+    const notificationsRef = collection(db, "notification");
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+      const fetchedNotifications = [];
+      const now = moment.tz("America/Denver");
+  
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const notificationDate = moment.tz(
+          `${data.date} ${data.time}`,
+          "MM/DD/YYYY h:mm A",
+          "America/Denver"
+        );
+  
+        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+          setNotTitle(data?.description);
+          updateDoc(doc.ref, {
+            status: "Delivered",
+            seen: [],
+          });
+          setPushNotification(prev => prev + 1); // Update notification count
+        }
+  
+        fetchedNotifications.push({ id: doc.id, ...data });
+      });
+  
+      const sortedNotifications = fetchedNotifications.sort((a, b) => {
+        const dateA = moment
+          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .valueOf();
+        const dateB = moment
+          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
+          .valueOf();
+        return dateB - dateA;
+      });
+  
+      setNotifications(sortedNotifications);
+      setLoading(false); // Set loading to false after fetching is done
+    });
+  
+    return unsubscribe;
+  };
+  
+    
 
 
   useEffect(() => {
