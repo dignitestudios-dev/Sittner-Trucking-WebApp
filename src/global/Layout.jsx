@@ -18,13 +18,11 @@ const Layout = ({ pages }) => {
   };
 
   const navigate = useNavigate();
-  const cookieData = Cookies.get('employe');
+  const cookieData = Cookies?.get('employe');
   useEffect(() => {
       if (cookieData) {
           try {
-              const data = JSON.parse(cookieData);
-              console.log(data, "data");
-              
+              const data = JSON?.parse(cookieData);            
               if (data.email) {
                   setEmployee(data);
               } else {
