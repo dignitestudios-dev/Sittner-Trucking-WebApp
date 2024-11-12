@@ -52,8 +52,8 @@ export default function DropdownList() {
   }, [pushNotification]);
 
   const getNots = () => {
-    const cookieData = Cookies.get("employe");
-    const data = JSON.parse(cookieData);
+    const cookieData = Cookies?.get("employe");
+    const data = JSON.parse(cookieData||null);
 
     setUserRole(data?.role);
 
