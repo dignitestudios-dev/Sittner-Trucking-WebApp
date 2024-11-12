@@ -20,6 +20,7 @@ const Layout = ({ pages }) => {
   const navigate = useNavigate();
   const cookieData = Cookies?.get('employe');
   useEffect(() => {
+    Cookies.set('first',false);    
       if (cookieData) {
           try {
               const data = JSON?.parse(cookieData);            

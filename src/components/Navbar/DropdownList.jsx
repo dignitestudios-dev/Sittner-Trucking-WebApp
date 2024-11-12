@@ -34,7 +34,7 @@ export default function DropdownList() {
   const [pushNotification, setPushNotification] = useState(0); 
   const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
-  const hasMounted = useRef(false);  // to track if component has mounted
+  // const hasMounted = useRef(false);  
   const [loading, setLoading] = useState(true);
   const previousNotificationCount = useRef(NotificationCount);  // Track previous notification count
   const toggleModal = () => {
@@ -63,13 +63,27 @@ export default function DropdownList() {
           'America/Denver'
         );
 
+        if (notificationDate.isSameOrBefore(now)&&data.status == 'Scheduled') {
+          toast.success(data.title||"New Notification", {
+            position: 'top-right',
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });          
+        }
+             
         if (notificationDate.isSameOrBefore(now) && data.status === 'Scheduled') {
+             
           setNotTitle(data?.description);
           updateDoc(doc.ref, {
             status: 'Delivered',
             seen: [],
           });
         }
+       
 
         fetchedNotifications.push({ id: doc.id, ...data });
       });
@@ -96,7 +110,8 @@ export default function DropdownList() {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
-    }, 30000); // Fetch every 30 seconds
+
+    }, 30000);
 
     return () => {
       clearInterval(intervalId);
@@ -105,53 +120,47 @@ export default function DropdownList() {
   }, []);
 
   useEffect(() => {
-    // Filter out delivered notifications
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === 'Delivered'
     );
-  
-    // Filter out unseen notifications for the current employee
-    const unseenNotifications = deliveredNotifications.filter((notification) => {
-      const hasSeen = notification?.seen?.some(
-        (seen) => seen.EmployeeId === Employee.id
+    const employeeCreatedAt = new Date(Employee.createdat);
+    const oldNot = deliveredNotifications.filter((notification) => {
+      const notificationDate = new Date(
+        `${notification.date} ${notification.time}`
       );
-      return !hasSeen;
+      return notificationDate > employeeCreatedAt;
     });
-  
-    // Set notification count and update cookies
+
+    const unseenNotifications = deliveredNotifications?.filter(
+      (notification) => {
+        const hasSeen = notification?.seen?.some(
+          (seen) => seen.EmployeeId === Employee.id
+        );
+        return !hasSeen;
+      } 
+    );
     setNotificationCount(unseenNotifications.length);
     Cookies.set('notficationCount', unseenNotifications.length);    
+    setDevNotifications(oldNot);
   
-    // Update developer notifications (if required, logic depends on your need)
-    setDevNotifications(deliveredNotifications);  // Or filter based on your criteria
-  
-    // Check if component has mounted to avoid triggering toast on first render
-    if (hasMounted.current) {
-      // Only show toast if unseen notifications count has increased
-      if (unseenNotifications.length > previousNotificationCount.current) {
-        const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
-  
-        // Trigger the toast notification
-        toast.success(newNotificationTitle, {
-          position: 'top-right',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-    } else {
-      // Prevent toast during the first mount/render
-      hasMounted.current = true;
+    if (unseenNotifications.length > previousNotificationCount.current) {
+      const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
+      Employee.role=="user"&&toast.success(newNotificationTitle || 'New Notification', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
-  
-    // Track previous notification count to detect new notifications
+
+    // Update previousNotificationCount to the current NotificationCount
     previousNotificationCount.current = unseenNotifications.length;
-  
-  }, [notifications, Employee.id]);
-  
+
+  }, [notifications, Employee.id, NotTitle]);
+
   return (
     <>
       {IsDropdownOpen && (
