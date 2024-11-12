@@ -37,19 +37,7 @@ export default function DropdownList() {
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
-  useEffect(() => {
-    if (NotTitle !="" && UserRole == "user") {
-      toast.success(NotTitle || "New Notification", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, [NotTitle]);
+
 
   const getNots = () => {
     const cookieData = Cookies?.get("employe");
@@ -101,6 +89,21 @@ export default function DropdownList() {
 
     return unsubscribe;
   };
+    
+  useEffect(() => {
+    if (NotTitle !="" && UserRole == "user") {
+      toast.success(NotTitle || "New Notification", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [NotTitle]);
+
 
   useEffect(() => {
     const unsubscribe = getNots();
