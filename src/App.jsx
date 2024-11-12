@@ -5,10 +5,12 @@ import AppRoutes from './routes/AppRoutes'
 function App() {
  
   return (
-    <MyContextProvider>
+ <>
          <ToastContainer  />
+ <MyContextProvider>
       <AppRoutes />
     </MyContextProvider>
+ </>
   )
 }
 

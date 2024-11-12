@@ -38,7 +38,7 @@ export default function DropdownList() {
     setIsDropdown(!IsDropdownOpen);
   };
   useEffect(() => {
-    if (pushNotification > 0 || UserRole == "user") {
+    if (NotTitle !="" && UserRole == "user") {
       toast.success(NotTitle || "New Notification", {
         position: "top-right",
         autoClose: 3000,
@@ -49,7 +49,7 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [pushNotification]);
+  }, [NotTitle]);
 
   const getNots = () => {
     const cookieData = Cookies?.get("employe");
