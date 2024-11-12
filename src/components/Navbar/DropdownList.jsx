@@ -49,12 +49,11 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-  }, [pushNotification,NotTitle]);
+  }, [pushNotification]);
 
   const getNots = () => {
     const cookieData = Cookies.get("employe");
     const data = JSON.parse(cookieData);
-    console.log("data----------->", data);
 
     setUserRole(data?.role);
 
@@ -64,7 +63,6 @@ export default function DropdownList() {
       const now = moment.tz("America/Denver");
 
       querySnapshot.forEach((doc) => {
-        console.log("querySnapshot running");
         const data = doc.data();
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
@@ -82,14 +80,13 @@ export default function DropdownList() {
             status: "Delivered",
             seen: [],
           });
-
+          console.log("pushNotification updated >>>", pushNotification);
           setPushNotification(pushNotification + 1);
         }
 
         fetchedNotifications.push({ id: doc.id, ...data });
       });
 
-      console.log("out of querySnapshot");
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
           .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
@@ -106,7 +103,6 @@ export default function DropdownList() {
   };
 
   useEffect(() => {
-    console.log("subscripbing");
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
@@ -118,7 +114,7 @@ export default function DropdownList() {
     };
   }, []);
 
-  useEffect(() => {    
+  useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
@@ -129,14 +125,16 @@ export default function DropdownList() {
       );
       return notificationDate > employeeCreatedAt;
     });
-  
-    const unseenNotifications = deliveredNotifications?.filter((notification) => {
-      const hasSeen = notification?.seen?.some(
-        (seen) => seen.EmployeeId === Employee.id
-      );
-      return !hasSeen;  
-    });
-    setNotificationCount(unseenNotifications.length); 
+
+    const unseenNotifications = deliveredNotifications?.filter(
+      (notification) => {
+        const hasSeen = notification?.seen?.some(
+          (seen) => seen.EmployeeId === Employee.id
+        );
+        return !hasSeen;
+      }
+    );
+    setNotificationCount(unseenNotifications.length);
     setDevNotifications(oldNot);
   }, [notifications, Employee.id]);
 
