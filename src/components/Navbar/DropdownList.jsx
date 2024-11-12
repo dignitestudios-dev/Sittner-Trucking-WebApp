@@ -32,7 +32,7 @@ export default function DropdownList() {
   const [DevNotifications, setDevNotifications] = useState([]);
   const [UserRole, setUserRole] = useState("");
   const [pushNotification, setPushNotification] = useState(0); 
-  const [NotTitle, setNotTitle] = useState("");
+  const NotTitle = useRef("");
   const DropdownRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const previousNotificationCount = useRef(NotificationCount);  // Track previous notification count
@@ -63,7 +63,7 @@ export default function DropdownList() {
         );
 
         if (notificationDate.isSameOrBefore(now) && data.status === 'Scheduled') {
-          setNotTitle(data?.description);
+          NotTitle.current=data?.description;
           updateDoc(doc.ref, {
             status: 'Delivered',
             seen: [],
@@ -122,14 +122,13 @@ export default function DropdownList() {
           (seen) => seen.EmployeeId === Employee.id
         );
         return !hasSeen;
-      }
+      } 
     );
     setNotificationCount(unseenNotifications.length);
     Cookies.set('notficationCount', unseenNotifications.length);    
     setDevNotifications(oldNot);
 
-    // Only show toast if NotificationCount is greater than the previous value
-    if (unseenNotifications.length > previousNotificationCount.current&&Employee.role=="user") {
+    if (unseenNotifications.length > previousNotificationCount.current&&Employee.role=="user"&&NotTitle!="") {
       toast.success(NotTitle || 'New Notification', {
         position: 'top-right',
         autoClose: 3000,
