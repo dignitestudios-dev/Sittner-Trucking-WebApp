@@ -79,7 +79,7 @@ export default function ForgotPassword() {
 
 
   return (
-    <div className="grid sm:grid-cols-1 h-screen lg:grid-cols-2  md:py-10 md:px-10 gap-4 flex items-center ">
+    <div className="grid sm:grid-cols-1 h-screen lg:grid-cols-2 px-3  md:py-10 md:px-10 gap-4 flex items-center ">
       <div className="h-full">
         <LeftImage />
       </div>
