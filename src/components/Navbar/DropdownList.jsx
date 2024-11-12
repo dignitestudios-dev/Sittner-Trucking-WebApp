@@ -129,7 +129,7 @@ export default function DropdownList() {
     setDevNotifications(oldNot);
 
     // Only show toast if NotificationCount is greater than the previous value
-    if (unseenNotifications.length > previousNotificationCount.current) {
+    if (unseenNotifications.length > previousNotificationCount.current&&Employee.role=="user") {
       toast.success(NotTitle || 'New Notification', {
         position: 'top-right',
         autoClose: 3000,
