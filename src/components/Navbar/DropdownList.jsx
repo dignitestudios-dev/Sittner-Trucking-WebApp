@@ -31,75 +31,78 @@ export default function DropdownList() {
   const [notifications, setNotifications] = useState([]);
   const [DevNotifications, setDevNotifications] = useState([]);
   const [UserRole, setUserRole] = useState("");
-  const [pushNotification, setPushNotification] = useState(0); 
+  const [pushNotification, setPushNotification] = useState(0);
   const [NotTitle, setNotTitle] = useState("");
   const DropdownRef = useRef(null);
-  // const hasMounted = useRef(false);  
+  // const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
-  const previousNotificationCount = useRef(NotificationCount);  // Track previous notification count
+  const previousNotificationCount = useRef(NotificationCount); // Track previous notification count
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };
 
-
   // Fetch notifications
   const getNots = () => {
-    const cookieData = Cookies?.get('employe');
+    const cookieData = Cookies?.get("employe");
     const data = JSON.parse(cookieData || null);
 
     setUserRole(data?.role);
     setLoading(true);
 
-    const notificationsRef = collection(db, 'notification');
+    const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
-      const now = moment.tz('America/Denver');
+      const now = moment.tz("America/Denver");
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
-          'MM/DD/YYYY h:mm A',
-          'America/Denver'
+          "MM/DD/YYYY h:mm A",
+          "America/Denver"
         );
 
-        if (notificationDate.isSameOrBefore(now)&&data.status == 'Scheduled') {
-          toast.success(data.title||"New Notification", {
-            position: 'top-right',
+        if (
+          notificationDate.isSameOrBefore(now) &&
+          data.status == "Scheduled"
+        ) {
+          toast.success(data.title || "New Notification", {
+            position: "top-right",
             autoClose: 3000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-          });          
+          });
         }
-             
-        if (notificationDate.isSameOrBefore(now) && data.status === 'Scheduled') {
-             
+
+        if (
+          notificationDate.isSameOrBefore(now) &&
+          data.status === "Scheduled"
+        ) {
           setNotTitle(data?.description);
           updateDoc(doc.ref, {
-            status: 'Delivered',
+            status: "Delivered",
             seen: [],
           });
         }
-       
 
         fetchedNotifications.push({ id: doc.id, ...data });
       });
 
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment
-          .tz(`${a.date} ${a.time}`, 'MM/DD/YYYY h:mm A', 'America/Denver')
+          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
           .valueOf();
         const dateB = moment
-          .tz(`${b.date} ${b.time}`, 'MM/DD/YYYY h:mm A', 'America/Denver')
+          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
           .valueOf();
         return dateB - dateA;
       });
 
       setNotifications(sortedNotifications);
-      setPushNotification(prev => prev + 1); // Update notification count
+      setPushNotification((prev) => prev + 1); // Update notification count
       setLoading(false); // Set loading to false after fetching is done
     });
 
@@ -110,7 +113,6 @@ export default function DropdownList() {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
       getNots();
-
     }, 30000);
 
     return () => {
@@ -121,7 +123,7 @@ export default function DropdownList() {
 
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
-      (notification) => notification.status === 'Delivered'
+      (notification) => notification.status === "Delivered"
     );
     const employeeCreatedAt = new Date(Employee.createdat);
     const oldNot = deliveredNotifications.filter((notification) => {
@@ -137,25 +139,33 @@ export default function DropdownList() {
           (seen) => seen.EmployeeId === Employee.id
         );
         return !hasSeen;
-      } 
+      }
     );
     setNotificationCount(unseenNotifications.length);
-    Cookies.set('notficationCount', unseenNotifications.length);    
+    Cookies.set("notficationCount", unseenNotifications.length);
     setDevNotifications(oldNot);
-    if (unseenNotifications.length > previousNotificationCount.current&&UserRole=="user") {
-      const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
-      toast.success((newNotificationTitle && newNotificationTitle.length > 16 ? newNotificationTitle.slice(0, 16) + '...' : newNotificationTitle) || 'New Notification', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+    if (
+      unseenNotifications.length > previousNotificationCount.current &&
+      UserRole == "user"
+    ) {
+      const newNotificationTitle =
+        unseenNotifications[0]?.description || "New Notification";
+      toast.success(
+        (newNotificationTitle && newNotificationTitle.length > 16
+          ? newNotificationTitle.slice(0, 16) + "..."
+          : newNotificationTitle) || "New Notification",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
     }
     previousNotificationCount.current = unseenNotifications.length;
-
   }, [notifications, Employee.id, NotTitle]);
 
   return (
@@ -195,7 +205,12 @@ export default function DropdownList() {
                           {notification?.title}
                         </p>
                         <p className="text-[13px] text-[#909090] font-normal">
-                          {notification.description && notification.description.length > 50 ? notification.description.slice(0, 50) + '...':notification.description}
+                          {notification.description &&
+                          notification.description.length > 20
+                            ? window.innerWidth <= 768
+                              ? notification.description.slice(0, 20) + "..."
+                              : notification.description.slice(0, 50) + "..."
+                            : notification.description}
                         </p>
                       </div>
                       <div className="flex flex-col items-end">
