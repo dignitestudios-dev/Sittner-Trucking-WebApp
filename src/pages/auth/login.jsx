@@ -135,7 +135,6 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              disabled={loader?loader:false}
               className="text-white bg-[#0A8A33]  rounded-lg  w-full  px-5 py-2.5 text-center"
             >
               Login
