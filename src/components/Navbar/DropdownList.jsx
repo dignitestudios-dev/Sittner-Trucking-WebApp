@@ -125,14 +125,14 @@ export default function DropdownList() {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
-    const employeeCreatedAt = new Date(Employee.createdat);
+    const employeeCreatedAt = new Date(Employee.createdat);  
     const oldNot = deliveredNotifications.filter((notification) => {
       const notificationDate = new Date(
         `${notification.date} ${notification.time}`
       );
       return notificationDate > employeeCreatedAt;
     });
-
+  
     const unseenNotifications = deliveredNotifications?.filter(
       (notification) => {
         const hasSeen = notification?.seen?.some(
@@ -140,16 +140,16 @@ export default function DropdownList() {
         );
         return !hasSeen;
       }
-    );
+    );  
     setNotificationCount(unseenNotifications.length);
-    Cookies.set("notficationCount", unseenNotifications.length);
-    setDevNotifications(oldNot);
+    Cookies.set("notficationCount", unseenNotifications.length);    
+    setDevNotifications(oldNot);  
     if (
       unseenNotifications.length > previousNotificationCount.current &&
-      UserRole == "user"
+      UserRole === "user" 
     ) {
       const newNotificationTitle =
-        unseenNotifications[0]?.title || "New Notification";
+        unseenNotifications[0]?.title || "New Notification";  
       toast.success(
         (newNotificationTitle && newNotificationTitle.length > 16
           ? newNotificationTitle.slice(0, 16) + "..."
@@ -164,10 +164,10 @@ export default function DropdownList() {
           progress: undefined,
         }
       );
-    }
+    }  
     previousNotificationCount.current = unseenNotifications.length;
-  }, [notifications, Employee.id]);
-
+  }, [notifications]);
+  
   return (
     <>
       {IsDropdownOpen && (
