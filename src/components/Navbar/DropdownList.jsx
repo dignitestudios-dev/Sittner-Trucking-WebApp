@@ -149,7 +149,7 @@ export default function DropdownList() {
       UserRole == "user"
     ) {
       const newNotificationTitle =
-        unseenNotifications[0]?.description || "New Notification";
+        unseenNotifications[0]?.title || "New Notification";
       toast.success(
         (newNotificationTitle && newNotificationTitle.length > 16
           ? newNotificationTitle.slice(0, 16) + "..."
