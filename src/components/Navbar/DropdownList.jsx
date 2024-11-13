@@ -195,7 +195,7 @@ export default function DropdownList() {
                           {notification?.title}
                         </p>
                         <p className="text-[13px] text-[#909090] font-normal">
-                          {notification.description && notification.description.length > 50 ? notification.description.slice(0, 60) + '...':notification.description}
+                          {notification.description && notification.description.length > 50 ? notification.description.slice(0, 50) + '...':notification.description}
                         </p>
                       </div>
                       <div className="flex flex-col items-end">
