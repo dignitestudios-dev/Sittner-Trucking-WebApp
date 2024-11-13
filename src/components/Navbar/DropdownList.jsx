@@ -156,7 +156,7 @@ export default function DropdownList() {
     }
     previousNotificationCount.current = unseenNotifications.length;
 
-  }, [notifications.length, Employee.id, NotTitle]);
+  }, [notifications, Employee.id, NotTitle]);
 
   return (
     <>
