@@ -142,10 +142,9 @@ export default function DropdownList() {
     setNotificationCount(unseenNotifications.length);
     Cookies.set('notficationCount', unseenNotifications.length);    
     setDevNotifications(oldNot);
-  
     if (unseenNotifications.length > previousNotificationCount.current&&UserRole=="user") {
       const newNotificationTitle = unseenNotifications[0]?.description || "New Notification";
-      toast.success(newNotificationTitle || 'New Notification', {
+      toast.success((newNotificationTitle && newNotificationTitle.length > 16 ? newNotificationTitle.slice(0, 16) + '...' : newNotificationTitle) || 'New Notification', {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -155,11 +154,9 @@ export default function DropdownList() {
         progress: undefined,
       });
     }
-
-    // Update previousNotificationCount to the current NotificationCount
     previousNotificationCount.current = unseenNotifications.length;
 
-  }, [notifications, Employee.id, NotTitle]);
+  }, [notifications.length, Employee.id, NotTitle]);
 
   return (
     <>
@@ -198,7 +195,7 @@ export default function DropdownList() {
                           {notification?.title}
                         </p>
                         <p className="text-[13px] text-[#909090] font-normal">
-                          {notification.description}
+                          {notification.description && notification.description.length > 50 ? notification.description.slice(0, 60) + '...':notification.description}
                         </p>
                       </div>
                       <div className="flex flex-col items-end">
