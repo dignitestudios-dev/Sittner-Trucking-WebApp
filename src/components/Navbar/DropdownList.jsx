@@ -1,23 +1,16 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import {
-  addDoc,
   collection,
   db,
   doc,
-  getDoc,
-  getDocs,
-  messaging,
   onSnapshot,
-  query,
-  setDoc,
   updateDoc,
 } from "../../firbase/FirebaseInit";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
-import moment from "moment";
-import "moment-timezone";
-import { getToken, onMessage } from "firebase/messaging";
+import moment from "moment-timezone";
+
 export default function DropdownList() {
   const {
     IsDropdownOpen,
@@ -29,30 +22,26 @@ export default function DropdownList() {
   } = useContext(MyContext);
 
   const [notifications, setNotifications] = useState([]);
-  const [DevNotifications, setDevNotifications] = useState([]);
   const [UserRole, setUserRole] = useState("");
   const [pushNotification, setPushNotification] = useState(0);
-  const [NotTitle, setNotTitle] = useState("");
-  const DropdownRef = useRef(null);
-  // const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
-  const previousNotificationCount = useRef(NotificationCount); // Track previous notification count
-  const toggleModal = () => {
-    setIsDropdown(!IsDropdownOpen);
-  };
+  const previousNotificationCount = useRef(NotificationCount);
 
-  // Fetch notifications
+  const DropdownRef = useRef(null);
+  const toggleModal = () => setIsDropdown(!IsDropdownOpen);
+
+  // Helper to fetch and sort notifications
   const getNots = () => {
     const cookieData = Cookies?.get("employe");
-    const data = JSON.parse(cookieData || null);
+    const employeeData = JSON.parse(cookieData || "{}");
+    setUserRole(employeeData?.role);
 
-    setUserRole(data?.role);
     setLoading(true);
 
     const notificationsRef = collection(db, "notification");
     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-      const fetchedNotifications = [];
       const now = moment.tz("America/Denver");
+      const fetchedNotifications = [];
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -62,26 +51,9 @@ export default function DropdownList() {
           "America/Denver"
         );
 
-        if (
-          notificationDate.isSameOrBefore(now) &&
-          data.status == "Scheduled"
-        ) {
-          toast.success(data.title || "New Notification", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        }
-
-        if (
-          notificationDate.isSameOrBefore(now) &&
-          data.status === "Scheduled"
-        ) {
-          setNotTitle(data?.description);
+        // Only show toast for scheduled notifications that are now due
+        if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
+          // Update notification status to "Delivered"
           updateDoc(doc.ref, {
             status: "Delivered",
             seen: [],
@@ -91,19 +63,16 @@ export default function DropdownList() {
         fetchedNotifications.push({ id: doc.id, ...data });
       });
 
+      // Sort notifications by date in descending order
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
-        const dateA = moment
-          .tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
-          .valueOf();
-        const dateB = moment
-          .tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver")
-          .valueOf();
+        const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
+        const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
         return dateB - dateA;
       });
 
       setNotifications(sortedNotifications);
-      setPushNotification((prev) => prev + 1); // Update notification count
-      setLoading(false); // Set loading to false after fetching is done
+      setPushNotification(prev => prev + 1);
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -111,6 +80,8 @@ export default function DropdownList() {
 
   useEffect(() => {
     const unsubscribe = getNots();
+
+    // Set interval to fetch notifications every 30 seconds
     const intervalId = setInterval(() => {
       getNots();
     }, 30000);
@@ -119,55 +90,38 @@ export default function DropdownList() {
       clearInterval(intervalId);
       unsubscribe();
     };
-  }, []);
+  }, []); // Runs only once on mount and cleans up on unmount
 
   useEffect(() => {
-    const deliveredNotifications = notifications.filter(
-      (notification) => notification.status === "Delivered"
-    );
-    const employeeCreatedAt = new Date(Employee.createdat);  
+    const deliveredNotifications = notifications.filter(notification => notification.status === "Delivered");
+
+    // Filter old notifications based on employee's created time
+    const employeeCreatedAt = new Date(Employee.createdat);
     const oldNot = deliveredNotifications.filter((notification) => {
-      const notificationDate = new Date(
-        `${notification.date} ${notification.time}`
-      );
+      const notificationDate = new Date(`${notification.date} ${notification.time}`);
       return notificationDate > employeeCreatedAt;
     });
-  
-    const unseenNotifications = deliveredNotifications?.filter(
-      (notification) => {
-        const hasSeen = notification?.seen?.some(
-          (seen) => seen.EmployeeId === Employee.id
-        );
-        return !hasSeen;
-      }
-    );  
+
+    // Find unseen notifications for current user
+    const unseenNotifications = deliveredNotifications.filter((notification) => {
+      return !notification.seen?.some(seen => seen.EmployeeId === Employee.id);
+    });
+
+    // Update notification count and local storage
     setNotificationCount(unseenNotifications.length);
-    Cookies.set("notficationCount", unseenNotifications.length);    
-    setDevNotifications(oldNot);  
-    if (
-      unseenNotifications.length > previousNotificationCount.current &&
-      UserRole === "user" 
-    ) {
-      const newNotificationTitle =
-        unseenNotifications[0]?.title || "New Notification";  
-      toast.success(
-        (newNotificationTitle && newNotificationTitle.length > 16
-          ? newNotificationTitle.slice(0, 16) + "..."
-          : newNotificationTitle) || "New Notification",
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
-    }  
+    Cookies.set("notificationCount", unseenNotifications.length);
+
+    // Trigger toast only if there are unseen notifications and the status is "Delivered"
+    if (unseenNotifications.length > previousNotificationCount.current && UserRole === "user") {
+      const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
+      toast.success(newNotificationTitle.length > 16 ? `${newNotificationTitle.slice(0, 16)}...` : newNotificationTitle, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+
     previousNotificationCount.current = unseenNotifications.length;
-  }, [notifications]);
-  
+  }, [notifications, Employee.createdat, UserRole, setNotificationCount]);
   return (
     <>
       {IsDropdownOpen && (
@@ -191,13 +145,13 @@ export default function DropdownList() {
             <h3 className="text-base leading-[19px] font-bold">
               Notifications
             </h3>
-            {DevNotifications.length === 0 ? (
+            {NotificationCount.length === 0 ? (
               <p className="text-center text-gray-500 mt-4">
                 No notifications available.
               </p>
             ) : (
               <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
-                {DevNotifications.map((notification) => (
+                {notifications.map((notification) => (
                   <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
                     <div className="flex space-x-4 ">
                       <div className="flex-1 min-w-0">
