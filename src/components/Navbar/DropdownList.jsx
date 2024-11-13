@@ -166,7 +166,7 @@ export default function DropdownList() {
       );
     }
     previousNotificationCount.current = unseenNotifications.length;
-  }, [notifications, Employee.id, NotTitle]);
+  }, [notifications, Employee.id]);
 
   return (
     <>
