@@ -53,6 +53,18 @@ export default function MessageBox() {
   const loc = useLocation();
   const msgBodyScroll = useRef();
   const [EmployeeCount, setEmployeeCount] = useState();
+  const textareaRef = useRef(null);
+
+  const handleInputResize = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset height to auto
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    handleInputResize();
+  }, [UserMsg]);
 
   useEffect(() => {
     if (sentMessage === 0) {
@@ -189,6 +201,10 @@ export default function MessageBox() {
   const handleImageChange = (e) => {
     const newImages = Array.from(e.target.files);
     setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleChange = (e) => {
+    setUserMsg(e.target.value);
   };
 
   const MessageSeen = async () => {
@@ -403,7 +419,7 @@ export default function MessageBox() {
                                 const updatedImages = [
                                   img,
                                   ...msg.images.filter((_, i) => i !== index),
-                                ]; 
+                                ];
                                 setModalImageUrl(updatedImages);
                                 setIviewImage(true);
                               }}
@@ -590,7 +606,7 @@ export default function MessageBox() {
             onSubmit={(e) => HandleMessage(e)}
             className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center  w-full  justify-center gap-5 "
           >
-            <div className="relative w-[85%] h-[40px]">
+            <div className="relative w-[85%] mt-3">
               <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">
                 <label htmlFor="attach">
                   <GrAttachment color="#000000" className="cursor-pointer" />
@@ -603,17 +619,19 @@ export default function MessageBox() {
                   onChange={handleImageChange}
                 />
               </div>
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={UserMsg}
-                onChange={(e) => setUserMsg(e.target.value)}
+                onChange={handleChange}
+                onInput={handleInputResize}
                 id="email-address-icon"
-                autocomplete="off"
-                className="bg-[#FFFFFF] w-[100%] h-[100%] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl  block w-full p-2.5  focus:outline-[#0A8A33]"
+                autoComplete="off"
                 placeholder="Type Here"
+                
+                className="bg-[#FFFFFF] overflow-hidden pr-10 resize-none w-full h-[40px] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]"
               />
             </div>
-            <div>
+            <div className="mt-3">
               <button
                 type="submit"
                 disabled={sentLoad ? sentLoad : sentLoad}

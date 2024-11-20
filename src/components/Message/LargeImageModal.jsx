@@ -59,6 +59,9 @@ export default function ViewImage() {
                   keyboard={{
                     enabled: true,
                   }}
+                  simulateTouch={false} 
+                  grabCursor={false} 
+                  allowTouchMove={false}
                   pagination={false}
                   navigation={true}
                   modules={[Keyboard, Pagination, Navigation]}
@@ -90,6 +93,7 @@ export default function ViewImage() {
                                   style={{
                                     maxWidth: '100%',
                                     maxHeight: '100%',
+                                    height:'400px',
                                     objectFit: 'cover', // Ensures the image is contained within the box
                                   }}
                                 />
