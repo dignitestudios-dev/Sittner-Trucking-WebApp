@@ -58,13 +58,13 @@ export default function MessageBox() {
   const handleInputResize = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"; // Reset height to auto
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight>100?100:textareaRef.current.scrollHeight}px`;            
     }
   };
 
-  useEffect(() => {
-    handleInputResize();
-  }, [UserMsg]);
+  // useEffect(() => {
+  //   handleInputResize();
+  // }, [UserMsg]);
 
   useEffect(() => {
     if (sentMessage === 0) {
@@ -550,7 +550,7 @@ export default function MessageBox() {
       </div>
       {/* Send Message */}
       {Employee?.role == "admin" && (
-        <div className="pb-2 h-[10%] w-full bottom-0">
+        <div className="pb-2 h-[15%]  w-full bottom-0">
           {images.length > 0 && (
             <div className="shadow-xl bg-slate-100 px-2 py-2 w-[90%] mx-auto flex items-center gap-5 nowrap scroll-box  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
@@ -604,10 +604,10 @@ export default function MessageBox() {
           )}
           <form
             onSubmit={(e) => HandleMessage(e)}
-            className="w-100 bg-white px-3 p-3 lg:px-5 py-5 flex items-center  w-full  justify-center gap-5 "
+            className="w-100 bg-white px-3 p-3 lg:px-5 py-5  flex items-center  w-full h-full justify-center gap-5 "
           >
-            <div className="relative w-[85%] mt-3">
-              <div className="absolute inset-y-0 end-5 top-1 z-[9999]  flex items-center ">
+            <div  className="relative h-full w-[85%] mt-3">
+              <div className="absolute inset-y-0 end-5 top-1 z-[9999]   flex items-center ">
                 <label htmlFor="attach">
                   <GrAttachment color="#000000" className="cursor-pointer" />
                 </label>
@@ -620,15 +620,14 @@ export default function MessageBox() {
                 />
               </div>
               <textarea
-                ref={textareaRef}
+              ref={textareaRef}
                 value={UserMsg}
                 onChange={handleChange}
                 onInput={handleInputResize}
                 id="email-address-icon"
                 autoComplete="off"
                 placeholder="Type Here"
-                
-                className="bg-[#FFFFFF] overflow-hidden pr-10 resize-none w-full h-[40px] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]"
+                className={`bg-[#FFFFFF]  ${textareaRef?.current?.scrollHeight>100?"overflow-auto":"overflow-hidden"} custom-scroll-bar  pr-10 resize-none w-full h-full border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]`}
               />
             </div>
             <div className="mt-3">

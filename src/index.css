@@ -102,6 +102,21 @@ input:focus{
 .scroll-box::-webkit-scrollbar-thumb:hover {
   background: #676767; 
 }
+.custom-scroll-bar::-webkit-scrollbar-track {
+  background: transparent; 
+  margin: 20px;
+}
+ 
+/* Handle */
+.custom-scroll-bar::-webkit-scrollbar-thumb {
+  background: #484848; 
+  transition: 0.4s;
+}
+
+/* Handle on hover */
+.custom-scroll-bar::-webkit-scrollbar-thumb:hover {
+  background: #676767; 
+}
 
 .react-ios-time-picker-container{
   
