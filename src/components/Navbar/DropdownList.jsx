@@ -32,7 +32,7 @@ export default function DropdownList() {
   const [UserRole, setUserRole] = useState("");
   const [loading, setLoading] = useState(true);
   const previousNotificationCount = useRef(NotificationCount);
-
+  const DropdownRef=useRef(null);
   // Fetch notifications from Firestore and listen for changes
   const getNots = () => {
     const cookieData = Cookies.get("employe");
