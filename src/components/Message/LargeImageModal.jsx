@@ -71,10 +71,7 @@ export default function ViewImage() {
                   {ModalImageUrl.map((img, i) => (
                    !img?.url?.includes(".pdf") && !img?.url?.includes(".xlsx")&&(                      
                     <SwiperSlide key={i}>
-                                         <ImageZoomContainer
-      src={img?.url}
-      alt="your-image-alt"
-    />
+                   
                     </SwiperSlide>
                     )
                   ))}

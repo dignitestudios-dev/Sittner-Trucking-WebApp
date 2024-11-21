@@ -24,6 +24,7 @@ import {
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
+import { ImageZoomContainer } from "react-simple-images-zoom";
 export default function MessageBox() {
   const {
     LookScreen,
@@ -58,7 +59,11 @@ export default function MessageBox() {
   const handleInputResize = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"; // Reset height to auto
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight>100?100:textareaRef.current.scrollHeight}px`;            
+      textareaRef.current.style.height = `${
+        textareaRef.current.scrollHeight > 100
+          ? 100
+          : textareaRef.current.scrollHeight
+      }px`;
     }
   };
 
@@ -412,7 +417,12 @@ export default function MessageBox() {
                             key={index}
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
-                            <img
+                            <ImageZoomContainer
+                             className="cursor-pointer rounded-md h-[80px] w-auto"
+                             src={img.url ? img.url : "/noprofile.png"}
+                              alt="your-image-alt"
+                            />
+                            {/* <img
                               src={img.url ? img.url : "/noprofile.png"}
                               className="cursor-pointer rounded-md h-[80px] w-auto"
                               onClick={() => {
@@ -424,7 +434,7 @@ export default function MessageBox() {
                                 setIviewImage(true);
                               }}
                               alt=""
-                            />
+                            /> */}
                           </div>
                         ) : msg.type[index]?.includes("video") ? (
                           <div
@@ -606,7 +616,7 @@ export default function MessageBox() {
             onSubmit={(e) => HandleMessage(e)}
             className="w-100 bg-white px-3 p-3 lg:px-5 py-5  flex items-center  w-full h-full justify-center gap-5 "
           >
-            <div  className="relative h-full w-[85%] mt-3">
+            <div className="relative h-full w-[85%] mt-3">
               <div className="absolute inset-y-0 end-5 top-1 z-[9999]   flex items-center ">
                 <label htmlFor="attach">
                   <GrAttachment color="#000000" className="cursor-pointer" />
@@ -620,14 +630,18 @@ export default function MessageBox() {
                 />
               </div>
               <textarea
-              ref={textareaRef}
+                ref={textareaRef}
                 value={UserMsg}
                 onChange={handleChange}
                 onInput={handleInputResize}
                 id="email-address-icon"
                 autoComplete="off"
                 placeholder="Type Here"
-                className={`bg-[#FFFFFF]  ${textareaRef?.current?.scrollHeight>100?"overflow-auto":"overflow-hidden"} custom-scroll-bar  pr-10 resize-none w-full h-full border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]`}
+                className={`bg-[#FFFFFF]  ${
+                  textareaRef?.current?.scrollHeight > 100
+                    ? "overflow-auto"
+                    : "overflow-hidden"
+                } custom-scroll-bar  pr-10 resize-none w-full h-full border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]`}
               />
             </div>
             <div className="mt-3">
