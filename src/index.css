@@ -231,6 +231,9 @@ font-weight: 600 !important;
     overscroll-behavior: contain !important; 
     transform: translateY(0) !important;
   }
+  .image-wrapper>img{
+    transform:translate(0px, 0px) scale(1.211375) rotate(0deg) !important;
+   }
 }
 
 
@@ -276,3 +279,4 @@ font-weight: 600 !important;
 .image-portal{
   z-index: 999999999999 !important;
 }
+
