@@ -116,7 +116,7 @@ export default function DropdownList() {
     const previousCount = previousNotificationCount.current;
     
     // Only show toast when there is an increase in unseen notifications
-    if (newNotificationCount > previousCount && UserRole === "user") {
+    if (newNotificationCount > previousCount && UserRole === "user"&&unseenNotifications[0]?.toast=="pending") {
       const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
       toast.success(
         (newNotificationTitle.length > 16 ? `${newNotificationTitle.slice(0, 16)}...` : newNotificationTitle),
@@ -130,6 +130,21 @@ export default function DropdownList() {
           progress: undefined,
         }
       );
+      const notificationsRef = collection(db, "notification");
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {    
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.notificationId == unseenNotifications[0]?.notificationId) {
+          updateDoc(doc.ref, {
+            toast: "done",
+          });
+        }
+      });   
+    });
+      // updateDoc(doc.ref, {
+      //   status: "Delivered",
+      //   seen: [],
+      // });
 
       // Update the previous notification count
       previousNotificationCount.current = newNotificationCount;

@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { ModernTimePicker } from "../../components/Picker/TimePicker";
 import DatePicker from "../../components/Picker/DatePicker";
 import { MyContext } from "../../context/GlobalContext";
-import { addDoc, collection, db, doc, getDoc } from "../../firbase/FirebaseInit";
+import { addDoc, collection, db, doc, getDoc, getDocs, query, where } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
 
 export default function CreateNotification() {
@@ -47,17 +47,31 @@ export default function CreateNotification() {
     });
   };
 
+  const generateUniqueId = async () => {
+    const randomId = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const existingEmployee = await getDocs(query(collection(db, "notification"), where("notificationId", "==", randomId)));
+    
+    if (!existingEmployee.empty) {
+        return generateUniqueId(); 
+    }
+    return randomId;
+};
+
+
   const UploadNotification = (e) => {
     e.preventDefault();
     setLoader(true)
     const myPromise = new Promise(async (resolve, reject) => {
         try {
+          const uniqueId = await generateUniqueId(); 
             await addDoc(collection(db, "notification"), {
+                notificationId:uniqueId,
                 title:Notification.title,
                 description:Notification.description,
                 time:SelectedTime,
                 date:SelectedDate,
                 status:"Scheduled",
+                toast:"pending",
                 author:Employee,
                 seen:[]
             });
