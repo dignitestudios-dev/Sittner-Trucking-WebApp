@@ -3,6 +3,9 @@ import "./App.css";
 import { MyContextProvider } from "./context/GlobalContext";
 import AppRoutes from "./routes/AppRoutes";
 function App() {
+  if (typeof global === 'undefined') {
+    var global = window;
+  }
   return (
     <>
       <ToastContainer />

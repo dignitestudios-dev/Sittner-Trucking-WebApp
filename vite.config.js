@@ -39,6 +39,9 @@ export default defineConfig({
       },
     })
   ],
+  define: {   
+    global: {},
+  },
   server: {
     host: true 
   }

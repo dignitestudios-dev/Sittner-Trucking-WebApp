@@ -14,6 +14,7 @@ import "swiper/css/navigation";
 // Import required modules
 import { Keyboard, Pagination, Navigation } from "swiper/modules";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { ImageZoomContainer } from "react-simple-images-zoom";
 
 const Controls = () => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
@@ -70,39 +71,10 @@ export default function ViewImage() {
                   {ModalImageUrl.map((img, i) => (
                    !img?.url?.includes(".pdf") && !img?.url?.includes(".xlsx")&&(                      
                     <SwiperSlide key={i}>
-                      <TransformWrapper
-                        initialScale={1} 
-                        initialPositionX={100}
-                        initialPositionY={100}
-                      >
-                        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                          <>
-                            <div
-                            className="flex justify-center items-center"
-                              style={{
-                                overflow: 'hidden',
-                                position: 'relative',
-                                width: '100%',
-                                height: '100%',
-                              }}
-                            >
-                              <TransformComponent  >
-                                <img
-                                  src={img?.url}
-                                  className="rounded-lg !h-[350px] md:!h-[400px] mx-auto"
-                                  alt=""
-                                  style={{
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',                                   
-                                    objectFit: 'cover', // Ensures the image is contained within the box
-                                  }}
-                                />
-                              </TransformComponent>
-                            </div>
-                            <Controls />  {/* User controls for zoom */}
-                          </>
-                        )}
-                      </TransformWrapper>
+                                         <ImageZoomContainer
+      src={img?.url}
+      alt="your-image-alt"
+    />
                     </SwiperSlide>
                     )
                   ))}
