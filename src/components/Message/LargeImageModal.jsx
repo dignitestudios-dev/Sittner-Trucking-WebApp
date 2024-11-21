@@ -68,6 +68,7 @@ export default function ViewImage() {
                   className="mySwiper"
                 >
                   {ModalImageUrl.map((img, i) => (
+                   !img?.url?.includes(".pdf") && !img?.url?.includes(".xlsx")&&(                      
                     <SwiperSlide key={i}>
                       <TransformWrapper
                         initialScale={1} 
@@ -104,6 +105,7 @@ export default function ViewImage() {
                         )}
                       </TransformWrapper>
                     </SwiperSlide>
+                    )
                   ))}
                 </Swiper>
               </div>
