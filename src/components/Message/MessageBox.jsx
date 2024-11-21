@@ -417,11 +417,17 @@ export default function MessageBox() {
                             key={index}
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
-                            <ImageZoomContainer
-                             className="cursor-pointer rounded-md h-[80px] w-auto"
-                             src={img.url ? img.url : "/noprofile.png"}
-                              alt="your-image-alt"
-                            />
+                           <ImageZoomContainer
+                           customProps={{
+                            // portalAnimationDuration: 500,
+                            // imageTransformDuration: 200,
+                            // maxPortalImageWidth: 100,
+                          }}
+  className="cursor-pointer rounded-md h-[80px] w-auto " 
+  src={img.url ? img.url : "/noprofile.png"} 
+  alt="your-image-alt" 
+/>
+
                             {/* <img
                               src={img.url ? img.url : "/noprofile.png"}
                               className="cursor-pointer rounded-md h-[80px] w-auto"

@@ -231,8 +231,13 @@ font-weight: 600 !important;
     overscroll-behavior: contain !important; 
     transform: translateY(0) !important;
   }
-  .image-wrapper>img{
-    transform:translate(0px, 0px) scale(1.211375) rotate(0deg) !important;
+  .image-wrapper{
+    width:100% !important;
+   }
+   .image-wrapper>img{
+    max-width: none  !important;
+    width: 800px !important;
+    margin-left: -230px !important;
    }
 }
 
