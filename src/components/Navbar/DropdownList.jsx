@@ -103,34 +103,46 @@ export default function DropdownList() {
     Cookies.set("notficationCount", newNotificationCount);
     setDevNotifications(oldNot);
 
-    const previousCount = previousNotificationCount.current;
-    if (newNotificationCount > previousCount && UserRole === "user"&&unseenNotifications[0]?.toast=="pending") {
-      const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
-      toast.success(
-        (newNotificationTitle.length > 16 ? `${newNotificationTitle.slice(0, 16)}...` : newNotificationTitle),
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
-      const notificationsRef = collection(db, "notification");
-    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {    
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.notificationId == unseenNotifications[0]?.notificationId) {
-          updateDoc(doc.ref, {
-            toast: "done",
-          });
-        }
-      });   
-    });
-      previousNotificationCount.current = newNotificationCount;
+    const previousCount = previousNotificationCount.current;  
+let toastEmployeeIds = [];
+
+if (newNotificationCount > previousCount && UserRole === "user" && !unseenNotifications[0]?.toast.includes(Employee.id)) {
+  console.log(unseenNotifications[0]?.toast,"checkess Array");
+  
+  const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
+  
+  toast.success(
+    (newNotificationTitle.length > 16 ? `${newNotificationTitle.slice(0, 16)}...` : newNotificationTitle),
+    {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
     }
+  );
+  if (!toastEmployeeIds.includes(Employee.id)) {
+    toastEmployeeIds.push(Employee.id);
+  }
+
+  const notificationsRef = collection(db, "notification");
+  const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+
+      if (data.notificationId === unseenNotifications[0]?.notificationId) {
+        updateDoc(doc.ref, {
+          toast: toastEmployeeIds,
+        });
+      }
+    });
+  });
+
+  previousNotificationCount.current = newNotificationCount;
+}
+
   }, [notifications, UserRole, Employee.id]);
 
   const toggleModal = () => {

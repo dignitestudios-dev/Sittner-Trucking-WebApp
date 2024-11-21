@@ -71,7 +71,7 @@ export default function CreateNotification() {
                 time:SelectedTime,
                 date:SelectedDate,
                 status:"Scheduled",
-                toast:"pending",
+                toast:[],
                 author:Employee,
                 seen:[]
             });
