@@ -25,6 +25,8 @@ import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
 import { ImageZoomContainer } from "react-simple-images-zoom";
+import { RViewer, RViewerTrigger } from "react-viewerjs";
+
 export default function MessageBox() {
   const {
     LookScreen,
@@ -299,6 +301,41 @@ export default function MessageBox() {
   // }, [Message, employee,isMessageSeen]);
 
   const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
+  const [AutoScal, setAutoScal] = useState(false);
+
+  const customControls = ({
+    transformImageScale,
+    transformImagePosition,
+    transformImageRotate,
+    resetImageTransform,
+    closePortal,
+  }) => {
+    console.log("wdwwiuqiiqui", AutoScal);
+
+    return (
+      <div>
+        <button onClick={() => transformImageScale(0.1, "increment")}>
+          Zoom In
+        </button>
+        <button onClick={() => transformImageScale(-0.1, "increment")}>
+          Zoom Out
+        </button>
+        <button onClick={() => transformImageRotate(90, "increment")}>
+          Rotate
+        </button>
+        <button onClick={() => resetImageTransform()}>Reset</button>
+        <button onClick={() => closePortal()}>Close</button>
+      </div>
+    );
+  };
+
+  let options = {
+    movable:false,
+    toolbar: {
+      prev: true,
+      next: true,
+    },
+  };
 
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
@@ -415,18 +452,42 @@ export default function MessageBox() {
                         msg.type[index]?.includes("image") ? (
                           <div
                             key={index}
+                            onClick={() => setAutoScal(!AutoScal)}
                             className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
                           >
-                           <ImageZoomContainer
-                           customProps={{
-                            // portalAnimationDuration: 500,
-                            // imageTransformDuration: 200,
-                            // maxPortalImageWidth: 100,
-                          }}
-  className="cursor-pointer rounded-md h-[80px] w-auto " 
-  src={img.url ? img.url : "/noprofile.png"} 
-  alt="your-image-alt" 
-/>
+                            <RViewer
+                              options={options}
+                              imageUrls={
+                                msg.images
+                                  .filter(
+                                    (img) =>
+                                      !img?.url?.includes(".pdf") &&
+                                      !img?.url?.includes(".xlsx")
+                                  ) // Filter out URLs with .pdf or .xlsx
+                                  .map((img) => img.url) // Map to get only the URLs
+                              }
+                            >
+                              <RViewerTrigger>
+                                <img
+                                  src={img.url ? img.url : "/noprofile.png"}
+                                  className="cursor-pointer rounded-md h-[80px] w-auto"
+                                  alt=""
+                                />
+                              </RViewerTrigger>
+                            </RViewer>
+
+                            {/* <ImageZoomContainer
+                              src={img.url ? img.url : "/noprofile.png"}
+                              alt="your-image-alt"
+                              className="cursor-pointer rounded-md h-[80px] w-auto " 
+                              
+                              customProps={{
+
+                                customControls,
+                                
+                                customControlClassName: "custom-controls",
+                              }}
+                            /> */}
 
                             {/* <img
                               src={img.url ? img.url : "/noprofile.png"}

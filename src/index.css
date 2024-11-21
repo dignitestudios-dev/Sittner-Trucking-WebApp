@@ -234,11 +234,11 @@ font-weight: 600 !important;
   .image-wrapper{
     width:100% !important;
    }
-   .image-wrapper>img{
+   /* .image-wrapper>img{
     max-width: none  !important;
     width: 800px !important;
     margin-left: -230px !important;
-   }
+   } */
 }
 
 
