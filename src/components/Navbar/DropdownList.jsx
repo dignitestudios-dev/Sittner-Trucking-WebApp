@@ -99,16 +99,16 @@ export default function DropdownList() {
     );
 
     const newNotificationCount = unseenNotifications.length;
-    setNotificationCount(newNotificationCount);
     Cookies.set("notficationCount", newNotificationCount);
     setDevNotifications(oldNot);
+    const newNotCount=DevNotifications.filter((not)=> !not?.seen?.some((seen) => seen?.EmployeeId == Employee?.id))?.length;
+    setNotificationCount(newNotCount);
 
     const previousCount = previousNotificationCount.current;  
 let toastEmployeeIds = [];
 
-if (newNotificationCount > previousCount && UserRole === "user" && !unseenNotifications[0]?.toast.includes(Employee.id)) {
-  console.log(unseenNotifications[0]?.toast,"checkess Array");
-  
+if (newNotCount > previousCount && UserRole === "user" && !unseenNotifications[0]?.toast.includes(Employee.id)) {
+
   const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
   
   toast.success(
@@ -126,21 +126,25 @@ if (newNotificationCount > previousCount && UserRole === "user" && !unseenNotifi
   if (!toastEmployeeIds.includes(Employee.id)) {
     toastEmployeeIds.push(Employee.id);
   }
-
+  
   const notificationsRef = collection(db, "notification");
   const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-
       if (data.notificationId === unseenNotifications[0]?.notificationId) {
+        const updatedToastIds = Array.from(new Set([
+          ...data.toast,      
+          ...toastEmployeeIds 
+        ]));  
         updateDoc(doc.ref, {
-          toast: toastEmployeeIds,
+          toast: updatedToastIds,
         });
       }
     });
   });
+  
 
-  previousNotificationCount.current = newNotificationCount;
+  previousNotificationCount.current = newNotCount;
 }
 
   }, [notifications, UserRole, Employee.id]);
