@@ -49,9 +49,7 @@ export default function DropdownList() {
           `${data.date} ${data.time}`,
           "MM/DD/YYYY h:mm A",
           "America/Denver"
-        );
-        
-        // Handle scheduled notifications
+        );        
         if (notificationDate.isSameOrBefore(now) && data.status === "Scheduled") {
           updateDoc(doc.ref, {
             status: "Delivered",
@@ -61,23 +59,17 @@ export default function DropdownList() {
 
         fetchedNotifications.push({ id: doc.id, ...data });
       });
-
-      // Sort notifications by date descending
       const sortedNotifications = fetchedNotifications.sort((a, b) => {
         const dateA = moment.tz(`${a.date} ${a.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
         const dateB = moment.tz(`${b.date} ${b.time}`, "MM/DD/YYYY h:mm A", "America/Denver").valueOf();
         return dateB - dateA;
       });
-
-      // Update state once data is fetched
       setNotifications(sortedNotifications);
       setLoading(false);
     });
 
     return unsubscribe;
   };
-
-  // Set interval to fetch notifications every 30 seconds
   useEffect(() => {
     const unsubscribe = getNots();
     const intervalId = setInterval(() => {
@@ -88,9 +80,7 @@ export default function DropdownList() {
       clearInterval(intervalId);
       unsubscribe();
     };
-  }, []); // Empty dependency array to only run once on mount
-
-  // Effect to handle unseen notifications and show toasts
+  }, []); 
   useEffect(() => {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
@@ -114,8 +104,6 @@ export default function DropdownList() {
     setDevNotifications(oldNot);
 
     const previousCount = previousNotificationCount.current;
-    
-    // Only show toast when there is an increase in unseen notifications
     if (newNotificationCount > previousCount && UserRole === "user"&&unseenNotifications[0]?.toast=="pending") {
       const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
       toast.success(
@@ -141,12 +129,6 @@ export default function DropdownList() {
         }
       });   
     });
-      // updateDoc(doc.ref, {
-      //   status: "Delivered",
-      //   seen: [],
-      // });
-
-      // Update the previous notification count
       previousNotificationCount.current = newNotificationCount;
     }
   }, [notifications, UserRole, Employee.id]);

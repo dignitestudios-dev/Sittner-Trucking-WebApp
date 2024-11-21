@@ -89,12 +89,11 @@ export default function ViewImage() {
                               <TransformComponent  >
                                 <img
                                   src={img?.url}
-                                  className="rounded-lg mx-auto"
+                                  className="rounded-lg !h-[350px] md:!h-[400px] mx-auto"
                                   alt=""
                                   style={{
                                     maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    height:'400px',
+                                    maxHeight: '100%',                                   
                                     objectFit: 'cover', // Ensures the image is contained within the box
                                   }}
                                 />
