@@ -616,7 +616,7 @@ export default function MessageBox() {
             className="w-100 bg-white px-3 p-3 lg:px-5 py-5  flex items-center  w-full h-full justify-center gap-5 "
           >
             <div className="relative h-full w-[85%] mt-3">
-              <div className="absolute inset-y-0 end-5 top-1 z-[9999]   flex items-center ">
+              <div className="absolute inset-y-0 end-5 top-1 z-[999]   flex items-center ">
                 <label htmlFor="attach">
                   <GrAttachment color="#000000" className="cursor-pointer" />
                 </label>
