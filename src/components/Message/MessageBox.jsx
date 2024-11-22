@@ -299,26 +299,25 @@ export default function MessageBox() {
   // }, [Message, employee,isMessageSeen]);
 
   const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
-  
+
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
     const handleKeydown = (event) => {
       if (isPreviewOpen) {
-        alert("hi")
+        alert("hi");
         event.preventDefault();
       }
     };
     if (isPreviewOpen) {
-      window.addEventListener('keydown', handleKeydown);
+      window.addEventListener("keydown", handleKeydown);
     } else {
-      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener("keydown", handleKeydown);
     }
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener("keydown", handleKeydown);
     };
   }, [isPreviewOpen]);
-
 
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
@@ -431,19 +430,15 @@ export default function MessageBox() {
                         Employee?.role == "admin" && "justify-end"
                       } flex-wrap gap-2`}
                     >
-                         {/* <PhotoProvider > */}
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
-                          
-<IonPhotoViewer
- src={img.url}
->
-  <img
-    alt="Image alt"
-    className="cursor-pointer rounded-md !h-[80px] w-auto"
-    src={img.url}
-  />
-</IonPhotoViewer>
+                          <IonPhotoViewer src={img.url}>
+                            <img
+                              alt="Image alt"
+                              className="cursor-pointer rounded-md !h-[80px] w-auto"
+                              src={img.url}
+                            />
+                          </IonPhotoViewer>
                         ) : msg.type[index]?.includes("video") ? (
                           <div
                             key={index}
@@ -494,7 +489,6 @@ export default function MessageBox() {
                           </div>
                         )
                       )}
-                      {/* </PhotoProvider> */}
                     </div>
                   )}
                 </div>
