@@ -24,10 +24,7 @@ import {
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
-import { ImageZoomContainer } from "react-simple-images-zoom";
-import { RViewer, RViewerTrigger } from "react-viewerjs";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import "react-photo-view/dist/react-photo-view.css";
+import IonPhotoViewer from "@codesyntax/ionic-react-photo-viewer";
 export default function MessageBox() {
   const {
     LookScreen,
@@ -302,16 +299,27 @@ export default function MessageBox() {
   // }, [Message, employee,isMessageSeen]);
 
   const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
-  const [AutoScal, setAutoScal] = useState(false);
+  
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  let options = {
-    movable: true,
-    toolbar: {
-      prev: true,
-      next: true,
-    },
-  };
-  const imagesArray = Message.map((msg) => msg.images.map((item) => item.url));
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      if (isPreviewOpen) {
+        alert("hi")
+        event.preventDefault();
+      }
+    };
+    if (isPreviewOpen) {
+      window.addEventListener('keydown', handleKeydown);
+    } else {
+      window.removeEventListener('keydown', handleKeydown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, [isPreviewOpen]);
+
+
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
@@ -423,17 +431,19 @@ export default function MessageBox() {
                         Employee?.role == "admin" && "justify-end"
                       } flex-wrap gap-2`}
                     >
-                         <PhotoProvider maskClosable={false} >
+                         {/* <PhotoProvider > */}
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
-                          <PhotoView key={index} src={img.url}>
-                          <img
-                            src={img.url}
-                            className="cursor-pointer rounded-md h-[80px] w-auto"
-                            alt={`message-image-${index}`}
-                          />
-                        </PhotoView>
-                      
+                          
+<IonPhotoViewer
+ src={img.url}
+>
+  <img
+    alt="Image alt"
+    className="cursor-pointer rounded-md !h-[80px] w-auto"
+    src={img.url}
+  />
+</IonPhotoViewer>
                         ) : msg.type[index]?.includes("video") ? (
                           <div
                             key={index}
@@ -484,7 +494,7 @@ export default function MessageBox() {
                           </div>
                         )
                       )}
-                      </PhotoProvider>
+                      {/* </PhotoProvider> */}
                     </div>
                   )}
                 </div>
