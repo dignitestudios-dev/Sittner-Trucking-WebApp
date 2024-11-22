@@ -423,7 +423,7 @@ export default function MessageBox() {
                         Employee?.role == "admin" && "justify-end"
                       } flex-wrap gap-2`}
                     >
-                         <PhotoProvider>
+                         <PhotoProvider maskClosable={false} >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <PhotoView key={index} src={img.url}>
