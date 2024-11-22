@@ -107,7 +107,7 @@ export default function DropdownList() {
     const previousCount = previousNotificationCount.current;  
 let toastEmployeeIds = [];
 
-if (newNotCount > previousCount && UserRole === "user" && !unseenNotifications[0]?.toast.includes(Employee.id)) {
+if (newNotificationCount > previousCount && UserRole === "user" && !unseenNotifications[0]?.toast.includes(Employee.id)) {
 
   const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
   
@@ -144,7 +144,7 @@ if (newNotCount > previousCount && UserRole === "user" && !unseenNotifications[0
   });
   
 
-  previousNotificationCount.current = newNotCount;
+  previousNotificationCount.current = newNotificationCount;
 }
 
   }, [notifications, UserRole, Employee.id]);
