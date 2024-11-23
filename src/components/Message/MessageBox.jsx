@@ -268,7 +268,6 @@ export default function MessageBox() {
     });
     return unsubscribe;
   };
-
   useEffect(() => {
     const unsubscribe = getEmploye();
     return () => unsubscribe();
