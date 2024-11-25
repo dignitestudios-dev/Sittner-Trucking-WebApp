@@ -118,7 +118,7 @@ export default function Message() {
       </div>
       <AddMemberModal />
       <MessageInfo />
-      <ViewImage />
+      {/* <ViewImage /> */}
     </div>
   );
 }
