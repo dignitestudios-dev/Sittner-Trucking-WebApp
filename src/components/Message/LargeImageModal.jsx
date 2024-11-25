@@ -14,7 +14,7 @@ import "swiper/css/navigation";
 // Import required modules
 import { Keyboard, Pagination, Navigation } from "swiper/modules";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { ImageZoomContainer } from "react-simple-images-zoom";
+
 
 const Controls = () => {
   const { zoomIn, zoomOut, resetTransform } = useControls();
