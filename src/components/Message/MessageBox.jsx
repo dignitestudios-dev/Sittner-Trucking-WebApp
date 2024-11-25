@@ -304,7 +304,6 @@ export default function MessageBox() {
   useEffect(() => {
     const handleKeydown = (event) => {
       if (isPreviewOpen) {
-        alert("hi");
         event.preventDefault();
       }
     };
