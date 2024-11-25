@@ -118,7 +118,6 @@ export default function Message() {
       </div>
       <AddMemberModal />
       <MessageInfo />
-      {/* <ViewImage /> */}
     </div>
   );
 }

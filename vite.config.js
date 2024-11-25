@@ -37,6 +37,9 @@ export default defineConfig({
           // Add your logo.webp here if necessary
         ],
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
+      },
     })
   ],
   define: {   
