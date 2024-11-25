@@ -1,11 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { MyContext } from "../../context/GlobalContext";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  TransformWrapper,
-  TransformComponent,
-  useControls,
-} from "react-zoom-pan-pinch";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
@@ -16,26 +11,6 @@ import { Keyboard, Pagination, Navigation } from "swiper/modules";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
 
-const Controls = () => {
-  const { zoomIn, zoomOut, resetTransform } = useControls();
-  const { viewImage } = useContext(MyContext);
-  useEffect(()=>{
-    zoomOut();
-  },[])
-  return (
-    <div className="tools flex gap-2 mb-2">
-      <button className="text-[30px]" onClick={() => zoomIn()}>
-        +
-      </button>
-      <button className="text-[30px]" onClick={() => zoomOut()}>
-        -
-      </button>
-      <button className="text-[20px]" onClick={() => resetTransform()}>
-        Reset
-      </button>
-    </div>
-  );
-};
 
 export default function ViewImage() {
   const { viewImage, setIviewImage, ModalImageUrl } = useContext(MyContext);
