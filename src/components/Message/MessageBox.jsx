@@ -434,7 +434,7 @@ export default function MessageBox() {
                           <IonPhotoViewer src={img.url}>
                             <img
                               alt="Image alt"
-                              className="cursor-pointer rounded-md !h-[80px] max-w-[100%] block"
+                              className="cursor-pointer rounded-md !h-[80px] w-[30%] md:max-w-[100%] block"
                               src={img.url}
                             />
                           </IonPhotoViewer>
