@@ -425,16 +425,16 @@ export default function MessageBox() {
                   )}
                   {msg.images.length > 0 && (
                     <div
-                      className={`w-full py-3 flex items-center  ${
-                        Employee?.role == "admin" && "justify-end"
-                      } flex-wrap gap-2`}
+                      className={`w-full py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
+                        Employee?.role == "admin" && ""
+                      }`}
                     >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
                           <IonPhotoViewer src={img.url}>
                             <img
                               alt="Image alt"
-                              className="cursor-pointer rounded-md !h-[80px] w-[30%] md:max-w-[100%] block"
+                              className="cursor-pointer rounded-md max-h-[80px] w-full max-w-[100%] block"
                               src={img.url}
                             />
                           </IonPhotoViewer>
