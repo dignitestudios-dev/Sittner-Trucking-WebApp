@@ -5,7 +5,7 @@ import EditGroup from "./EditGroup";
 import { MyContext } from "../../context/GlobalContext";
 import { MdOutlineClose } from "react-icons/md";
 export default function GroupDetail() {
-  const { isEditGroup, setEditGroup, LookScreen,GroupName, setSideDraw } =
+  const { isEditGroup, setEditGroup, LookScreen, GroupName, setSideDraw } =
     useContext(MyContext);
   return (
     <div className="bg-[#FFFFFF] h-[630px] w-[-webkit-fill-available] scroll-box  overflow-auto rounded-[24px] px-5 py-5">
@@ -30,26 +30,23 @@ export default function GroupDetail() {
       </div>
       <div className="flex flex-col items-center">
         <div className="w-[88px] h-[88px]">
-        {
-                      GroupName.groupimg?(
-                        <img
-                        src={GroupName.groupimg}
-                         className="w-full h-full rounded-full"
-                         alt=""
-                         srcset=""
-                       />
-                      ):(
-                        <img
-                src={"noprofile.png"}
-                class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
-                alt=""
-              />
-                      )
-                    }
-         
+          {GroupName.groupimg ? (
+            <img
+              src={GroupName.groupimg}
+              className="w-full h-full rounded-full"
+              alt=""
+              srcset=""
+            />
+          ) : (
+            <img
+              src={"noprofile.png"}
+              class="rounded-[50%] object-cover cursor-pointer w-[50px] h-[50px] lg:w-[50px] lg:h-[50px]"
+              alt=""
+            />
+          )}
         </div>
         <h3 className="lg:text-base font-semibold leading-[19px] mt-3">
-        {GroupName.group_name}
+          {GroupName.group_name}
         </h3>
       </div>
       <Attachment />

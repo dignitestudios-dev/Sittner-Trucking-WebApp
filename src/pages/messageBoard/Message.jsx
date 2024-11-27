@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import MessageBox from "../../components/Message/MessageBox";
 import Look from "../../components/Message/Look";
 import GroupDetail from "../../components/Message/GroupDetail";
@@ -27,13 +33,9 @@ export default function Message() {
   useEffect(() => {
     window.scroll(0, 0);
   }, []);
-  
-
-  
-
 
   return (
-    <div className="h-[70%]   pt-2 pb-[2rem] px-2 lg:px-10 lg:py-6   ">
+    <div className="h-[0%] pt-2 pb-[2rem] px-2 lg:px-10 lg:py-6">
       {LookScreen && (
         <NavLink
           onClick={() => setLookScreen(false)}
@@ -43,15 +45,21 @@ export default function Message() {
           <IoMdArrowBack size={25} className="mr-2" /> Message Board
         </NavLink>
       )}
-      <div className="grid gap-5 h-[100%] md:h-[90%] grid-cols-1 lg:grid-cols-3 ">
+      <div className="grid gap-5 grid-cols-1 lg:grid-cols-3 ">
         {hideLookAhed ? (
           !LookScreen && (
-            <div className={`${!LookScreen ? "col-span-2" : "col-span-1"} h-[100%] `}>
+            <div
+              className={`${
+                !LookScreen ? "col-span-2" : "col-span-1"
+              } h-[100%] `}
+            >
               <MessageBox />
             </div>
           )
         ) : (
-          <div className={`${!LookScreen ? "col-span-2" : "col-span-1"}  h-[100%]`}>
+          <div
+            className={`${!LookScreen ? "col-span-2" : "col-span-1"}  h-[100%]`}
+          >
             <MessageBox />
           </div>
         )}
@@ -105,14 +113,15 @@ export default function Message() {
                 </button>
               </div>
               <div className="col-span-1">
-                {Employee?.role == "user" ? <Look  /> : !LookScreen && <Look  />}
+                {Employee?.role == "user" ? <Look /> : !LookScreen && <Look />}
               </div>
             </div>
           </div>
         )}
+        {/* web */}
         {hideLookAhed && (
           <div className="col-span-1">
-            {Employee?.role == "user" ? <Look  /> : LookScreen && <Look />}
+            {Employee?.role == "user" ? <Look /> : LookScreen && <Look />}
           </div>
         )}
       </div>

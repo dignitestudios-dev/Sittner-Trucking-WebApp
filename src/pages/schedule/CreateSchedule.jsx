@@ -22,8 +22,8 @@ export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
     useContext(MyContext);
-    console.log(SelectedDate,"currnet data");
-  
+  console.log(SelectedDate, "currnet data");
+
   const locationState = useLocation();
   const [message, setMessage] = useState("");
 
@@ -46,8 +46,8 @@ export default function CreateSchedule() {
     const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
-      console.log(SelectedDate,SelectedTime,"selectedDatess");
-      
+      console.log(SelectedDate, SelectedTime, "selectedDatess");
+
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);
@@ -74,7 +74,9 @@ export default function CreateSchedule() {
         autoClose: 5000,
       });
       setLoader(false);
-      locationState.state.collection=="look"?navigate("/"):navigate("/schedule")      
+      locationState.state.collection == "look"
+        ? navigate("/")
+        : navigate("/schedule");
     } catch (error) {
       console.error("Failed to schedule:", error);
       toast.update(loadingToastId, {
@@ -95,7 +97,7 @@ export default function CreateSchedule() {
   return (
     <div class="bg-[#F7F7F7] h-[100vh] py-5 px-5 ">
       <NavLink
-        to={locationState.state.collection=="look"?"/":"/schedule"}
+        to={locationState.state.collection == "look" ? "/" : "/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
       >
         {" "}
@@ -128,7 +130,9 @@ export default function CreateSchedule() {
                 />
               </label>
               {images.length > 0 && (
-                <div className={`image-preview flex items-center flex-wrap mt-2 gap-2`}>
+                <div
+                  className={`image-preview flex items-center flex-wrap mt-2 gap-2`}
+                >
                   {Array.from(images).map((image, targetIndex) => (
                     <div key={targetIndex}>
                       {image.type?.includes("image") ? (
@@ -173,13 +177,13 @@ export default function CreateSchedule() {
           <div className="flex items-center gap-5 mt-5">
             <button
               type="submit"
-              disabled={loader?loader:false}
+              disabled={loader ? loader : false}
               className="text-white bg-[#0A8A33] rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
             >
               Schedule
             </button>
             <NavLink
-              to={locationState.state.collection=="look"?"/":"/schedule"}
+              to={locationState.state.collection == "look" ? "/" : "/schedule"}
               className="bg-[#F1F1F1] font-bold rounded-lg w-[150px] h-[50px] px-5 py-2.5 text-center"
             >
               Cancel

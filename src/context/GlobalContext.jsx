@@ -4,9 +4,12 @@ export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
   const currentTime = new Date();
-  const formattedTime = `${currentTime.getHours() % 12 || 12}:${String(currentTime.getMinutes()).padStart(2, '0')} ${currentTime.getHours() >= 12 ? 'PM' : 'AM'}`;
+  const formattedTime = `${currentTime.getHours() % 12 || 12}:${String(
+    currentTime.getMinutes()
+  ).padStart(2, "0")} ${currentTime.getHours() >= 12 ? "PM" : "AM"}`;
 
-  const [PasswordSuccessFullChange, setPasswordSuccessFullChange] = useState(false);
+  const [PasswordSuccessFullChange, setPasswordSuccessFullChange] =
+    useState(false);
   const [ChangePassword, setIsChangePassword] = useState(false);
   const [LogOut, setIsLogOut] = useState(false);
   const [IsDropdownOpen, setIsDropdown] = useState(false);
@@ -18,67 +21,63 @@ export const MyContextProvider = ({ children }) => {
   const [AddMem, setIsAddMem] = useState(false);
   const [MessageInfo, setIsMessageInfo] = useState(false);
   const [viewImage, setIviewImage] = useState(false);
-  const [token,setToken]=useState("");
+  const [token, setToken] = useState("");
   const [sideDraw, setSideDraw] = useState(false);
   const [LookAhedDraw, setLookAhedDraw] = useState(false);
   const [Employee, setEmployee] = useState({});
   const [Otp, setOtp] = useState();
-  const [displaySize,setDisplaySize]=useState(window.innerWidth);
-  const [hideMsgGroup,setHideMsgGroup]=useState(false);
-  const [hideLookAhed,sethideLookAhed]=useState(false);
-  const [DeleteEmpId,setDeleteEmpId]=useState();
-  const [DeleteDocId,setDeleteDocId]=useState();
-  const [NotificationCount,setNotificationCount]=useState(0);
-  const [SelectedDate,setSelectDate]=useState();
-  const [SelectedTime,setSelectTime]=useState();
-  
+  const [displaySize, setDisplaySize] = useState(window.innerWidth);
+  const [hideMsgGroup, setHideMsgGroup] = useState(false);
+  const [hideLookAhed, sethideLookAhed] = useState(false);
+  const [DeleteEmpId, setDeleteEmpId] = useState();
+  const [DeleteDocId, setDeleteDocId] = useState();
+  const [NotificationCount, setNotificationCount] = useState(0);
+  const [SelectedDate, setSelectDate] = useState();
+  const [SelectedTime, setSelectTime] = useState();
+
   useEffect(() => {
     const currentTime = new Date();
     // Mountain Time ke liye date aur time format karna
-    const options = { timeZone: 'America/Denver' };
-    const formattedDate = new Intl.DateTimeFormat('en-US', {
+    const options = { timeZone: "America/Denver" };
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
       ...options,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     }).format(currentTime);
 
-    const formattedTime = new Intl.DateTimeFormat('en-US', {
+    const formattedTime = new Intl.DateTimeFormat("en-US", {
       ...options,
-      hour: 'numeric',
-      minute: '2-digit',
+      hour: "numeric",
+      minute: "2-digit",
       hour12: true,
     }).format(currentTime);
 
     setSelectDate(formattedDate);
     setSelectTime(formattedTime);
   }, []);
-   
 
-  const [GroupName,setGroupName]=useState("");
-  const [ModalImageUrl,setModalImageUrl]=useState("");
-  const [isMessageSeen,setIsMessageSeen]=useState([]);
-  const [IsAttachments,setIsAttachments]=useState([]);
-  const [msgSeenEmp,setMsgSeenEmp]=useState([]);
-  const [loader,setLoader] =useState(false);
-  const [OtpVal,setOtpVal] =useState("");
-  const [ForgetEmail,setForgetEmail] =useState("");
-  const [RealTimeData,setRealTimeData] =useState(0);
+  const [GroupName, setGroupName] = useState("");
+  const [ModalImageUrl, setModalImageUrl] = useState("");
+  const [isMessageSeen, setIsMessageSeen] = useState([]);
+  const [IsAttachments, setIsAttachments] = useState([]);
+  const [msgSeenEmp, setMsgSeenEmp] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [OtpVal, setOtpVal] = useState("");
+  const [ForgetEmail, setForgetEmail] = useState("");
+  const [RealTimeData, setRealTimeData] = useState(0);
 
-  
   useEffect(() => {
     const handleResize = () => {
-      setDisplaySize(window.innerWidth)       
+      setDisplaySize(window.innerWidth);
     };
-    setHideMsgGroup(displaySize>1023?true:false);
-    sethideLookAhed(displaySize>1023?true:false);
+    setHideMsgGroup(displaySize > 1023 ? true : false);
+    sethideLookAhed(displaySize > 1023 ? true : false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [displaySize]);
-  
-const NotificationCall=()=>{
 
-}
+  const NotificationCall = () => {};
 
   return (
     <MyContext.Provider
@@ -149,11 +148,10 @@ const NotificationCall=()=>{
         ForgetEmail,
         msgSeenEmp,
         setMsgSeenEmp,
-        NotificationCall
+        NotificationCall,
       }}
     >
       {children}
     </MyContext.Provider>
   );
 };
-

@@ -29,7 +29,7 @@ export default function DatePicker(props) {
       if (!isNaN(parsedDate)) {
         console.log("Updating selectedDate to:", parsedDate);
         setSelectedDate(parsedDate);
-        setSelectDate(parsedDate.toLocaleDateString())
+        setSelectDate(parsedDate.toLocaleDateString());
       }
     }
   }, [props.date]);
@@ -70,22 +70,48 @@ export default function DatePicker(props) {
       selectedDate
     );
 
+  // const setDateValue = (date) => () => {
+  //   console.log(date);
+  //   setSelectedDate(
+  //     new Date(
+  //       datepickerHeaderDate.getFullYear(),
+  //       datepickerHeaderDate.getMonth(),
+  //       date
+  //     )
+  //   );
+
+  //   setSelectDate(
+  //     new Date(
+  //       datepickerHeaderDate.getFullYear(),
+  //       datepickerHeaderDate.getMonth(),
+  //       date
+  //     ).toLocaleDateString()
+  //   );
+  //   setShowDatepicker(false);
+  // };
+
   const setDateValue = (date) => () => {
-    setSelectedDate(
-      new Date(
-        datepickerHeaderDate.getFullYear(),
-        datepickerHeaderDate.getMonth(),
-        date
-      )
+    console.log(date);
+
+    // Create the new Date object for the selected date
+    const selectedDate = new Date(
+      datepickerHeaderDate.getFullYear(),
+      datepickerHeaderDate.getMonth(),
+      date
     );
 
-    setSelectDate(
-      new Date(
-        datepickerHeaderDate.getFullYear(),
-        datepickerHeaderDate.getMonth(),
-        date
-      ).toLocaleDateString()
-    );
+    // Format the selected date using Intl.DateTimeFormat
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(selectedDate);
+
+    // Set the selected date and formatted date
+    setSelectedDate(selectedDate);
+    setSelectDate(formattedDate); // Store the formatted date string
+
+    // Close the date picker
     setShowDatepicker(false);
   };
 
@@ -139,7 +165,7 @@ export default function DatePicker(props) {
           <input
             type="text"
             readOnly
-            className="cursor-pointer w-full pl-10 pr-10  leading-none rounded-[12px]  bg-white border border-color text-gray-900 text-sm rounded-[12px]  mt-1  block w-full h-[40px] focus:outline-[#0A8A33]"
+            className="cursor-pointer w-full pl-10 pr-10  leading-none bg-white border border-color text-gray-900 text-sm rounded-[12px]  mt-1  block h-[40px] focus:outline-[#0A8A33]"
             placeholder="Select date"
             value={format(selectedDate, "yyyy-MM-dd")}
             onClick={toggleDatepicker}

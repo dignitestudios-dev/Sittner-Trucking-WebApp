@@ -2,7 +2,7 @@ import React from "react";
 
 export default function LookBehind({ deliveredNotifications }) {
   return (
-    <div className=" mt-3 h-[80%] scroll-box px-3  overflow-auto">
+    <div className=" mt-3 h-[100%] scroll-box px-3  overflow-auto">
       {deliveredNotifications && deliveredNotifications.length > 0 ? (
         deliveredNotifications.map((item, i) => (
           <div className="look-behind   px-3 py-3 w-[100%]" key={i}>
@@ -30,8 +30,8 @@ export default function LookBehind({ deliveredNotifications }) {
                   </span>
                 </div>
                 <div>
-                {item.images.length > 0 && (
-                    <div className={`w-full  flex items-center gap-1`} >
+                  {item.images.length > 0 && (
+                    <div className={`w-full  flex items-center gap-1`}>
                       {item.images.map((img, index) =>
                         item.type[index]?.includes("image") ? (
                           <div
@@ -39,17 +39,17 @@ export default function LookBehind({ deliveredNotifications }) {
                             className="rounded-xl flex justify-center  py-1 bg-[#F4F4F4] text-xs font-normal"
                           >
                             <a
-                            href={img.url}
-                            download
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                          <img
-                            src={img.url ? img.url : "/noprofile.png"}
-                            className="cursor-pointer rounded-md h-[30px] w-[30px]"
-                            alt=""
-                          />
-                          </a>
+                              href={img.url}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <img
+                                src={img.url ? img.url : "/noprofile.png"}
+                                className="cursor-pointer rounded-md h-[30px] w-[30px]"
+                                alt=""
+                              />
+                            </a>
                           </div>
                         ) : item.type[index]?.includes("video") ? (
                           <div
@@ -57,7 +57,7 @@ export default function LookBehind({ deliveredNotifications }) {
                             className="rounded-xl flex justify-center  bg-[#F4F4F4] text-xs font-normal"
                           >
                             <video
-                              className="cursor-pointer rounded-md "                              
+                              className="cursor-pointer rounded-md "
                               controls
                               src={img.url}
                             />

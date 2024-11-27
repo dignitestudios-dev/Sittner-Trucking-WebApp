@@ -273,30 +273,6 @@ export default function MessageBox() {
     return () => unsubscribe();
   }, []);
 
-  // useEffect(() => {
-  //   const employeeIds = employee.map(data => data.id);
-  //   const messageSeenEmp = Message.filter(item =>
-  //     item.UserMsgSeen.some(user => employeeIds.includes(user.EmployeeId))
-  //   );
-  //   const seenEmployeeData = employee.map(emp => {
-  //     const seenMessages = messageSeenEmp.filter(msg =>
-  //       msg.UserMsgSeen.some(user => user.EmployeeId == emp.id)
-  //     );
-
-  //     const seenTimes = seenMessages.map(msg =>
-  //       msg.UserMsgSeen.find(user => user.EmployeeId == emp.id)?.seenTime
-  //     ).filter(Boolean);
-
-  //     return {
-  //       ...emp,
-  //       seenTime: seenTimes.length > 0 ? seenTimes : null,
-  //     };
-  //   }).filter(emp => emp.seenTime);
-  //   console.log(seenEmployeeData,messageSeenEmp,employeeIds,"testtting");
-
-  //   setMsgSeenEmp(seenEmployeeData);
-  // }, [Message, employee,isMessageSeen]);
-
   const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -316,6 +292,30 @@ export default function MessageBox() {
       window.removeEventListener("keydown", handleKeydown);
     };
   }, [isPreviewOpen]);
+
+  const separateLinks = (message) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regular expression to match URLs
+    const parts = message.split(urlRegex); // Split message into parts based on URLs
+
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        // If the part is a URL, render it as a clickable link
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      // Otherwise, render as plain text
+      return <span key={index}>{part}</span>;
+    });
+  };
 
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
@@ -414,12 +414,13 @@ export default function MessageBox() {
                           : "bg-[#F4F4F4] "
                       } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
                     >
-                      <a
+                      {/* <a
                         href={msg.message.includes("https://") && msg.message}
                         target="_blank"
                       >
                         {msg.message}
-                      </a>
+                      </a> */}
+                      <span>{separateLinks(msg.message)}</span>
                     </div>
                   )}
                   {msg.images.length > 0 && (
@@ -433,7 +434,7 @@ export default function MessageBox() {
                           <IonPhotoViewer src={img.url}>
                             <img
                               alt="Image alt"
-                              className="cursor-pointer rounded-md !h-[80px] w-auto"
+                              className="cursor-pointer rounded-md !h-[80px] max-w-[100%] block"
                               src={img.url}
                             />
                           </IonPhotoViewer>
