@@ -306,7 +306,9 @@ export default function MessageBox() {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline"
+            className={`underline ${
+              Employee?.role === "user" && "text-blue-500"
+            }`}
           >
             {part}
           </a>
