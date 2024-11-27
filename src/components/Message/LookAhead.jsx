@@ -5,13 +5,6 @@ import { MyContext } from "../../context/GlobalContext";
 
 export default function LookAhead({ pendingNotifications }) {
   const { Employee } = useContext(MyContext);
-  console.log("pendingNotifications >>>>", pendingNotifications.reverse());
-
-  const formatDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
-    // Return the date in the format YYYY-MM-DD which JavaScript can parse
-    return new Date(`${year}-${month}-${day}`);
-  };
 
   return (
     <div className=" mt-3 h-[100%] scroll-box  px-3 overflow-y-scroll">

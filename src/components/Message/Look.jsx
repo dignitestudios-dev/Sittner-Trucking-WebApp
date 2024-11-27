@@ -18,7 +18,6 @@ export default function Look() {
   const [notifications, setNotifications] = useState([]);
   const [PendNot, setPendNot] = useState([]);
   const [DelNot, setDelNot] = useState([]);
-  console.log("Employee >>>", Employee);
 
   useEffect(() => {
     const notificationsRef = collection(db, "look");
@@ -86,7 +85,6 @@ export default function Look() {
     const pendingNotifications = notifications.filter(
       (notification) => notification.status === "pending"
     );
-    console.log("pendingNotifications >>>>", pendingNotifications);
 
     setPendNot(pendingNotifications);
     setDelNot(deliveredNotifications);

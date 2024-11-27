@@ -150,6 +150,7 @@ export default function DropdownList() {
       const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
+          console.log("data >>>>", data);
           if (data.notificationId === unseenNotifications[0]?.notificationId) {
             const updatedToastIds = Array.from(
               new Set([...data.toast, ...toastEmployeeIds])

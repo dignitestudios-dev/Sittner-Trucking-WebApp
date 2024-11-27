@@ -294,12 +294,11 @@ export default function MessageBox() {
   }, [isPreviewOpen]);
 
   const separateLinks = (message) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regular expression to match URLs
-    const parts = message.split(urlRegex); // Split message into parts based on URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = message.split(urlRegex);
 
     return parts.map((part, index) => {
       if (part.match(urlRegex)) {
-        // If the part is a URL, render it as a clickable link
         return (
           <a
             key={index}
@@ -314,7 +313,6 @@ export default function MessageBox() {
           </a>
         );
       }
-      // Otherwise, render as plain text
       return <span key={index}>{part}</span>;
     });
   };
