@@ -465,7 +465,7 @@ export default function MessageBox() {
                   )}
                   {msg.images.length > 0 && (
                     <div
-                      className={`w-full py-3 grid  grid-cols-2 lg:grid-cols-5 gap-3  ${
+                      className={`w-full py-3 grid  grid-cols-1 lg:grid-cols-5 gap-3  ${
                         Employee?.role == "admin" && ""
                       }`}
                     >
@@ -475,13 +475,7 @@ export default function MessageBox() {
                           key={index}
                           className="rounded-xl flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
                         >
-                          <IonPhotoViewer src={img.url}>
-                            <img
-                              alt="Image alt"
-                              className="cursor-pointer rounded-md max-h-[80px] w-auto max-w-[100%] block"
-                              src={img.url}
-                            />
-                          </IonPhotoViewer>
+                        
                           </div>
                         ) : msg.type[index]?.includes("video") ? (
                           <div
