@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function LookBehind({ deliveredNotifications }) {
+  const [FilterLook,setFilterLook]=useState([])
+  useEffect(()=>{
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 7); // Get the date 14 days ago
+    
+    const filteredNotifications = deliveredNotifications.filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= twoWeeksAgo; // Only keep notifications within the last 14 days
+    });
+    setFilterLook(filteredNotifications)
+  },[deliveredNotifications])
   return (
     <div className=" mt-3 h-[100%] scroll-box px-3  overflow-auto">
-      {deliveredNotifications && deliveredNotifications.length > 0 ? (
-        deliveredNotifications.map((item, i) => (
+      {FilterLook && FilterLook.length > 0 ? (
+        FilterLook.map((item, i) => (
           <div className="look-behind   px-3 py-3 w-[100%]" key={i}>
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">
@@ -14,9 +25,9 @@ export default function LookBehind({ deliveredNotifications }) {
               </h2>
             </div>
             <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
-              <h3 className="font-semibold text-sm leading-[14px]">
+              {/* <h3 className="font-semibold text-sm leading-[14px]">
                 Day {new Date(item.date).getDay()}
-              </h3>
+              </h3> */}
               <div className="flex items-end justify-between ">
                 <div>
                   <div className=" w-full rounded-2xl mt-2 text-xs font-normal">

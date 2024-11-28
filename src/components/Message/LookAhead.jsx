@@ -42,9 +42,9 @@ export default function LookAhead({ pendingNotifications }) {
                 )}
               </div>
               <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
-                <h3 className="font-semibold text-sm leading-[14px]">
+                {/* <h3 className="font-semibold text-sm leading-[14px]">
                   Day {new Date(item.date).getDay()}
-                </h3>
+                </h3> */}
                 <div className="flex items-end justify-between ">
                   <div>
                     <div className="w-full rounded-2xl mt-2 text-xs font-normal">

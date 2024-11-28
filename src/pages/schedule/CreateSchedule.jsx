@@ -18,6 +18,7 @@ import {
 } from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
+import moment from 'moment-timezone';
 export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
@@ -41,13 +42,25 @@ export default function CreateSchedule() {
   const HandleScheduled = async (e) => {
     e.preventDefault();
     setLoader(true);
+
+    const parsedDate = moment.tz(SelectedDate, "MM/DD/YYYY", "America/Denver");
+    const currentDate = moment.tz("America/Denver");
+    const futureDate = currentDate.clone().add(14, 'days');
+    // console.log(parsedDate.format(), futureDate.format(), "collectionname");
+    if (parsedDate.isAfter(futureDate) && locationState.state.collection.includes("look")) {
+        toast.error("The selected date cannot be more than two weeks in the future.");
+        setLoader(false);
+        return;
+    }
+
+
     const scheduledRef = collection(db, locationState.state.collection);
     const imageUrls = [];
     const docType = [];
     const loadingToastId = toast.loading("Uploading...");
     try {
-      console.log(SelectedDate, SelectedTime, "selectedDatess");
-
+      // console.log(SelectedDate, SelectedTime, "selectedDatess");
+      
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);

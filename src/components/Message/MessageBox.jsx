@@ -58,12 +58,14 @@ export default function MessageBox() {
 
   const handleInputResize = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset height to auto
-      textareaRef.current.style.height = `${
-        textareaRef.current.scrollHeight > 100
+      if (UserMsg.length>72) {      
+        textareaRef.current.style.height = "auto"; // Reset height to auto
+        textareaRef.current.style.height = `${
+          textareaRef.current.scrollHeight > 100
           ? 100
           : textareaRef.current.scrollHeight
-      }px`;
+          }px`;      
+        }
     }
   };
 
@@ -85,6 +87,8 @@ export default function MessageBox() {
           msgArray.push({ docId: doc.id, ...doc.data() });
         });
         SetMessages(msgArray);
+        console.log(msgArray,"msg--->array");
+        
         setIsAttachments(msgArray);
         setLoader(false);
         setTimeout(() => {
@@ -94,6 +98,7 @@ export default function MessageBox() {
           }
         }, 600);
       },
+
       (error) => {
         console.error("Error fetching messages: ", error);
         setLoader(false);
@@ -140,7 +145,7 @@ export default function MessageBox() {
   const HandleMessage = async (e) => {
     e.preventDefault();
     setSentLoad(true);
-    const trimmedUserMsg = UserMsg.trim();
+    const trimmedUserMsg = UserMsg;
     if (trimmedUserMsg === "" && images.length === 0) {
       toast.error("Please enter a message or upload an image.");
       setSentLoad(false);
@@ -181,6 +186,8 @@ export default function MessageBox() {
       });
       setImages([]);
       setUserMsg("");
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `50px`;
       toast.update(loadingToastId, {
         render: "Message sent successfully!",
         type: "success",
@@ -209,6 +216,10 @@ export default function MessageBox() {
   };
 
   const handleChange = (e) => {
+    if (e.target.value=="") {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `50px`;   
+    }
     setUserMsg(e.target.value);
   };
 
@@ -294,10 +305,19 @@ export default function MessageBox() {
   }, [isPreviewOpen]);
 
   const separateLinks = (message) => {
+    // Define a regex to match URLs
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const parts = message.split(urlRegex);
+
+    // First, replace the newline characters with a special string marker
+    const messageWithLineBreaks = message.replace(/\n/g, " <NEWLINE> ");
+
+    // Split the message by URLs and the special NEWLINE marker
+    const parts = messageWithLineBreaks.split(
+      /(https?:\/\/[^\s]+| <NEWLINE> )/g
+    );
 
     return parts.map((part, index) => {
+      // If the part is a URL, render as a clickable link
       if (part.match(urlRegex)) {
         return (
           <a
@@ -306,13 +326,20 @@ export default function MessageBox() {
             target="_blank"
             rel="noopener noreferrer"
             className={`underline ${
-              Employee?.role === "user" && "text-blue-500"
+              Employee?.role === "user" ? "text-blue-500" : ""
             }`}
           >
             {part}
           </a>
         );
       }
+
+      // If the part is the special marker for newlines, render as a <br />
+      if (part === " <NEWLINE> ") {
+        return <br key={index} />;
+      }
+
+      // Otherwise, render as normal text
       return <span key={index}>{part}</span>;
     });
   };
@@ -635,7 +662,7 @@ export default function MessageBox() {
                 ref={textareaRef}
                 value={UserMsg}
                 onChange={handleChange}
-                onInput={handleInputResize}
+                onKeyDown={handleInputResize}
                 id="email-address-icon"
                 autoComplete="off"
                 placeholder="Type Here"
