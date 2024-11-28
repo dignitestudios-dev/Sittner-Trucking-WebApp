@@ -85,6 +85,7 @@ input:focus{
 }
 *::-webkit-scrollbar {
   width: 5px;
+  height: 4px;
 }
 
 /* Track */
@@ -105,12 +106,16 @@ input:focus{
 .custom-scroll-bar::-webkit-scrollbar-track {
   background: transparent; 
   margin: 20px;
+  width: 5px;
+  height: 5px;
 }
  
 /* Handle */
 .custom-scroll-bar::-webkit-scrollbar-thumb {
   background: #484848; 
   transition: 0.4s;
+  width: 5px;
+  height: 5px;
 }
 
 /* Handle on hover */

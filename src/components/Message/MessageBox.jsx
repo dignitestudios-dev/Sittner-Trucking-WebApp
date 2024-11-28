@@ -591,7 +591,7 @@ export default function MessageBox() {
       {Employee?.role == "admin" && (
         <div className="pb-2 h-[15%]  w-full bottom-0">
           {images.length > 0 && (
-            <div className="shadow-xl bg-slate-100 px-2 py-2 w-[90%] mx-auto flex items-center gap-5 nowrap scroll-box  overflow-auto">
+            <div className="shadow-xl bg-slate-100 px-2 py-2 mx-auto flex items-center gap-5 nowrap  absolute bottom-[110px] w-full  custom-scroll-bar  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
                 <div key={targetIndex}>
                   <div className="flex justify-end px-3 pb-2">
