@@ -465,7 +465,7 @@ export default function MessageBox() {
                   )}
                   {msg.images.length > 0 && (
                     <div
-                      className={`w-full  py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
+                      className={`w-full py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
                         Employee?.role == "admin" && ""
                       }`}
                     >
@@ -609,7 +609,7 @@ export default function MessageBox() {
       {Employee?.role == "admin" && (
         <div className="pb-2 h-[15%]  w-full bottom-0">
           {images.length > 0 && (
-            <div className="shadow-xl bg-slate-100 px-2 py-2 mx-auto flex items-center gap-5 nowrap  absolute bottom-[30px] md:bottom-[110px] w-full  custom-scroll-bar  overflow-auto">
+            <div className="shadow-xl bg-slate-100 px-2 py-2 mx-auto flex items-center gap-5 nowrap  absolute bottom-[35px] md:bottom-[110px] w-full  custom-scroll-bar  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
                 <div key={targetIndex}>
                   <div className="flex justify-end px-3 pb-2">
