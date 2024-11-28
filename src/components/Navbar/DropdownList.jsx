@@ -93,10 +93,11 @@ export default function DropdownList() {
      const previousCount = previousNotificationCount.current;
  setNotificationCount(newNotificationCount)
      // Check for new delivered notifications and trigger a toast
-     unseenNotifications.forEach((notification) => {
+   
+     if(unseenNotifications[0]?.title.length>0){
        // Check if the notification has already triggered a toast
-       if (!triggeredNotifications.current.has(notification.id)&&Employee.role=="user") {
-         const newNotificationTitle = notification.title || "New Notification";
+       if (!triggeredNotifications.current.has(unseenNotifications[0]?.id)&&Employee.role=="user") {
+         const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
  
          // Trigger toast notification
          toast.success(
@@ -115,7 +116,7 @@ export default function DropdownList() {
          );
  
          // Mark this notification as triggered
-         triggeredNotifications.current.add(notification.id);
+         triggeredNotifications.current.add(unseenNotifications[0]?.id);
  
          // Store the updated triggered notifications in localStorage
          localStorage.setItem('triggeredNotifications', JSON.stringify(Array.from(triggeredNotifications.current)));
@@ -134,7 +135,7 @@ export default function DropdownList() {
            });
          });
        }
-     });
+      }
  
      // Update previous notification count to track changes
      previousNotificationCount.current = newNotificationCount;
