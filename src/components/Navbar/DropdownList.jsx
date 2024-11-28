@@ -33,113 +33,131 @@ export default function DropdownList() {
   const [loading, setLoading] = useState(true);
   const previousNotificationCount = useRef(NotificationCount);
   const DropdownRef = useRef(null);
-   // Load previously triggered notifications from localStorage
-   const triggeredNotifications = useRef(new Set(JSON.parse(localStorage.getItem('triggeredNotifications')) || []));
+  // Load previously triggered notifications from localStorage
+  const triggeredNotifications = useRef(
+    new Set(JSON.parse(localStorage.getItem("triggeredNotifications")) || [])
+  );
 
-   // Fetch notifications from Firestore
-   const getNots = () => {
-     const cookieData = Cookies.get("employe");
-     const data = JSON.parse(cookieData || "{}");
-     setUserRole(data?.role || "");
-     const notificationsRef = collection(db, "notification");
- 
-     const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-       const fetchedNotifications = [];
-       querySnapshot.forEach((doc) => {
-         const data = doc.data();
-         fetchedNotifications.push({ id: doc.id, ...data });
-       });
- 
-       const sortedNotifications = fetchedNotifications.sort((a, b) => {
-         const dateA = new Date(`${a.date} ${a.time}`);
-         const dateB = new Date(`${b.date} ${b.time}`);
-         return dateB - dateA;
-       });
- 
-       setNotifications(sortedNotifications);
-     });
- 
-     return unsubscribe;
-   };
- 
-   useEffect(() => {
-     const unsubscribe = getNots();
-     const intervalId = setInterval(() => {
-       getNots();
-     }, 30000);
- 
-     return () => {
-       clearInterval(intervalId);
-       unsubscribe();
-     };
-   }, []);
- 
-   useEffect(() => {
-     const deliveredNotifications = notifications.filter(
-       (notification) => notification.status === "Delivered"
-     );
- 
-     // Filter out notifications that have been seen by this employee
-     const unseenNotifications = deliveredNotifications.filter(
-       (notification) =>
-         !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
-     );
+  // Fetch notifications from Firestore
+  const getNots = () => {
+    const cookieData = Cookies.get("employe");
+    const data = JSON.parse(cookieData || "{}");
+    setUserRole(data?.role || "");
+    const notificationsRef = collection(db, "notification");
 
-     setDevNotifications(deliveredNotifications)
- 
-     const newNotificationCount = unseenNotifications.length;
-     Cookies.set("notificationCount", newNotificationCount);
- 
-     const previousCount = previousNotificationCount.current;
- setNotificationCount(newNotificationCount)
-     // Check for new delivered notifications and trigger a toast
-   
-     if(unseenNotifications[0]?.title.length>0){
-       // Check if the notification has already triggered a toast
-       if (!triggeredNotifications.current.has(unseenNotifications[0]?.id)&&Employee.role=="user") {
-         const newNotificationTitle = unseenNotifications[0]?.title || "New Notification";
- 
-         // Trigger toast notification
-         toast.success(
-           newNotificationTitle.length > 16
-             ? `${newNotificationTitle.slice(0, 16)}...`
-             : newNotificationTitle,
-           {
-             position: "top-right",
-             autoClose: 3000, // Automatically close the toast after 3 seconds
-             hideProgressBar: false,
-             closeOnClick: true,
-             pauseOnHover: true,
-             draggable: true,
-             progress: undefined,
-           }
-         );
- 
-         // Mark this notification as triggered
-         triggeredNotifications.current.add(unseenNotifications[0]?.id);
- 
-         // Store the updated triggered notifications in localStorage
-         localStorage.setItem('triggeredNotifications', JSON.stringify(Array.from(triggeredNotifications.current)));
- 
-         // Optionally update the database or do other actions
-         const notificationsRef = collection(db, "notification");
-         const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
-           querySnapshot.forEach((doc) => {
-             const data = doc.data();
-             if (data.notificationId === notification.notificationId) {
-               const updatedToastIds = Array.from(new Set([...data.toast, Employee.id]));
-               updateDoc(doc.ref, {
-                 toast: updatedToastIds,
-               });
-             }
-           });
-         });
-       }
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+      const now = moment.tz("America/Denver");
+      const fetchedNotifications = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const notificationDate = moment.tz(
+          `${data.date} ${data.time}`,
+          "MM/DD/YYYY h:mm A",
+          "America/Denver"
+        );
+        if (
+          notificationDate.isSameOrBefore(now) &&
+          data.status === "Scheduled"
+        ) {
+          updateDoc(doc.ref, {
+            status: "Delivered",
+            seen: [],
+          });
+        }
+        fetchedNotifications.push({ id: doc.id, ...data });
+      });
+
+      const sortedNotifications = fetchedNotifications.sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.time}`);
+        const dateB = new Date(`${b.date} ${b.time}`);
+        return dateB - dateA;
+      });
+
+      setNotifications(sortedNotifications);
+    });
+
+    return unsubscribe;
+  };
+
+  useEffect(() => {
+    const unsubscribe = getNots();
+    const intervalId = setInterval(() => {
+      getNots();
+    }, 30000);
+
+    return () => {
+      clearInterval(intervalId);
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const deliveredNotifications = notifications.filter(
+      (notification) => notification.status === "Delivered"
+    );
+
+    const unseenNotifications = deliveredNotifications.filter(
+      (notification) =>
+        !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
+    );
+
+    setDevNotifications(deliveredNotifications);
+
+    const newNotificationCount = unseenNotifications.length;
+    Cookies.set("notificationCount", newNotificationCount);
+
+    const previousCount = previousNotificationCount.current;
+    setNotificationCount(newNotificationCount);
+
+    console.log(unseenNotifications, "unseenNotss");
+    if (unseenNotifications[0]?.title.length > 0) {
+      if (
+        !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
+        Employee.role == "user"
+      ) {
+        const newNotificationTitle =
+          unseenNotifications[0]?.title || "New Notification";
+        toast.success(
+          newNotificationTitle.length > 16
+            ? `${newNotificationTitle.slice(0, 16)}...`
+            : newNotificationTitle,
+          {
+            position: "top-right",
+            autoClose: 3000, 
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+
+        triggeredNotifications.current.add(unseenNotifications[0]?.id);
+
+        localStorage.setItem(
+          "triggeredNotifications",
+          JSON.stringify(Array.from(triggeredNotifications.current))
+        );
+
+        const notificationsRef = collection(db, "notification");
+        const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.notificationId === unseenNotifications[0].notificationId) {
+              const updatedToastIds = Array.from(
+                new Set([...data.toast, Employee.id])
+              );
+              updateDoc(doc.ref, {
+                toast: updatedToastIds,
+              });
+            }
+          });
+        });
       }
- 
-     // Update previous notification count to track changes
-     previousNotificationCount.current = newNotificationCount;
-   }, [notifications, Employee.id, UserRole]);
+    }
+
+    previousNotificationCount.current = newNotificationCount;
+  }, [notifications, Employee.id, UserRole]);
 
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
