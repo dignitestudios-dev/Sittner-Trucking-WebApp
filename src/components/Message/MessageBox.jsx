@@ -58,7 +58,7 @@ export default function MessageBox() {
 
   const handleInputResize = () => {
     if (textareaRef.current) {
-      if (UserMsg.length>72) {      
+      if (UserMsg.length>30) {      
         textareaRef.current.style.height = "auto"; // Reset height to auto
         textareaRef.current.style.height = `${
           textareaRef.current.scrollHeight > 100
@@ -591,7 +591,7 @@ export default function MessageBox() {
       {Employee?.role == "admin" && (
         <div className="pb-2 h-[15%]  w-full bottom-0">
           {images.length > 0 && (
-            <div className="shadow-xl bg-slate-100 px-2 py-2 mx-auto flex items-center gap-5 nowrap  absolute bottom-[110px] w-full  custom-scroll-bar  overflow-auto">
+            <div className="shadow-xl bg-slate-100 px-2 py-2 mx-auto flex items-center gap-5 nowrap  absolute bottom-[30px] md:bottom-[110px] w-full  custom-scroll-bar  overflow-auto">
               {Array.from(images).map((image, targetIndex) => (
                 <div key={targetIndex}>
                   <div className="flex justify-end px-3 pb-2">
@@ -646,7 +646,7 @@ export default function MessageBox() {
             className="w-100 bg-white px-3 p-3 lg:px-5 py-5  flex items-center  w-full h-full justify-center gap-5 "
           >
             <div className="relative h-full w-[85%] mt-3">
-              <div className="absolute inset-y-0 end-5 top-1 z-[999]   flex items-center ">
+              <div className="absolute inset-y-6 md:inset-y-4 end-5   z-[999]   flex items-center ">
                 <label htmlFor="attach">
                   <GrAttachment color="#000000" className="cursor-pointer" />
                 </label>
@@ -670,7 +670,7 @@ export default function MessageBox() {
                   textareaRef?.current?.scrollHeight > 100
                     ? "overflow-auto"
                     : "overflow-hidden"
-                } custom-scroll-bar  pr-10 resize-none w-full h-full border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]`}
+                } custom-scroll-bar  pr-10 resize-none w-full h-[45px] border border-[#CFCFCF] text-gray-900 text-sm rounded-2xl block p-2.5 focus:outline-[#0A8A33]`}
               />
             </div>
             <div className="mt-3">
