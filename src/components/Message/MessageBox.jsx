@@ -480,7 +480,7 @@ export default function MessageBox() {
                         ) : msg.type[index]?.includes("video") ? (
                           <div
                             key={index}
-                            className="rounded-xl flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
+                            className="rounded-xl col-span-2 flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
                           >
                             <video
                             width="400"
