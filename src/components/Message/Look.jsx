@@ -21,29 +21,37 @@ export default function Look() {
   const [DelNot, setDelNot] = useState([]);
 
   useEffect(() => {
-    // Function to fetch notifications and set them immediately when component mounts or IsBehind changes
-    const fetchNotifications = async () => {
-      const notificationsRef = collection(db, "look");
-      const querySnapshot = await getDocs(notificationsRef);
+    const notificationsRef = collection(db, "look");
+    const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
       const fetchedNotifications = [];
-
-      querySnapshot.docs.forEach((doc) => {
+      querySnapshot.forEach((doc) => {
         const data = doc.data();
         fetchedNotifications.push({ docId: doc.id, ...data });
       });
 
+      // Sort notifications by date/time
       const sortedNotifications = fetchedNotifications.sort(
         (a, b) =>
           new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
       );
 
+      // Separate delivered and pending notifications
+      const deliveredNotifications = sortedNotifications.filter(
+        (notification) => notification.status === "Delivered"
+      );
+      const pendingNotifications = sortedNotifications.filter(
+        (notification) => notification.status === "pending"
+      );
+
+      // Update states
+      setPendNot(pendingNotifications);
+      setDelNot(deliveredNotifications);
       setNotifications(sortedNotifications);
-    };
+    });
+    return () => unsubscribe();
+  }, [IsBehind, Employee]);
 
-    // Fetch the data immediately when component mounts or IsBehind changes
-    fetchNotifications();
-
-    // Function to perform status update every 30 seconds
+  useEffect(() => {
     const performStatusUpdate = async () => {
       const notificationsRef = collection(db, "look");
       const messageRef = collection(db, "message");
@@ -61,10 +69,7 @@ export default function Look() {
         const now = moment.tz("America/Denver");
 
         if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
-          // Update status to "Delivered"
           updates.push(updateDoc(doc.ref, { status: "Delivered" }));
-
-          // Add to messages collection
           addDoc(messageRef, {
             time: data?.time,
             message: data?.message,
@@ -74,8 +79,9 @@ export default function Look() {
             type: data?.type,
             createdAt: new Date(),
             employeeId: Employee?.id,
+          }).then(() => {
+            alert("hi")
           });
-          fetchNotifications();
         }
       });
 
@@ -84,25 +90,10 @@ export default function Look() {
       }
     };
 
-    // Set an interval to run the status update function every 30 seconds
     const intervalId = setInterval(performStatusUpdate, 30000);
 
-    // Clean up the interval when the component is unmounted or IsBehind changes
     return () => clearInterval(intervalId);
   }, [IsBehind, Employee]);
-console.log(notifications,"------getLooks-----");
-
-  useEffect(() => {
-    const deliveredNotifications = notifications.filter(
-      (notification) => notification.status === "Delivered"
-    );
-    const pendingNotifications = notifications.filter(
-      (notification) => notification.status === "pending"
-    );
-
-    setPendNot(pendingNotifications);
-    setDelNot(deliveredNotifications);
-  }, [notifications]);
 
   return (
     <div

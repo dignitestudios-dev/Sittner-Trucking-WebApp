@@ -18,13 +18,11 @@ import {
 } from "../../firbase/FirebaseInit";
 import { MyContext } from "../../context/GlobalContext";
 import { toast } from "react-toastify";
-import moment from 'moment-timezone';
+import moment from "moment-timezone";
 export default function CreateSchedule() {
   const navigate = useNavigate("");
   const { SelectedTime, SelectedDate, Employee, setLoader, loader } =
     useContext(MyContext);
-  console.log(SelectedDate, "currnet data");
-
   const locationState = useLocation();
   const [message, setMessage] = useState("");
 
@@ -45,14 +43,18 @@ export default function CreateSchedule() {
 
     const parsedDate = moment.tz(SelectedDate, "MM/DD/YYYY", "America/Denver");
     const currentDate = moment.tz("America/Denver");
-    const futureDate = currentDate.clone().add(14, 'days');
+    const futureDate = currentDate.clone().add(14, "days");
     // console.log(parsedDate.format(), futureDate.format(), "collectionname");
-    if (parsedDate.isAfter(futureDate) && locationState.state.collection.includes("look")) {
-        toast.error("The selected date cannot be more than two weeks in the future.");
-        setLoader(false);
-        return;
+    if (
+      parsedDate.isAfter(futureDate) &&
+      locationState.state.collection.includes("look")
+    ) {
+      toast.error(
+        "The selected date cannot be more than two weeks in the future."
+      );
+      setLoader(false);
+      return;
     }
-
 
     const scheduledRef = collection(db, locationState.state.collection);
     const imageUrls = [];
@@ -60,7 +62,7 @@ export default function CreateSchedule() {
     const loadingToastId = toast.loading("Uploading...");
     try {
       // console.log(SelectedDate, SelectedTime, "selectedDatess");
-      
+
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);
@@ -103,8 +105,13 @@ export default function CreateSchedule() {
   };
 
   const [images, setImages] = useState([]);
+
   const handleImageChange = (e) => {
-    setImages([...e.target.files]);
+    const newImages = Array.from(e.target.files);
+    setImages((prevImages) => [...prevImages, ...newImages]);
+  };
+  const handleRemoveImage = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   return (
@@ -146,37 +153,39 @@ export default function CreateSchedule() {
                 <div
                   className={`image-preview flex items-center flex-wrap mt-2 gap-2`}
                 >
-                  {Array.from(images).map((image, targetIndex) => (
-                    <div key={targetIndex}>
+                  {images.map((image, targetIndex) => (
+                    <div key={targetIndex} className="relative">
                       {image.type?.includes("image") ? (
                         <img
                           src={URL.createObjectURL(image)}
                           alt=""
                           className="h-[100px] rounded-md w-auto"
-                          srcset=""
                         />
-                      ) : image.type.includes("video") ? (
+                      ) : image.type?.includes("video") ? (
                         <img
-                          src={"/video.webp"}
+                          src="/video.webp"
                           alt=""
                           className="h-[100px] rounded-md w-[100px]"
-                          srcset=""
                         />
                       ) : image.type?.includes("spreadsheetml") ? (
                         <img
-                          src={"/xl.webp"}
+                          src="/xl.webp"
                           alt=""
                           className="h-[100px] rounded-md w-[100px]"
-                          srcset=""
                         />
                       ) : (
                         <img
-                          src={"/pdf.webp"}
+                          src="/pdf.webp"
                           alt=""
                           className="h-[100px] rounded-md w-[100px]"
-                          srcset=""
                         />
                       )}
+                      <button
+                        onClick={() => handleRemoveImage(targetIndex)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-[6px] py-0"
+                      >
+                        X
+                      </button>
                     </div>
                   ))}
                 </div>

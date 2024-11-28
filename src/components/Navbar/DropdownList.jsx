@@ -105,16 +105,14 @@ export default function DropdownList() {
 
     const newNotificationCount = unseenNotifications.length;
     Cookies.set("notificationCount", newNotificationCount);
-
     const previousCount = previousNotificationCount.current;
-    setNotificationCount(newNotificationCount);
-
-    console.log(unseenNotifications, "unseenNotss");
+    
     if (unseenNotifications[0]?.title.length > 0) {
       if (
         !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
         Employee.role == "user"
       ) {
+        setNotificationCount(newNotificationCount);
         const newNotificationTitle =
           unseenNotifications[0]?.title || "New Notification";
         toast.success(

@@ -83,11 +83,18 @@ export default function LookAhead({ pendingNotifications }) {
                               key={index}
                               className="rounded-xl flex justify-center bg-[#F4F4F4] text-xs font-normal"
                             >
-                              <video
-                                className="cursor-pointer rounded-md"
-                                controls
-                                src={img.url}
+                              <a
+                              href={img.url}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                           <img
+                                src="/video.webp"
+                                alt=""
+                                className="h-[50px] rounded-md w-[50px]"
                               />
+                              </a>
                             </div>
                           ) : item.type[index]?.includes("spreadsheetml") ? (
                             <div
@@ -120,7 +127,7 @@ export default function LookAhead({ pendingNotifications }) {
                               >
                                 <img
                                   src="/pdf.png"
-                                  className="cursor-pointer"
+                                  className="cursor-pointer h-[50px] rounded-md w-[50px]"
                                   alt=""
                                 />
                               </a>
