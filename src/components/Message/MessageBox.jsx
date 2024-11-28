@@ -465,7 +465,7 @@ export default function MessageBox() {
                   )}
                   {msg.images.length > 0 && (
                     <div
-                      className={`w-full py-3 grid  grid-cols-1 lg:grid-cols-5 gap-3  ${
+                      className={`w-full py-3 grid  grid-cols-2 lg:grid-cols-5 gap-3  ${
                         Employee?.role == "admin" && ""
                       }`}
                     >
@@ -484,7 +484,7 @@ export default function MessageBox() {
                           >
                             <video
                             width="400"
-                              className="cursor-pointer max-w-[100%] h-auto rounded-md"
+                              className="cursor-pointer max-w-[100%] rounded-md"
                               onClick={() => {}}
                               controls
                               src={img.url}
