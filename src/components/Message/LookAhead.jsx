@@ -20,15 +20,17 @@ export default function LookAhead({ pendingNotifications }) {
       )}
       {pendingNotifications && pendingNotifications?.length > 0 ? (
         pendingNotifications
-          ?.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate())
-          ?.slice()
-          ?.reverse()
+          ?.sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate()) // Sorting the notifications based on creation time
+          ?.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          ) // Sort by date, soonest first
           ?.map((item, i) => (
             <div key={i} className="look-ahead px-3 py-3 w-[100%]">
               <div className="username mb-3 flex items-center justify-between">
                 <h2 className="font-semibold text-sm leading-[14px]">
                   {new Date(item.date).toLocaleDateString("en-US", {
                     weekday: "long",
+                    timeZone: "America/Denver", // Specify Mountain Time zone here
                   })}
                 </h2>
                 {Employee?.role === "admin" && (
@@ -42,10 +44,7 @@ export default function LookAhead({ pendingNotifications }) {
                 )}
               </div>
               <div className="w-full py-2 px-2 bg-[#F9F9F9] border border-[#DFDFDF] rounded-[10px]">
-                {/* <h3 className="font-semibold text-sm leading-[14px]">
-                  Day {new Date(item.date).getDay()}
-                </h3> */}
-                <div className="flex items-end justify-between ">
+                <div className="flex items-end justify-between">
                   <div>
                     <div className="w-full rounded-2xl mt-2 text-xs font-normal">
                       {item.message}
@@ -59,12 +58,12 @@ export default function LookAhead({ pendingNotifications }) {
                   </div>
                   <div>
                     {item.images.length > 0 && (
-                      <div className={`w-full  flex items-center gap-1`}>
+                      <div className="w-full flex items-center gap-1">
                         {item.images.map((img, index) =>
                           item.type[index]?.includes("image") ? (
                             <div
                               key={index}
-                              className="rounded-xl flex justify-center  py-1 bg-[#F4F4F4] text-xs font-normal"
+                              className="rounded-xl flex justify-center py-1 bg-[#F4F4F4] text-xs font-normal"
                             >
                               <a
                                 href={img.url}
@@ -82,10 +81,10 @@ export default function LookAhead({ pendingNotifications }) {
                           ) : item.type[index]?.includes("video") ? (
                             <div
                               key={index}
-                              className="rounded-xl flex justify-center  bg-[#F4F4F4] text-xs font-normal"
+                              className="rounded-xl flex justify-center bg-[#F4F4F4] text-xs font-normal"
                             >
                               <video
-                                className="cursor-pointer rounded-md "
+                                className="cursor-pointer rounded-md"
                                 controls
                                 src={img.url}
                               />
@@ -93,7 +92,7 @@ export default function LookAhead({ pendingNotifications }) {
                           ) : item.type[index]?.includes("spreadsheetml") ? (
                             <div
                               key={index}
-                              className="rounded-xl flex justify-center  py-1 bg-[#F4F4F4] text-xs font-normal"
+                              className="rounded-xl flex justify-center py-1 bg-[#F4F4F4] text-xs font-normal"
                             >
                               <a
                                 href={img.url}
@@ -111,7 +110,7 @@ export default function LookAhead({ pendingNotifications }) {
                           ) : (
                             <div
                               key={index}
-                              className="rounded-xl flex justify-center  py-1 bg-[#F4F4F4] text-xs font-normal"
+                              className="rounded-xl flex justify-center py-1 bg-[#F4F4F4] text-xs font-normal"
                             >
                               <a
                                 href={img.url}

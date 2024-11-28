@@ -38,36 +38,51 @@ export default function EditSchedule() {
     const filteredImages = items.filter((item) =>
       item.name.includes(loc?.state?.data?.id)
     );
-
+  
     const metadataPromises = filteredImages.map(async (imgPath) => {
       try {
-        const metadata = await getMetadata(imgPath);
-        const downloadURL = await getDownloadURL(imgPath);
-        return { metadata, downloadURL };
+        const metadata = await getMetadata(imgPath);        
+        const downloadURL = await getDownloadURL(imgPath);        
+        return {
+          metadata: {
+            name: metadata.name, 
+            type: metadata.contentType,
+          },
+          downloadURL,
+        };
       } catch (error) {
         console.error("Error fetching metadata or download URL:", error);
       }
-    });
-
+    });  
     const results = await Promise.all(metadataPromises);
     setImagesPath(results);
-
     const existingImageNames = new Set(images.map((image) => image.name));
     let updatedImg = [];
+  
+    // Filter out images that are already in the images state
     const img_data = results.filter(
       (item) => item && !existingImageNames.has(item.metadata.name)
     );
+  
+    // For each new image, fetch its blob and create a file object
     for (const item of img_data) {
       const { metadata, downloadURL } = item;
+      
+      // Fetch the image blob from the download URL
       const response = await fetch(downloadURL);
       const blob = await response.blob();
+      
+      // Create a File object with the fetched blob, including the correct content type
       const file = new File([blob], metadata.name, {
-        type: metadata.contentType,
+        type: metadata.type, // Use the type from the metadata
       });
+  
+      // Push the newly created file into the updatedImg array
       updatedImg.push(file);
     }
     setImages(updatedImg);
   }
+  
 
   useEffect(() => {
     setScheduled({
@@ -105,17 +120,27 @@ export default function EditSchedule() {
 
   const HandleUploadAttach = (e) => {
     const filesArray = Array.from(e.target.files);
+    
+    // Process the files to create new File objects with unique names
     const updatedFiles = filesArray.map((file) => {
-      return new File([file], loc.state.data.id + file.name, {
-        type: file.type,
-      });
+      return new File([file], loc.state.data.id + file.name, { type: file.type });
     });
-
+  
+    // Loop through the updated files to add them to `images` and `ImagesPath`
     updatedFiles.forEach((file) => {
       setImages((prev) => [...prev, file]);
+      const newImageURL = URL.createObjectURL(file);
+      setImagesPath((prev) => [
+        ...prev,
+        {
+          metadata: { name: file.name, type: file.type },  // Include file type here
+          downloadURL: newImageURL,  // Temporary URL for the image
+        },
+      ]);
     });
   };
-
+  
+  
   const HandleScheduled = async (e) => {
     e.preventDefault();
     console.log(images, "checkImages");
@@ -158,6 +183,8 @@ export default function EditSchedule() {
       });
     }
   };
+  console.log(ImagesPath,"imagesPathh");
+  
 
   console.log(Scheduled, "getUpdateArray");
   return (
@@ -204,28 +231,28 @@ export default function EditSchedule() {
                 {ImagesPath.map((img, i) => (
                   <div key={i}>
                     <label htmlFor={`file${i}`}>
-                      <div className="text-[#007AFF] flex items-center cursor-pointer">
+                      {/* <div className="text-[#007AFF] flex items-center cursor-pointer">
                         <HiOutlinePencilSquare className="mr-2 mb-2" />
-                      </div>
-                      {Scheduled.type[i].includes("image") ? (
+                      </div> */}
+                      {img.metadata.type.includes("image") ? (
                         <img
                           src={img.downloadURL}
                           alt=""
                           className="h-[100px] w-auto rounded-md"
                         />
-                      ) : (
-                        <img
+                      ) : ( 
+                       <img
                           src="/pdf.png"
                           alt=""
-                          className="h-[50px] rounded-md"
+                          className="h-[100px] rounded-md"
                         />
-                      )}
-                      <input
+                       )}
+                      {/* <input
                         type="file"
                         onChange={(e) => handleImageChange(e, img)}
                         className="hidden"
                         id={`file${i}`}
-                      />
+                      /> */}
                     </label>
                   </div>
                 ))}

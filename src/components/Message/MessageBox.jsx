@@ -344,6 +344,19 @@ export default function MessageBox() {
     });
   };
 
+  const [FilterMessages, setFilterMessages] = useState([]);
+  useEffect(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);  
+    const filteredNotifications = Message.filter(item => {
+      const itemDate = item.createdAt.toDate();  
+      return itemDate >= sevenDaysAgo; 
+    });
+  
+    setFilterMessages(filteredNotifications);
+  }, [Message]);
+  
+
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
@@ -418,7 +431,7 @@ export default function MessageBox() {
               </span>
             </div>
             {/* Messages */}
-            {Message?.map((msg, i) => (
+            {FilterMessages?.map((msg, i) => (
               <div
                 key={i}
                 className={`left-side ${
@@ -452,23 +465,28 @@ export default function MessageBox() {
                   )}
                   {msg.images.length > 0 && (
                     <div
-                      className={`w-full py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
+                      className={`w-full  py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
                         Employee?.role == "admin" && ""
                       }`}
                     >
                       {msg.images.map((img, index) =>
                         msg.type[index]?.includes("image") ? (
+                          <div
+                          key={index}
+                          className="rounded-xl flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
+                        >
                           <IonPhotoViewer src={img.url}>
                             <img
                               alt="Image alt"
-                              className="cursor-pointer rounded-md max-h-[80px] w-full max-w-[100%] block"
+                              className="cursor-pointer rounded-md max-h-[80px] w-auto max-w-[100%] block"
                               src={img.url}
                             />
                           </IonPhotoViewer>
+                          </div>
                         ) : msg.type[index]?.includes("video") ? (
                           <div
                             key={index}
-                            className="rounded-xl flex justify-center  bg-[#F4F4F4] text-xs font-normal"
+                            className="rounded-xl flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
                           >
                             <video
                               className="cursor-pointer rounded-md"

@@ -5,6 +5,7 @@ import {
   addDoc,
   collection,
   db,
+  getDocs,
   onSnapshot,
   updateDoc,
 } from "../../firbase/FirebaseInit";
@@ -20,36 +21,50 @@ export default function Look() {
   const [DelNot, setDelNot] = useState([]);
 
   useEffect(() => {
-    const notificationsRef = collection(db, "look");
-    const messageRef = collection(db, "message");
-    const unsubscribe = onSnapshot(notificationsRef, async (querySnapshot) => {
+    // Function to fetch notifications and set them immediately when component mounts or IsBehind changes
+    const fetchNotifications = async () => {
+      const notificationsRef = collection(db, "look");
+      const querySnapshot = await getDocs(notificationsRef);
       const fetchedNotifications = [];
+
+      querySnapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        fetchedNotifications.push({ docId: doc.id, ...data });
+      });
+
+      const sortedNotifications = fetchedNotifications.sort(
+        (a, b) =>
+          new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
+      );
+
+      setNotifications(sortedNotifications);
+    };
+
+    // Fetch the data immediately when component mounts or IsBehind changes
+    fetchNotifications();
+
+    // Function to perform status update every 30 seconds
+    const performStatusUpdate = async () => {
+      const notificationsRef = collection(db, "look");
+      const messageRef = collection(db, "message");
+
+      const querySnapshot = await getDocs(notificationsRef);
       const updates = [];
 
       querySnapshot.docs.forEach((doc) => {
         const data = doc.data();
-
-        // Create the notification date in Mountain Time using moment
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
           "MM/DD/YYYY h:mm A",
           "America/Denver"
         );
-
-        // Get the current time in Mountain Time
         const now = moment.tz("America/Denver");
 
-        // Format both dates for logging purposes
-        const formattedNotificationDate = notificationDate.format(
-          "ddd MMM DD YYYY HH:mm:ss"
-        );
-        const formattedCurrentDate = now.format("ddd MMM DD YYYY HH:mm:ss");
-
-        fetchedNotifications.push({ docId: doc.id, ...data });
-
-        // Check if the notification date is less than or equal to current time (Mountain Time)
         if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
+          // Update status to "Delivered"
           updates.push(updateDoc(doc.ref, { status: "Delivered" }));
+
+          // Add to messages collection
           addDoc(messageRef, {
             time: data?.time,
             message: data?.message,
@@ -60,23 +75,22 @@ export default function Look() {
             createdAt: new Date(),
             employeeId: Employee?.id,
           });
+          fetchNotifications();
         }
       });
 
       if (updates.length > 0) {
         await Promise.all(updates);
       }
+    };
 
-      const sortedNotifications = fetchedNotifications.sort(
-        (a, b) =>
-          new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`)
-      );
-      // console.log("sortedNotifications >>>", sortedNotifications);
-      setNotifications(sortedNotifications);
-    });
+    // Set an interval to run the status update function every 30 seconds
+    const intervalId = setInterval(performStatusUpdate, 30000);
 
-    return unsubscribe;
-  }, [IsBehind]);
+    // Clean up the interval when the component is unmounted or IsBehind changes
+    return () => clearInterval(intervalId);
+  }, [IsBehind, Employee]);
+console.log(notifications,"------getLooks-----");
 
   useEffect(() => {
     const deliveredNotifications = notifications.filter(

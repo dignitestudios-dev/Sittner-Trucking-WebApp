@@ -109,6 +109,7 @@ export default function MessageList() {
   }, [updateCount]);
   
 
+console.log(scheduled,"scheduledMessage");
 
   return (
     <div className="bg-[#FFFFFF] border  scroll-box  overflow-auto h-[70vh]  rounded-[10px] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-6  lg:px-10">
