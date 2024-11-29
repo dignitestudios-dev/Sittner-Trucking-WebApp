@@ -99,46 +99,40 @@ export default function DropdownList() {
       (notification) =>
         !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
     );
-
     setDevNotifications(deliveredNotifications);
-
     const newNotificationCount = unseenNotifications.length;
     Cookies.set("notificationCount", newNotificationCount);
-    const previousCount = previousNotificationCount.current;
-    const oldNotificationCount=unseenNotifications.filter(
-      (notification) =>
-        moment(notification.date + ", " + notification.time).isAfter(
-          moment(Employee.createdat)
-        ) 
+
+    const oldNotificationCount = unseenNotifications.filter((notification) =>
+      moment(notification.date + ", " + notification.time).isAfter(
+        moment(Employee.createdat)
+      )
     );
+    setNotificationCount(oldNotificationCount.length);
+    if (
+      unseenNotifications[0]?.title &&
+      oldNotificationCount.length > 0 &&
+      !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
+      Employee.role === "user"
+    ) {
+      const newNotificationTitle =
+        unseenNotifications[0]?.title || "New Notification";
 
-    if (unseenNotifications[0]?.title.length > 0) {
-      setNotificationCount(oldNotificationCount.length>0&&newNotificationCount);
-      if (
-        !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
-        Employee.role == "user"
-      ) {        
-
-
-        const newNotificationTitle =
-          unseenNotifications[0]?.title || "New Notification";
-        toast.success(
-          newNotificationTitle.length > 16
-            ? `${newNotificationTitle.slice(0, 16)}...`
-            : newNotificationTitle,
-          {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          }
-        );
-
-        triggeredNotifications.current.add(unseenNotifications[0]?.id);
-
+      toast.success(
+        newNotificationTitle.length > 16
+          ? `${newNotificationTitle.slice(0, 16)}...`
+          : newNotificationTitle,
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+      unseenNotifications.forEach((notss) => {
+        triggeredNotifications.current.add(notss?.id);
         localStorage.setItem(
           "triggeredNotifications",
           JSON.stringify(Array.from(triggeredNotifications.current))
@@ -148,21 +142,18 @@ export default function DropdownList() {
         const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const data = doc.data();
-            if (data.notificationId === unseenNotifications[0].notificationId) {
+            if (data.notificationId == notss.notificationId) {
               const updatedToastIds = Array.from(
                 new Set([...data.toast, Employee.id])
               );
-              updateDoc(doc.ref, {
-                toast: updatedToastIds,
-              });
+              updateDoc(doc.ref, { toast: updatedToastIds });
             }
           });
         });
-      }
+      });
     }
-
     previousNotificationCount.current = newNotificationCount;
-  }, [notifications, Employee.id, UserRole]);
+  }, [notifications, Employee.id, Employee.createdat, Employee.role]);
 
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
@@ -199,9 +190,9 @@ export default function DropdownList() {
               <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
                 {DevNotifications.map((notification) => (
                   <>
-                    {moment(notification.date + ", " + notification.time).isAfter(
-                      moment(Employee.createdat)
-                    ) && (
+                    {moment(
+                      notification.date + ", " + notification.time
+                    ).isAfter(moment(Employee.createdat)) && (
                       <li
                         key={notification.id}
                         className="pb-3 pt-3 sm:pb-4 mt-2 "
