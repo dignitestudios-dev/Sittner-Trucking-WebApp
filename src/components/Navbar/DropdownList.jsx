@@ -95,20 +95,31 @@ export default function DropdownList() {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
+  
+    // Get all unseen notifications for the current user
     const unseenNotifications = deliveredNotifications.filter(
       (notification) =>
         !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
     );
+  
+    // Update the displayed notifications
     setDevNotifications(deliveredNotifications);
+  
+    // Calculate the new unseen notification count
     const newNotificationCount = unseenNotifications.length;
     Cookies.set("notificationCount", newNotificationCount);
-
+  
+    // Filter old notifications that are newer than the employee's creation date
     const oldNotificationCount = unseenNotifications.filter((notification) =>
       moment(notification.date + ", " + notification.time).isAfter(
         moment(Employee.createdat)
       )
     );
+    
+    // Update the notification count for the employee
     setNotificationCount(oldNotificationCount.length);
+  
+    // Show toast notifications for new unseen notifications
     if (
       unseenNotifications[0]?.title &&
       oldNotificationCount.length > 0 &&
@@ -117,7 +128,7 @@ export default function DropdownList() {
     ) {
       const newNotificationTitle =
         unseenNotifications[0]?.title || "New Notification";
-
+  
       toast.success(
         newNotificationTitle.length > 16
           ? `${newNotificationTitle.slice(0, 16)}...`
@@ -131,13 +142,15 @@ export default function DropdownList() {
           draggable: true,
         }
       );
+      
+      // Mark notifications as triggered
       unseenNotifications.forEach((notss) => {
         triggeredNotifications.current.add(notss?.id);
         localStorage.setItem(
           "triggeredNotifications",
           JSON.stringify(Array.from(triggeredNotifications.current))
         );
-
+        
         const notificationsRef = collection(db, "notification");
         const unsubscribe = onSnapshot(notificationsRef, (querySnapshot) => {
           querySnapshot.forEach((doc) => {
@@ -152,9 +165,11 @@ export default function DropdownList() {
         });
       });
     }
+  
+    // Keep track of the previous notification count
     previousNotificationCount.current = newNotificationCount;
   }, [notifications, Employee.id, Employee.createdat, Employee.role]);
-
+  
   const toggleModal = () => {
     setIsDropdown(!IsDropdownOpen);
   };

@@ -25,23 +25,42 @@ export default function Dropdown() {
       setIsDropdown((prev) => !prev);
       const notificationsRef = collection(db, "notification");
       const querySnapshot = await getDocs(notificationsRef);
+      
+      // Start by updating the notifications in Firestore
       const updates = querySnapshot.docs.map(async (doc) => {
         const seenArray = doc.data()?.seen || [];
-        const hasSeen = seenArray.some(
-          (user) => user.EmployeeId === Employee.id
-        );
+        const hasSeen = seenArray.some((user) => user.EmployeeId === Employee.id);
+  
         if (!hasSeen) {
           const seenData = { EmployeeId: Employee.id };
+          // Update Firestore to mark the notification as seen
           await updateDoc(doc.ref, { seen: [...seenArray, seenData] });
         }
       });
+      
+      // Wait for all Firestore updates to complete
       await Promise.all(updates);
-      setNotificationCount(0);
+  
+      // Recalculate the unseen notifications for this user
+      const deliveredNotifications = notifications.filter(
+        (notification) => notification.status === "Delivered"
+      );
+      
+      const unseenNotifications = deliveredNotifications.filter(
+        (notification) =>
+          !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
+      );
+  
+      // Update the counter
+      const newNotificationCount = unseenNotifications.length;
+      setNotificationCount(newNotificationCount);
+      Cookies.set("notificationCount", newNotificationCount);
+  
     } catch (error) {
       console.error("Error updating notifications: ", error);
     }
   };
-
+  
   return (
     <>
       <button
