@@ -113,12 +113,13 @@ export default function DropdownList() {
     );
 
     if (unseenNotifications[0]?.title.length > 0) {
+      setNotificationCount(oldNotificationCount.length>0&&newNotificationCount);
       if (
         !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
         Employee.role == "user"
       ) {        
 
-        setNotificationCount(oldNotificationCount.length>0&&newNotificationCount);
+
         const newNotificationTitle =
           unseenNotifications[0]?.title || "New Notification";
         toast.success(
