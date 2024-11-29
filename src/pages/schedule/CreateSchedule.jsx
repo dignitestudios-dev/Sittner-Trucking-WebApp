@@ -180,12 +180,12 @@ export default function CreateSchedule() {
                           className="h-[100px] rounded-md w-[100px]"
                         />
                       )}
-                      <button
+                      <div
                         onClick={() => handleRemoveImage(targetIndex)}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-[6px] py-0"
+                        className="absolute cursor-pointer top-0 right-0 bg-red-500 text-white rounded-full px-[6px] py-0"
                       >
                         X
-                      </button>
+                      </div>
                     </div>
                   ))}
                 </div>
