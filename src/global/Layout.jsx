@@ -61,18 +61,19 @@ const Layout = ({ pages }) => {
 
   const clearEmployeeAndNavigate = () => {
     const data = cookieData&&JSON.parse(cookieData);
-    if (data.role=="user") {      
+    
+    if (!data) {      
+      Cookies.remove("employe");         
       setEmployee({});
-      Cookies.set("employe", "");      
+      navigate("/login");
+    }
+    if (data?.role=="user") {      
+      Cookies.remove("employe");      
+      setEmployee({});
       navigate("/login");
     }
     console.log(data,"testing data");
     
-    if (!data) {      
-      setEmployee({});
-      Cookies.set("employe", "");      
-      navigate("/login");
-    }
   };
 
   const getEmployee = (userEmail) => {
