@@ -79,9 +79,7 @@ export default function Look() {
             type: data?.type,
             createdAt: new Date(),
             employeeId: Employee?.id,
-          }).then(() => {
-            alert("hi")
-          });
+          })
         }
       });
 
