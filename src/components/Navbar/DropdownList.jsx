@@ -105,7 +105,7 @@ export default function DropdownList() {
     const newNotificationCount = unseenNotifications.length;
     Cookies.set("notificationCount", newNotificationCount);
     const previousCount = previousNotificationCount.current;
-    const oldNotificationCount=deliveredNotifications.filter(
+    const oldNotificationCount=unseenNotifications.filter(
       (notification) =>
         moment(notification.date + ", " + notification.time).isAfter(
           moment(Employee.createdat)
