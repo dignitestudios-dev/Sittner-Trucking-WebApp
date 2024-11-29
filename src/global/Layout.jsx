@@ -124,7 +124,7 @@ const Layout = ({ pages }) => {
       <div className="w-full relative lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)]   overflow-y-auto overflow-x-hidden">
         <div className="sticky  h-16 bg-white flex items-center justify-between lg:justify-end px-4 z-[99]">
           <button
-            onClick={() => setisOpen((prev) => !prev)}
+            onClick={() => setIsOpen((prev) => !prev)}
             className="lg:hidden block"
           >
             <HiOutlineMenuAlt2 className="text-2xl" />
