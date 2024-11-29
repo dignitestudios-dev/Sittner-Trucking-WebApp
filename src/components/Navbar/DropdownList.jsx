@@ -95,7 +95,6 @@ export default function DropdownList() {
     const deliveredNotifications = notifications.filter(
       (notification) => notification.status === "Delivered"
     );
-
     const unseenNotifications = deliveredNotifications.filter(
       (notification) =>
         !notification?.seen?.some((seen) => seen.EmployeeId === Employee.id)
@@ -106,13 +105,19 @@ export default function DropdownList() {
     const newNotificationCount = unseenNotifications.length;
     Cookies.set("notificationCount", newNotificationCount);
     const previousCount = previousNotificationCount.current;
-    
+    const oldNotificationCount=deliveredNotifications.filter(
+      (notification) =>
+        moment(notification.date + ", " + notification.time).isAfter(
+          moment(Employee.createdat)
+        ) 
+    );
+
     if (unseenNotifications[0]?.title.length > 0) {
       if (
         !triggeredNotifications.current.has(unseenNotifications[0]?.id) &&
         Employee.role == "user"
-      ) {
-        setNotificationCount(newNotificationCount);
+      ) {        
+        setNotificationCount(oldNotificationCount.length>0&&newNotificationCount);
         const newNotificationTitle =
           unseenNotifications[0]?.title || "New Notification";
         toast.success(
@@ -121,7 +126,7 @@ export default function DropdownList() {
             : newNotificationTitle,
           {
             position: "top-right",
-            autoClose: 3000, 
+            autoClose: 3000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -191,37 +196,48 @@ export default function DropdownList() {
             ) : (
               <ul className="max-w-md mt-4 divide-y divide-gray-200 dark:divide-gray-700">
                 {DevNotifications.map((notification) => (
-                  <li key={notification.id} className="pb-3 pt-3 sm:pb-4 mt-2 ">
-                    <div className="flex space-x-4 ">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-bold">
-                          {notification?.title}
-                        </p>
-                        <p className="text-[13px] text-[#909090] font-normal">
-                          {notification.description &&
-                          notification.description.length > 20
-                            ? window.innerWidth <= 768
-                              ? notification.description.slice(0, 20) + "..."
-                              : notification.description.slice(0, 50) + "..."
-                            : notification.description}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <p className="text-xs text-[#717171] font-medium">
-                          {notification.time}
-                        </p>
-                        <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
-                          <span className="">
-                            {notification.seen === "pending" && (
-                              <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
-                                {notification.seen === "pending" ? "1" : ""}
-                              </div>
-                            )}
-                          </span>
+                  <>
+                    {moment(notification.date + ", " + notification.time).isAfter(
+                      moment(Employee.createdat)
+                    ) && (
+                      <li
+                        key={notification.id}
+                        className="pb-3 pt-3 sm:pb-4 mt-2 "
+                      >
+                        <div className="flex space-x-4 ">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-bold">
+                              {notification?.title}
+                            </p>
+                            <p className="text-[13px] text-[#909090] font-normal">
+                              {notification.description &&
+                              notification.description.length > 20
+                                ? window.innerWidth <= 768
+                                  ? notification.description.slice(0, 20) +
+                                    "..."
+                                  : notification.description.slice(0, 50) +
+                                    "..."
+                                : notification.description}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <p className="text-xs text-[#717171] font-medium">
+                              {notification.time}
+                            </p>
+                            <div className="inline-flex items-center justify-end text-base font-semibold text-gray-900">
+                              <span className="">
+                                {notification.seen === "pending" && (
+                                  <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-[#EF5151] text-white">
+                                    {notification.seen === "pending" ? "1" : ""}
+                                  </div>
+                                )}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </li>
+                      </li>
+                    )}
+                  </>
                 ))}
               </ul>
             )}

@@ -34,7 +34,7 @@ const Layout = ({ pages }) => {
     const fetchData = async () => {
       if (cookieData) {
         try {
-          const data = JSON.parse(cookieData);
+          const data = cookieData&&JSON.parse(cookieData);
 
           if (data.email) {
             setEmployee(data);
@@ -60,9 +60,19 @@ const Layout = ({ pages }) => {
   }, [cookieData, setEmployee]);
 
   const clearEmployeeAndNavigate = () => {
-    setEmployee({});
-    Cookies.set("employe", "");
-    navigate("/login");
+    const data = cookieData&&JSON.parse(cookieData);
+    if (data.role=="user") {      
+      setEmployee({});
+      Cookies.set("employe", "");      
+      navigate("/login");
+    }
+    console.log(data,"testing data");
+    
+    if (!data) {      
+      setEmployee({});
+      Cookies.set("employe", "");      
+      navigate("/login");
+    }
   };
 
   const getEmployee = (userEmail) => {
