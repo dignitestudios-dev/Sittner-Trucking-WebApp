@@ -13,7 +13,7 @@ export default function LookBehind({ deliveredNotifications }) {
     setFilterLook(filteredNotifications)
   },[deliveredNotifications])
   return (
-    <div className=" mt-3 h-[100%] scroll-box px-3  overflow-auto">
+    <div className=" mt-3 h-[100%] scroll-box px-3 py-3 overflow-auto">
       {FilterLook && FilterLook.length > 0 ? (
         FilterLook.map((item, i) => (
           <div className="look-behind  px-3 py-3 w-[100%]" key={i}>

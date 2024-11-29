@@ -7,7 +7,7 @@ export default function LookAhead({ pendingNotifications }) {
   const { Employee } = useContext(MyContext);
 
   return (
-    <div className=" mt-3 h-[100%] scroll-box  px-3 overflow-y-scroll">
+    <div className=" mt-3 h-[100%] scroll-box py-3 px-3 overflow-y-scroll">
       {Employee?.role == "admin" && (
         <NavLink
           to={"/createschedule"}
