@@ -16,7 +16,7 @@ export default function LookBehind({ deliveredNotifications }) {
     <div className=" mt-3 h-[100%] scroll-box px-3  overflow-auto">
       {FilterLook && FilterLook.length > 0 ? (
         FilterLook.map((item, i) => (
-          <div className="look-behind   px-3 py-3 w-[100%]" key={i}>
+          <div className="look-behind  px-3 py-3 w-[100%]" key={i}>
             <div className="username mb-3">
               <h2 className="font-semibold text-sm leading-[14px] ">
                 {new Date(item.date).toLocaleDateString("en-US", {
@@ -28,21 +28,23 @@ export default function LookBehind({ deliveredNotifications }) {
               {/* <h3 className="font-semibold text-sm leading-[14px]">
                 Day {new Date(item.date).getDay()}
               </h3> */}
-              <div className="flex items-end justify-between ">
-                <div>
+              <div className={`flex items-end ${item.images.length > 5 && 'flex-wrap' }  justify-between`}>
+                <div className={` ${item.images.length > 5 && 'flex items-center mb-2 justify-between w-full' } `} >
                   <div className=" w-full rounded-2xl mt-2 text-xs font-normal">
                     {item.message}
                   </div>
+                  <div>
                   <span className="text-[12px] font-normal text-[#5C5C5C]">
                     {item.date}
                   </span>
-                  <span className="text-[12px] ml-2 font-normal text-[#5C5C5C]">
+                  <span className="text-[12px] text-nowrap ml-2 font-normal text-[#5C5C5C]">
                     {item.time}
-                  </span>
+                  </span> 
+                  </div>
                 </div>
                 <div>
                   {item.images.length > 0 && (
-                    <div className={`w-full  flex items-center gap-1`}>
+                    <div className={`flex flex-wrap items-center  gap-4`}>
                       {item.images.map((img, index) =>
                         item.type[index]?.includes("image") ? (
                           <div

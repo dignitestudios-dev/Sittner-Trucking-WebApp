@@ -6,42 +6,93 @@ import LogOut from "../components/Logout/LogOut";
 import { MyContext } from "../context/GlobalContext";
 import DropdownList from "../components/Navbar/DropdownList";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie';
-import { auth, onAuthStateChanged,collection, db, getDocs, query,where } from "../firbase/FirebaseInit";
+import Cookies from "js-cookie";
+import {
+  auth,
+  onAuthStateChanged,
+  collection,
+  db,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "../firbase/FirebaseInit";
 
 const Layout = ({ pages }) => {
   const sidebarRef = useRef(null);
-  const [isOpen, setisOpen] = useState(false);
-  const {setEmployee,Employee}=useContext(MyContext);
-  const toggleModal = () => {
-    setisOpen(!isOpen);
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const { setEmployee, setLoader } = useContext(MyContext);
+  const cookieData = Cookies.get("employe");
+
+  const toggleModal = () => setIsOpen((prev) => !prev);
+
+  useEffect(() => {
+    // Set initial cookies state
+    Cookies.set("first", false);
+
+    const fetchData = async () => {
+      if (cookieData) {
+        try {
+          const data = JSON.parse(cookieData);
+
+          if (data.email) {
+            setEmployee(data);
+            getEmployee(data.email); // Fetch employee details
+          } else {
+            clearEmployeeAndNavigate();
+          }
+        } catch (error) {
+          console.error("Error parsing cookie data:", error);
+          clearEmployeeAndNavigate();
+        }
+      } else {
+        clearEmployeeAndNavigate();
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function (unsubscribe from Firebase on component unmount)
+    return () => {
+      setLoader(false); // Ensures loader is off if component unmounts
+    };
+  }, [cookieData, setEmployee]);
+
+  const clearEmployeeAndNavigate = () => {
+    setEmployee({});
+    Cookies.set("employe", "");
+    navigate("/login");
   };
 
-  const navigate = useNavigate();
-  const cookieData = Cookies?.get('employe');
-  useEffect(() => {
-    Cookies.set('first',false);    
-      if (cookieData) {
-          try {
-              const data = JSON?.parse(cookieData);            
-              if (data.email) {
-                  setEmployee(data);
-              } else {
-                  setEmployee({});
-                  navigate('/login');
-              }
-          } catch (error) {
-              console.error("Error parsing cookie data:", error);
-              setEmployee({});
-              navigate('/login');
-          }
-      } else {
-          setEmployee({});
-          navigate('/login');
-      }
-  }, [cookieData]);
-  
+  const getEmployee = (userEmail) => {
+    const employeesRef = collection(db, "employee");
+    const employeeQuery = query(employeesRef);
+    const unsubscribe = onSnapshot(
+      employeeQuery,
+      (querySnapshot) => {
+        const employeeData = querySnapshot.docs.map((doc) => ({
+          docId: doc.id,
+          ...doc.data(),
+        }));
 
+        const currentUser = employeeData.find((emp) => emp.email === userEmail);
+
+        if (!currentUser) {
+          Cookies.set("employe", ""); 
+          clearEmployeeAndNavigate(); 
+        }
+
+       
+      },
+      (error) => {
+        console.error("Error fetching employees: ", error);
+        clearEmployeeAndNavigate();
+      }
+    );
+
+    return () => unsubscribe();
+  };
   return (
     <div className="w-screen h-screen flex justify-start items-start overflow-hidden">
       <div
@@ -70,12 +121,9 @@ const Layout = ({ pages }) => {
           </button>
           <Navbar />
         </div>
-        <div className="" >
-        {pages}
-        </div>
+        <div className="">{pages}</div>
         <DropdownList />
         <LogOut />
-     
       </div>
     </div>
   );

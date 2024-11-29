@@ -18,7 +18,7 @@ import {
   where,
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { FaEyeSlash, FaRegEye } from "react-icons/fa";
 
 export default function AddMember() {
@@ -52,110 +52,121 @@ export default function AddMember() {
   };
 
   const generateUniqueId = async () => {
-    const randomId = Math.floor(100000 + Math.random() * 900000).toString(); 
-    const existingEmployee = await getDocs(query(collection(db, "employee"), where("id", "==", randomId)));
-    
+    const randomId = Math.floor(100000 + Math.random() * 900000).toString();
+    const existingEmployee = await getDocs(
+      query(collection(db, "employee"), where("id", "==", randomId))
+    );
+
     if (!existingEmployee.empty) {
-        return generateUniqueId(); 
+      return generateUniqueId();
     }
     return randomId;
-};
+  };
 
-const handleAddMember = async (e) => {
+  const handleAddMember = async (e) => {
     e.preventDefault();
     const currentUser = JSON.parse(Cookies.get("employe"));
     if (member?.password.length < 6) {
-        return toast("Password must be at least 6 characters");
+      return toast("Password must be at least 6 characters");
     }
-  
-    if (contact.value?.length < 10 ) {
-        return toast("Contact must be at least 10 characters");
+
+    if (contact.value?.length < 10) {
+      return toast("Contact must be at least 10 characters");
     }
     if (contact.value?.length > 11) {
       return toast("Contact must not be more than 11 characters");
-  }
-  
-    const existingEmployeeByEmail = await getDocs(query(collection(db, "employee"), where("email", "==", member?.email)));
-    const existingEmployeeByNumber = await getDocs(query(collection(db, "employee"), where("contact", "==", contact.value)));
-    if (!existingEmployeeByEmail.empty) {
-        return toast("Email is already in use");
-    }else if(!existingEmployeeByNumber.empty){
-      return toast("Number is already in use");
     }
-    else{
+
+    const existingEmployeeByEmail = await getDocs(
+      query(collection(db, "employee"), where("email", "==", member?.email))
+    );
+    const existingEmployeeByNumber = await getDocs(
+      query(collection(db, "employee"), where("contact", "==", contact.value))
+    );
+    if (!existingEmployeeByEmail.empty) {
+      return toast("Email is already in use");
+    } else if (!existingEmployeeByNumber.empty) {
+      return toast("Number is already in use");
+    } else {
       const myPromise = new Promise(async (resolve, reject) => {
         try {
-            const uniqueId = await generateUniqueId();          
-            const storageRef = ref(storage, `member/${uniqueId}`);
-            const uploadTask = uploadBytesResumable(storageRef, image);
-            
-            uploadTask.on(
-                "state_changed",
-                null,
-                (error) => {
-                    reject(error.message);
-                },
-                async () => {
-                    // Convert to Mountain Time Zone (MST/MDT)
-                    const options = {
-                        timeZone: 'America/Denver',
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true,
-                    };
-                    const formatter = new Intl.DateTimeFormat('en-US', options);
-                    const createdAtMountainTime = formatter.format(new Date());
-    
-                    // Adding the new document
-                    await addDoc(collection(db, "employee"), {
-                        contact: contact.value,
-                        address: member?.address,
-                        email: member?.email,
-                        name: member?.name,
-                        password: member?.password,
-                        role: member?.role,
-                        id: uniqueId, 
-                        createdat: createdAtMountainTime,
-                        pic: image ? downloadURL : "",
-                    });
-    
-                    resolve("Member Created");
-                }
-            );
+          const uniqueId = await generateUniqueId();
+          const storageRef = ref(storage, `member/${uniqueId}`);
+          const uploadTask = uploadBytesResumable(storageRef, image);
+
+          uploadTask.on(
+            "state_changed",
+            null,
+            (error) => {
+              reject(error.message);
+            },
+            async () => {
+              // Once upload is complete, get the download URL
+              try {
+                const downloadURL = await getDownloadURL(
+                  uploadTask.snapshot.ref
+                );
+
+                // Convert to Mountain Time Zone (MST/MDT)
+                const options = {
+                  timeZone: "America/Denver",
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: true,
+                };
+                const formatter = new Intl.DateTimeFormat("en-US", options);
+                const createdAtMountainTime = formatter.format(new Date());
+
+                // Adding the new document
+                await addDoc(collection(db, "employee"), {
+                  contact: contact.value,
+                  address: member?.address,
+                  email: member?.email,
+                  name: member?.name,
+                  password: member?.password,
+                  role: member?.role,
+                  id: uniqueId,
+                  createdat: createdAtMountainTime,
+                  pic: image ? downloadURL : "",
+                });
+
+                resolve("Member Created");
+              } catch (error) {
+                reject(error.message);
+              }
+            }
+          );
         } catch (error) {
-            reject(error.message);
+          reject(error.message);
         }
-    });
-    
-    toast.promise(myPromise, {
-        pending: "Adding member...",
-        success: (data) => data,
-        error: (error) => error,
-    }).then(() => {
-        navigate("/employee");
-    });
+      });
+
+      toast
+        .promise(myPromise, {
+          pending: "Adding member...",
+          success: (data) => data,
+          error: (error) => error,
+        })
+        .then(() => {
+          navigate("/employee");
+        });
     }
- 
-};
+  };
 
+  useEffect(() => {
+    if (!image) {
+      setPreview(undefined);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
 
- 
-useEffect(() => {
-  if (!image) {
-      setPreview(undefined)
-      return
-  }
-  const objectUrl = URL.createObjectURL(image)
-  setPreview(objectUrl)
-  return () => URL.revokeObjectURL(objectUrl)
-}, [image])
-
-  
-  
   return (
     <div class="bg-[#F7F7F7] h-[80vh] py-5 px-5 ">
       <NavLink
@@ -170,15 +181,16 @@ useEffect(() => {
         <div class="bg-[#F9FAFB] rounded-[10px] border border-[#E4E4E4] py-3 px-3 lg:py-10 lg:px-10">
           <div className="flex items-center">
             <div className="w-[60px] h-[60px] rounded-full border border-dashed border-[#0A8A33] flex items-center justify-center">
-            {
-              Preview?(
-                <img src={Preview} alt=""  className="w-[55px] h-[55px] rounded-full " srcset="" /> 
-              ):
-              (
-                 <IoMdPerson color="#0A8A33" size={25} />
-              )
-            }
-            
+              {Preview ? (
+                <img
+                  src={Preview}
+                  alt=""
+                  className="w-[55px] h-[55px] rounded-full "
+                  srcset=""
+                />
+              ) : (
+                <IoMdPerson color="#0A8A33" size={25} />
+              )}
             </div>
             <label
               htmlFor="changeprofile"
@@ -253,32 +265,32 @@ useEffect(() => {
                 />
               </div>
               <div className="relative mb-3 col-span-2 lg:col-span-1">
-                  <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
-                    Password
-                  </label>
-                  <input
-                   type={showPassword ? "text" : "password"}
-                    id="password-input"
-                    name="password"
-                    onChange={HandleInput}
-                    value={member.password}
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
-                    required
-                    placeholder="Password"
-                    />
-            <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
-              {showPassword ? (
-                <div onClick={() => setShowPassword(!showPassword)}>
-                  <FaRegEye className="text-gray-400 cursor-pointer" />
+                <label className="text-[13px] mb-1 font-semibold leading-[16.94px]">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password-input"
+                  name="password"
+                  onChange={HandleInput}
+                  value={member.password}
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg   block w-full p-2.5 focus:outline-[#0A8A33] "
+                  required
+                  placeholder="Password"
+                />
+                <div className="absolute inset-y-0 end-0 top-5 flex items-center  pe-3.5 ">
+                  {showPassword ? (
+                    <div onClick={() => setShowPassword(!showPassword)}>
+                      <FaRegEye className="text-gray-400 cursor-pointer" />
+                    </div>
+                  ) : (
+                    <div onClick={() => setShowPassword(!showPassword)}>
+                      {" "}
+                      <FaEyeSlash className="text-gray-400 cursor-pointer" />
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div onClick={() => setShowPassword(!showPassword)}>
-                  {" "}
-                  <FaEyeSlash className="text-gray-400 cursor-pointer" />
-                </div>
-              )}
-            </div>
-          </div>
+              </div>
             </div>
             <div className="flex items-center gap-5 mt-5">
               <button

@@ -108,8 +108,18 @@ export default function MessageList() {
     }
   }, [updateCount]);
   
-
-console.log(scheduled,"scheduledMessage");
+  const [FilterMessages, setFilterMessages] = useState([]);
+  useEffect(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);  
+    const filteredNotifications = scheduled.filter(item => {
+      const itemDate = item.createdAt.toDate();  
+      return itemDate >= sevenDaysAgo; 
+    });
+  
+    setFilterMessages(filteredNotifications);
+  }, [scheduled]);
+  
 
   return (
     <div className="bg-[#FFFFFF] border  scroll-box  overflow-auto h-[70vh]  rounded-[10px] border-[#E4E4E4] mt-6 py-3 px-3 lg:py-6  lg:px-10">
@@ -120,7 +130,7 @@ console.log(scheduled,"scheduledMessage");
           No scheduled items available.
         </div>
       ) : (
-        scheduled.map((item, i) => (
+        FilterMessages.map((item, i) => (
           <div
             key={i}
             className="flex mb-2 items-center justify-between border-b-2 py-4 border-[#F4F4F4]"
@@ -139,7 +149,7 @@ console.log(scheduled,"scheduledMessage");
                         <img
                           src={img.url}
                           alt=""
-                          className="rounded-lg w-auto h-[80px] "
+                          className="rounded-lg w-[70px] h-[40px] "
                         />
                       </div>
                     ) : (

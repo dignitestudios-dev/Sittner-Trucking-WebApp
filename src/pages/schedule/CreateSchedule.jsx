@@ -115,7 +115,7 @@ export default function CreateSchedule() {
   };
 
   return (
-    <div class="bg-[#F7F7F7] h-[100vh] py-5 px-5 ">
+    <div class="bg-[#F7F7F7] h-[90vh] py-5 px-5 ">
       <NavLink
         to={locationState.state.collection == "look" ? "/" : "/schedule"}
         className="font-semibold text-[24px] leading-[29px] flex items-center"
@@ -124,7 +124,7 @@ export default function CreateSchedule() {
         <IoMdArrowBack size={25} className="mr-2" /> Create Message
       </NavLink>
 
-      <div class="bg-[#FFFFFF] mb-3 h-[80%] border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">
+      <div class="bg-[#FFFFFF] mb-3 h-auto border rounded-[10px] border-[#E4E4E4] mt-6 px-3 lg:py-5 lg:px-10">
         <form onSubmit={HandleScheduled}>
           <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
             <div className="mb-1 col-span-2">
