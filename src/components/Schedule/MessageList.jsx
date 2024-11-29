@@ -22,9 +22,10 @@ export default function MessageList() {
     setIsDeleteProfile,
     setLoader,
     loader,
+    updateCount,
+    setUpdateCount
   } = useContext(MyContext);
   const [scheduled, setScheduled] = useState([]);
-  const [updateCount, setUpdateCount] = useState(0);
   
   const getEmployees = () => {
     const employeesRef = collection(db, "scheduled");

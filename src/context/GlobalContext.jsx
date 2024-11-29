@@ -1,5 +1,17 @@
 import React, { createContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import {
+  collection,
+  db,
+  onSnapshot,
+  query,
+  getDocs,
+  addDoc,
+  updateDoc,
+  orderBy,
+} from "../firbase/FirebaseInit";
+import Cookies from "js-cookie";
+import moment from "moment";
+import "moment-timezone";
 export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
@@ -34,7 +46,7 @@ export const MyContextProvider = ({ children }) => {
   const [NotificationCount, setNotificationCount] = useState(0);
   const [SelectedDate, setSelectDate] = useState();
   const [SelectedTime, setSelectTime] = useState();
-
+  const [updateCount, setUpdateCount] = useState(0);
   useEffect(() => {
     const currentTime = new Date();
     // Mountain Time ke liye date aur time format karna
@@ -77,7 +89,54 @@ export const MyContextProvider = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [displaySize]);
 
-  const NotificationCall = () => {};
+  useEffect(() => {
+    const checkAndSendNotifications = async (empData) => {
+      const notificationsRef = collection(db, "scheduled");
+      const messageRef = collection(db, "message");
+
+      const querySnapshot = await getDocs(notificationsRef);
+      const updates = [];
+
+      const now = moment.tz("America/Denver");
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const notificationDate = moment.tz(
+          `${data.date} ${data.time}`,
+          "MM/DD/YYYY h:mm A",
+          "America/Denver"
+        );
+        if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
+          updates.push(updateDoc(doc.ref, { status: "Sent" }));
+          updates.push(
+            addDoc(messageRef, {
+              time: data?.time,
+              message: data?.message,
+              UserMsgSeen: [],
+              images: data?.images,
+              id: data.id,
+              type: data?.type,
+              createdAt: new Date(),
+              employeeId: empData?.id,
+            })
+          );
+        }
+      });
+
+      await Promise.all(updates);
+    };
+
+    const cookieData = Cookies.get("employe");
+    if (cookieData) {
+      const empData = JSON.parse(cookieData);
+      const intervalId = setInterval(() => {
+        checkAndSendNotifications(empData);
+      }, 5000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [updateCount]);
 
   return (
     <MyContext.Provider
@@ -148,7 +207,8 @@ export const MyContextProvider = ({ children }) => {
         ForgetEmail,
         msgSeenEmp,
         setMsgSeenEmp,
-        NotificationCall,
+        updateCount,
+        setUpdateCount,
       }}
     >
       {children}
