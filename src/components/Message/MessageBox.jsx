@@ -58,14 +58,14 @@ export default function MessageBox() {
 
   const handleInputResize = () => {
     if (textareaRef.current) {
-      if (UserMsg.length>30) {      
+      if (UserMsg.length > 30) {
         textareaRef.current.style.height = "auto"; // Reset height to auto
         textareaRef.current.style.height = `${
           textareaRef.current.scrollHeight > 100
-          ? 100
-          : textareaRef.current.scrollHeight
-          }px`;      
-        }
+            ? 100
+            : textareaRef.current.scrollHeight
+        }px`;
+      }
     }
   };
 
@@ -87,8 +87,8 @@ export default function MessageBox() {
           msgArray.push({ docId: doc.id, ...doc.data() });
         });
         SetMessages(msgArray);
-        console.log(msgArray,"msg--->array");
-        
+        console.log(msgArray, "msg--->array");
+
         setIsAttachments(msgArray);
         setLoader(false);
         setTimeout(() => {
@@ -216,9 +216,9 @@ export default function MessageBox() {
   };
 
   const handleChange = (e) => {
-    if (e.target.value=="") {
+    if (e.target.value == "") {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `50px`;   
+      textareaRef.current.style.height = `50px`;
     }
     setUserMsg(e.target.value);
   };
@@ -347,16 +347,33 @@ export default function MessageBox() {
   const [FilterMessages, setFilterMessages] = useState([]);
   useEffect(() => {
     const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);  
-    const filteredNotifications = Message.filter(item => {
-      const itemDate = item.createdAt.toDate();  
-      return itemDate >= sevenDaysAgo; 
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 14);
+    const filteredNotifications = Message.filter((item) => {
+      const itemDate = item.createdAt.toDate();
+      return itemDate >= sevenDaysAgo;
     });
-  
     setFilterMessages(filteredNotifications);
   }, [Message]);
-  
 
+  const groupMessagesByDate = (messages) => {
+    return messages.reduce((acc, message) => {
+      // Convert Firebase timestamp to JavaScript Date
+      const firebaseTimestamp = message.createdAt; // Assuming message.createdAt is a Firebase Timestamp
+      const messageDate = new Date(firebaseTimestamp.seconds * 1000).toLocaleDateString(); // Multiply seconds by 1000 to get milliseconds
+      
+      console.log(messageDate, firebaseTimestamp.seconds, "message createdAt");
+  
+      if (!acc[messageDate]) {
+        acc[messageDate] = []; // create a new array if the date doesn't exist yet
+      }
+      acc[messageDate].push(message); // push the message into the correct date group
+      return acc;
+    }, {});
+  };
+
+
+
+  const groupedMessages = groupMessagesByDate(FilterMessages);
   return (
     <div className="bg-[#FFFFFF] w-full h-[78vh] md:h-[80%] lg:h-[630px] relative rounded-[24px]">
       {/* Message Head */}
@@ -425,182 +442,163 @@ export default function MessageBox() {
           <Loader />
         ) : (
           <>
-            <div className="flex justify-center py-2">
-              <span className="bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal">
-                Today
-              </span>
-            </div>
             {/* Messages */}
-            {FilterMessages?.map((msg, i) => (
-              <div
-                key={i}
-                className={`left-side ${
-                  Employee?.role == "admin" && "ms-auto"
-                } mb-3 px-3 py-3 msg-list w-auto lg:max-w-[100%]`}
-              >
-                {Employee?.role == "user" && (
-                  <div className="username mb-3">
-                    <h2 className="font-semibold text-sm leading-[14px] ">
-                      Admin
-                    </h2>
-                  </div>
-                )}
-                <div className="w-full py-2">
-                  {msg.message && (
-                    <div
-                      className={` ${
-                        Employee?.role == "admin"
-                          ? "bg-[#0A8A33] text-white ms-auto"
-                          : "bg-[#F4F4F4] "
-                      } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
-                    >
-                      {/* <a
-                        href={msg.message.includes("https://") && msg.message}
-                        target="_blank"
-                      >
-                        {msg.message}
-                      </a> */}
-                      <span>{separateLinks(msg.message)}</span>
-                    </div>
-                  )}
-                  {msg.images.length > 0 && (
-                    <div
-                      className={`w-full py-3 grid  grid-cols-3 lg:grid-cols-5 gap-3  ${
-                        Employee?.role == "admin" && ""
-                      }`}
-                    >
-                      {msg.images.map((img, index) =>
-                        msg.type[index]?.includes("image") ? (
-                          <div
-                          key={index}
-                          className="rounded-xl flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
-                        >
-                          <IonPhotoViewer src={img.url}>
-                            <img
-                              alt="Image alt"
-                              className="cursor-pointer rounded-md max-h-[80px] w-auto max-w-[100%] block"
-                              src={img.url}
-                            />
-                          </IonPhotoViewer>
-                          </div>
-                        ) : msg.type[index]?.includes("video") ? (
-                          <div
-                            key={index}
-                            className="rounded-xl col-span-2 md:col-span-1 flex justify-center items-center  bg-[#F4F4F4] text-xs font-normal"
-                          >
-                            <video
-                            width="400"
-                              className="cursor-pointer max-w-[100%] h-auto rounded-md"
-                              onClick={() => {}}
-                              controls
-                              src={img.url}
-                            />
-                          </div>
-                        ) : msg.type[index]?.includes("spreadsheetml") ? (
-                          <div
-                            key={index}
-                            className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
-                          >
-                            <a
-                              href={img.url}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <img
-                                src="/xl.png"
-                                className="cursor-pointer"
-                                alt="xlsx"
-                              />
-                            </a>
-                          </div>
-                        ) : (
-                          <div
-                            key={index}
-                            className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
-                          >
-                            <a
-                              href={img.url}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <img
-                                src="/pdf.png"
-                                className="cursor-pointer"
-                                alt="pdf"
-                              />
-                            </a>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 justify-end">
-                  {Employee?.role == "admin" && (
-                    <div className="flex items-center gap-2 ">
-                      {/* {
-                        msgSeenEmp.slice(0,4).filter((fil)=>fil.role!="admin").map((seen,i)=>(
-                                                  
-                      <div className={`msg-view ${col_Array[i]} w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full`}>
-                        <img
-                          src={seen.pic?seen.pic:"/noprofile.png"}
-                          className="w-full h-full rounded-full "
-                          alt=""
-                          srcset=""
-                        />
-                      </div>
-                     
-                       ))
-                      }
-                       {
-                    msgSeenEmp.length>3&&(
-                      <div className={`msg-view bg-[#0A8A33] text-white w-[30px] h-[30px] flex p-1 items-center justify-center rounded-full`}>
-                       <span className="font-[20px]" >{msgSeenEmp.length}+</span>
-                    </div>
-                    )
-                  } */}
-                      <img
-                        src="/tick-double.png"
-                        onClick={() => {
-                          const seenEmployeeData = msg.UserMsgSeen.map(
-                            (user) => ({
-                              EmployeeId: user.EmployeeId,
-                              seenTime: user.seenTime,
-                            })
-                          );
-                          const seenEmployeeIds = seenEmployeeData.map(
-                            (user) => user.EmployeeId
-                          );
-                          const getMsgSeenEmp = employee
-                            .map((emp) => {
-                              const seenRecord = seenEmployeeData.find(
-                                (user) => user.EmployeeId === emp.id
-                              );
-                              return {
-                                ...emp,
-                                seenTime: seenRecord
-                                  ? seenRecord.seenTime
-                                  : null,
-                              };
-                            })
-                            .filter((emp) => seenEmployeeIds.includes(emp.id));
-
-                          setIsMessageSeen(msg.UserMsgSeen);
-                          setMsgSeenEmp(getMsgSeenEmp);
-                          setIsMessageInfo(true);
-                        }}
-                        className="w-5 cursor-pointer ml-1"
-                        alt=""
-                      />
-                    </div>
-                  )}
-
-                  <span className=" text-[10px] font-normal leading-[10px] text-[#797C7B]">
-                    {msg?.time}
+            {Object.keys(groupedMessages).map((date, index) => (
+              <div key={index}>
+                {/* Show the date only once for each group */}
+                <div className="flex justify-center py-2">
+                  <span className="bg-[#F4F4F4] rounded-full px-2 py-1 text-xs font-normal">
+                    {date}
                   </span>
                 </div>
+
+                {/* Render all the messages for that specific date */}
+                {groupedMessages[date].map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`left-side ${
+                      Employee?.role == "admin" && "ms-auto"
+                    } mb-3 px-3 py-3 msg-list w-auto lg:max-w-[100%]`}
+                  >
+                    {Employee?.role == "user" && (
+                      <div className="username mb-3">
+                        <h2 className="font-semibold text-sm leading-[14px]">
+                          Admin
+                        </h2>
+                      </div>
+                    )}
+                    <div className="w-full py-2">
+                      {msg.message && (
+                        <div
+                          className={`${
+                            Employee?.role == "admin"
+                              ? "bg-[#0A8A33] text-white ms-auto"
+                              : "bg-[#F4F4F4] "
+                          } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
+                        >
+                          <span>{separateLinks(msg.message)}</span>
+                        </div>
+                      )}
+                      {msg.images.length > 0 && (
+                        <div
+                          className={`w-full py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
+                            Employee?.role == "admin" && ""
+                          }`}
+                        >
+                          {msg.images.map((img, index) =>
+                            msg.type[index]?.includes("image") ? (
+                              <div
+                                key={index}
+                                className="rounded-xl flex justify-center items-center bg-[#F4F4F4] text-xs font-normal"
+                              >
+                                <IonPhotoViewer src={img.url}>
+                                  <img
+                                    alt="Image alt"
+                                    className="cursor-pointer rounded-md max-h-[80px] w-auto max-w-[100%] block"
+                                    src={img.url}
+                                  />
+                                </IonPhotoViewer>
+                              </div>
+                            ) : msg.type[index]?.includes("video") ? (
+                              <div
+                                key={index}
+                                className="rounded-xl col-span-2 md:col-span-1 flex justify-center items-center bg-[#F4F4F4] text-xs font-normal"
+                              >
+                                <video
+                                  width="400"
+                                  className="cursor-pointer max-w-[100%] h-auto rounded-md"
+                                  onClick={() => {}}
+                                  controls
+                                  src={img.url}
+                                />
+                              </div>
+                            ) : msg.type[index]?.includes("spreadsheetml") ? (
+                              <div
+                                key={index}
+                                className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
+                              >
+                                <a
+                                  href={img.url}
+                                  download
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <img
+                                    src="/xl.png"
+                                    className="cursor-pointer"
+                                    alt="xlsx"
+                                  />
+                                </a>
+                              </div>
+                            ) : (
+                              <div
+                                key={index}
+                                className="rounded-xl flex justify-center px-2 py-2 bg-[#F4F4F4] text-xs font-normal"
+                              >
+                                <a
+                                  href={img.url}
+                                  download
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <img
+                                    src="/pdf.png"
+                                    className="cursor-pointer"
+                                    alt="pdf"
+                                  />
+                                </a>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 justify-end">
+                      {Employee?.role == "admin" && (
+                        <div className="flex items-center gap-2 ">
+                          <img
+                            src="/tick-double.png"
+                            onClick={() => {
+                              const seenEmployeeData = msg.UserMsgSeen.map(
+                                (user) => ({
+                                  EmployeeId: user.EmployeeId,
+                                  seenTime: user.seenTime,
+                                })
+                              );
+                              const seenEmployeeIds = seenEmployeeData.map(
+                                (user) => user.EmployeeId
+                              );
+                              const getMsgSeenEmp = employee
+                                .map((emp) => {
+                                  const seenRecord = seenEmployeeData.find(
+                                    (user) => user.EmployeeId === emp.id
+                                  );
+                                  return {
+                                    ...emp,
+                                    seenTime: seenRecord
+                                      ? seenRecord.seenTime
+                                      : null,
+                                  };
+                                })
+                                .filter((emp) =>
+                                  seenEmployeeIds.includes(emp.id)
+                                );
+
+                              setIsMessageSeen(msg.UserMsgSeen);
+                              setMsgSeenEmp(getMsgSeenEmp);
+                              setIsMessageInfo(true);
+                            }}
+                            className="w-5 cursor-pointer ml-1"
+                            alt=""
+                          />
+                        </div>
+                      )}
+                      <span className="text-[10px] font-normal leading-[10px] text-[#797C7B]">
+                        {msg?.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </>
