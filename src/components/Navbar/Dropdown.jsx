@@ -60,6 +60,9 @@ export default function Dropdown() {
       console.error("Error updating notifications: ", error);
     }
   };
+
+  
+ 
   
   return (
     <>
