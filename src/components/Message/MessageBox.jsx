@@ -494,10 +494,18 @@ export default function MessageBox() {
                       {msg.message && (
                         <div
                           className="flex"
-                          onMouseLeave={() => setCurrentInd(null)}
+                          onMouseLeave={(e) => {
+                            console.log(currentInd)
+                            setCurrentInd(null)
+                          }}
                         >
                           <div
-                            onMouseOver={() => setCurrentInd(i)}
+                            onMouseOver={() =>{
+                              
+                              setCurrentInd(msg.docId)
+                              
+                              console.log(msg.docId)
+                              }}
                             className={`${
                               Employee?.role == "admin"
                                 ? "bg-[#0A8A33] text-white ms-auto"
@@ -506,8 +514,8 @@ export default function MessageBox() {
                           >
                             <span>{separateLinks(msg.message)}</span>
                           </div>
+                            {currentInd ==  msg.docId&& (
                           <div>
-                            {currentInd == i && (
                               <button
                                 onClick={() => {
                                   setSelectedMessage(msg);
@@ -516,8 +524,8 @@ export default function MessageBox() {
                               >
                                 <CiTrash size={20} color="#797C7B" />
                               </button>
-                            )}
                           </div>
+                            )}
                         </div>
                       )}
                       {msg.images.length > 0 && (
@@ -594,7 +602,7 @@ export default function MessageBox() {
                             )
                           )}
                            <div>
-                            {currentInd == i && (
+                            {currentInd == msg?.docId && (
                               <button
                                 onClick={() => {
                                   setSelectedMessage(msg);
