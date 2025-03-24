@@ -62,7 +62,6 @@ export default function CreateSchedule() {
     const loadingToastId = toast.loading("Uploading...");
     try {
       // console.log(SelectedDate, SelectedTime, "selectedDatess");
-
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);

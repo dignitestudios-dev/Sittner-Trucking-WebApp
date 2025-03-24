@@ -8,6 +8,8 @@ import {
   addDoc,
   collection,
   db,
+  deleteDoc,
+  deleteObject,
   doc,
   getCountFromServer,
   getDocs,
@@ -25,6 +27,9 @@ import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
 import IonPhotoViewer from "@codesyntax/ionic-react-photo-viewer";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { CiTrash } from "react-icons/ci";
+import DeleteMessageModal from "./DeleteMessage";
 export default function MessageBox() {
   const {
     LookScreen,
@@ -51,11 +56,14 @@ export default function MessageBox() {
   const [images, setImages] = useState([]);
   const [sentMessage, setSentMessage] = useState(0);
   const [sentLoad, setSentLoad] = useState(false);
+  const [deleteModal,setDeleteModal] = useState(false);
   const loc = useLocation();
   const msgBodyScroll = useRef();
   const [EmployeeCount, setEmployeeCount] = useState();
   const textareaRef = useRef(null);
-
+  const [currentInd, setCurrentInd] = useState();
+  const [selectedMessage,setSelectedMessage]=useState(false);
+  
   const handleInputResize = () => {
     if (textareaRef.current) {
       if (UserMsg.length > 30) {
@@ -68,10 +76,6 @@ export default function MessageBox() {
       }
     }
   };
-
-  // useEffect(() => {
-  //   handleInputResize();
-  // }, [UserMsg]);
 
   useEffect(() => {
     if (sentMessage === 0) {
@@ -158,13 +162,14 @@ export default function MessageBox() {
     const imageUrls = [];
     const docType = [];
 
+    setUserMsg("");
     try {
       const uniqueId = await generateUniqueId();
       for (const image of images) {
         const storageRef = ref(storage, `images/${uniqueId + image.name}`);
         await uploadBytesResumable(storageRef, image);
         const url = await getDownloadURL(storageRef);
-        imageUrls.push({ url: url, name: image.name });
+        imageUrls.push({ url: url, name: uniqueId + image.name });
         docType.push(image.type);
       }
       const options = { timeZone: "America/Denver" };
@@ -185,7 +190,6 @@ export default function MessageBox() {
         employeeId: Employee.id,
       });
       setImages([]);
-      setUserMsg("");
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `50px`;
       toast.update(loadingToastId, {
@@ -284,7 +288,6 @@ export default function MessageBox() {
     return () => unsubscribe();
   }, []);
 
-  const col_Array = ["bg-[#E8F569]", "bg-[#B9FF9E]", "bg-[#94D0E4]"];
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -357,21 +360,41 @@ export default function MessageBox() {
 
   const groupMessagesByDate = (messages) => {
     return messages.reduce((acc, message) => {
-      // Convert Firebase timestamp to JavaScript Date
-      const firebaseTimestamp = message.createdAt; // Assuming message.createdAt is a Firebase Timestamp
-      const messageDate = new Date(firebaseTimestamp.seconds * 1000).toLocaleDateString(); // Multiply seconds by 1000 to get milliseconds
-      
-      console.log(messageDate, firebaseTimestamp.seconds, "message createdAt");
-  
+      const firebaseTimestamp = message.createdAt;
+      const messageDate = new Date(
+        firebaseTimestamp.seconds * 1000
+      ).toLocaleDateString();
       if (!acc[messageDate]) {
-        acc[messageDate] = []; // create a new array if the date doesn't exist yet
+        acc[messageDate] = [];
       }
       acc[messageDate].push(message); // push the message into the correct date group
       return acc;
     }, {});
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteDoc(doc(db, "message", selectedMessage?.docId));
+      if (selectedMessage.images.length > 0) {
+        selectedMessage.images.forEach((el) => {
+          console.log(el);
+          const desertRef = ref(storage, `images/${el?.name}`);
+          deleteObject(desertRef)
+            .then(() => {
+              console.log("deleted Image");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
+      }
+      console.log(selectedMessage, "success fulyy deleted");
+    } catch (error) {
+      console.log(error);
+    }
 
+    console.log(selectedMessage, "test");
+  };
 
   const groupedMessages = groupMessagesByDate(FilterMessages);
   return (
@@ -467,20 +490,40 @@ export default function MessageBox() {
                         </h2>
                       </div>
                     )}
-                    <div className="w-full py-2">
+                    <div className="w-full  py-2">
                       {msg.message && (
                         <div
-                          className={`${
-                            Employee?.role == "admin"
-                              ? "bg-[#0A8A33] text-white ms-auto"
-                              : "bg-[#F4F4F4] "
-                          } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
+                          className="flex"
+                          onMouseLeave={() => setCurrentInd(null)}
                         >
-                          <span>{separateLinks(msg.message)}</span>
+                          <div
+                            onMouseOver={() => setCurrentInd(i)}
+                            className={`${
+                              Employee?.role == "admin"
+                                ? "bg-[#0A8A33] text-white ms-auto"
+                                : "bg-[#F4F4F4] "
+                            } w-full rounded-2xl rounded-tr-none break-words lg:w-[30%]  px-2 py-3 text-xs font-normal`}
+                          >
+                            <span>{separateLinks(msg.message)}</span>
+                          </div>
+                          <div>
+                            {currentInd == i && (
+                              <button
+                                onClick={() => {
+                                  setSelectedMessage(msg);
+                                  setDeleteModal(!deleteModal);
+                                }}
+                              >
+                                <CiTrash size={20} color="#797C7B" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
                       {msg.images.length > 0 && (
                         <div
+                        onMouseLeave={() => setCurrentInd(null)}
+                        onMouseOver={() => setCurrentInd(i)}
                           className={`w-full py-3 grid grid-cols-3 lg:grid-cols-5 gap-3  ${
                             Employee?.role == "admin" && ""
                           }`}
@@ -550,8 +593,21 @@ export default function MessageBox() {
                               </div>
                             )
                           )}
+                           <div>
+                            {currentInd == i && (
+                              <button
+                                onClick={() => {
+                                  setSelectedMessage(msg);
+                                  setDeleteModal(!deleteModal);
+                                }}
+                              >
+                                <CiTrash size={20} color="#797C7B" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
+
                     </div>
                     <div className="flex items-center gap-1 justify-end">
                       {Employee?.role == "admin" && (
@@ -702,6 +758,9 @@ export default function MessageBox() {
           </form>
         </div>
       )}
+
+
+      <DeleteMessageModal deleteModal={deleteModal} setDeleteModal={setDeleteModal} handleDelete={handleDelete} />
     </div>
   );
 }
