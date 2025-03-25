@@ -46,7 +46,7 @@ export default function Login() {
       }));
       if (employeeData.length > 0) {
         setEmployee(employeeData[0]);
-        Cookies.set("employe", JSON.stringify(employeeData[0]));
+        Cookies.set("employe", JSON.stringify(employeeData[0]),{expires:60});
         setLoader(false);
       } else {
         setLoader(false);
