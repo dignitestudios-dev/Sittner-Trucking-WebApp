@@ -4,13 +4,10 @@ import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/GlobalContext";
 import {
-  auth,
   collection,
   db,
   getDocs,
-  onAuthStateChanged,
   query,
-  signInWithEmailAndPassword,
   where,
 } from "../../firbase/FirebaseInit";
 import { toast } from "react-toastify";

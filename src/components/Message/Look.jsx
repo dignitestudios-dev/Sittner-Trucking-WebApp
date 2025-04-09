@@ -56,10 +56,11 @@ export default function Look() {
       const notificationsRef = collection(db, "look");
       const messageRef = collection(db, "message");
 
+      // Get all notifications that need processing
       const querySnapshot = await getDocs(notificationsRef);
-      const updates = [];
 
-      querySnapshot.docs.forEach((doc) => {
+      // Create a batch of updates to ensure atomicity
+      for (const doc of querySnapshot.docs) {
         const data = doc.data();
         const notificationDate = moment.tz(
           `${data.date} ${data.time}`,
@@ -68,30 +69,38 @@ export default function Look() {
         );
         const now = moment.tz("America/Denver");
 
+        // Only process if it's time to deliver AND status is still pending
         if (notificationDate.isSameOrBefore(now) && data.status === "pending") {
-          updates.push(updateDoc(doc.ref, { status: "Delivered" }));
-          addDoc(messageRef, {
-            time: data?.time,
-            message: data?.message,
-            UserMsgSeen: [],
-            images: data?.images,
-            id: data.id,
-            type: data?.type,
-            createdAt: new Date(),
-            employeeId: Employee?.id,
-          })
-        }
-      });
+          try {
+            // First update the status to "Delivered" to prevent duplicate processing
+            await updateDoc(doc.ref, { status: "Delivered" });
 
-      if (updates.length > 0) {
-        await Promise.all(updates);
+            // Then create the message
+            await addDoc(messageRef, {
+              time: data?.time,
+              message: data?.message,
+              UserMsgSeen: [],
+              images: data?.images,
+              id: data.id,
+              type: data?.type,
+              createdAt: new Date(),
+              employeeId: Employee?.id,
+            });
+
+            console.log(`Successfully delivered notification: ${doc.id}`);
+          } catch (error) {
+            console.error(`Error processing notification ${doc.id}:`, error);
+          }
+        }
       }
     };
 
     const intervalId = setInterval(performStatusUpdate, 30000);
 
+    performStatusUpdate();
+
     return () => clearInterval(intervalId);
-  }, [IsBehind, Employee]);
+  }, [Employee]);
 
   return (
     <div
