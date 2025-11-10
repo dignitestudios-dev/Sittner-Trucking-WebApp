@@ -3,10 +3,12 @@ import { NavLink, useLocation } from "react-router-dom";
 import { admin_links, links } from "../constants/SideBar";
 import { IoExitOutline } from "react-icons/io5";
 import { MyContext } from "../context/GlobalContext";
-export default function Sidebar() {
+import { CiSettings } from "react-icons/ci";
+export default function Sidebar({setIsOpen}) {
   const pathName = useLocation();
-  const { setIsLogOut,Employee } = useContext(MyContext);
+  const { setIsLogOut, Employee } = useContext(MyContext);
   const [user, setUser] = useState("");
+
 
   useEffect(() => {
     if (Employee?.role == "admin") {
@@ -34,7 +36,7 @@ export default function Sidebar() {
                     : "text-[#9F9F9F]"
                 } `}
               >
-                <span className="">{e.img}</span>
+                <span className="text-[20px]" >{e.img}</span>
                 <span className="ml-2"> {e.title}</span>
               </NavLink>
             ))}
@@ -43,17 +45,28 @@ export default function Sidebar() {
               <NavLink
                 key={i}
                 to={e?.to}
-                state={{id:e.title=="Profile"&&Employee?.id}}
+                state={{ id: e.title == "Profile" && Employee?.id }}
                 className={`flex text-sm items-center font-normal mt-3 px-4 py-2  ${
                   pathName.pathname == e?.to
                     ? "bg-[#0A8A33] text-white rounded-xl h-[40px]"
                     : "text-[#9F9F9F]"
                 } `}
               >
-                <span className="">{e.img}</span>
+                <span className=""  >{e.img}</span>
                 <span className="ml-2"> {e.title}</span>
               </NavLink>
             ))}
+          <button
+            className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
+            onClick={() => {
+              setIsOpen(true);
+            }}
+          >
+            <span className="">
+              <CiSettings size={20} />
+            </span>
+            <span className="ml-2">Settings</span>
+          </button>
           <button
             className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
             onClick={() => {
@@ -61,12 +74,13 @@ export default function Sidebar() {
             }}
           >
             <span className="">
-              <IoExitOutline />
+              <IoExitOutline size={20} />
             </span>
             <span className="ml-2">Log Out</span>
           </button>
         </nav>
       </div>
+   
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   where,
   onSnapshot,
 } from "../firbase/FirebaseInit";
+import SettingModal from "./SettingModal";
 
 const Layout = ({ pages }) => {
   const sidebarRef = useRef(null);
@@ -24,7 +25,7 @@ const Layout = ({ pages }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { setEmployee, setLoader } = useContext(MyContext);
   const cookieData = Cookies.get("employe");
-
+  const [settingModal, setSettingModal] = useState(false);
   const toggleModal = () => setIsOpen((prev) => !prev);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const Layout = ({ pages }) => {
     const fetchData = async () => {
       if (cookieData) {
         try {
-          const data = cookieData&&JSON.parse(cookieData);
+          const data = cookieData && JSON.parse(cookieData);
 
           if (data.email) {
             setEmployee(data);
@@ -60,20 +61,19 @@ const Layout = ({ pages }) => {
   }, [cookieData, setEmployee]);
 
   const clearEmployeeAndNavigate = () => {
-    const data = cookieData&&JSON.parse(cookieData);
-    
-    if (!data) {      
-      Cookies.remove("employe");         
+    const data = cookieData && JSON.parse(cookieData);
+
+    if (!data) {
+      Cookies.remove("employe");
       setEmployee({});
       navigate("/login");
     }
-    if (data?.role=="user") {      
-      Cookies.remove("employe");      
+    if (data?.role == "user") {
+      Cookies.remove("employe");
       setEmployee({});
       navigate("/login");
     }
-    console.log(data,"testing data");
-    
+    console.log(data, "testing data");
   };
 
   const getEmployee = (userEmail) => {
@@ -90,11 +90,9 @@ const Layout = ({ pages }) => {
         const currentUser = employeeData.find((emp) => emp.email === userEmail);
 
         if (!currentUser) {
-          Cookies.set("employe", ""); 
-          clearEmployeeAndNavigate(); 
+          Cookies.set("employe", "");
+          clearEmployeeAndNavigate();
         }
-
-       
       },
       (error) => {
         console.error("Error fetching employees: ", error);
@@ -118,7 +116,7 @@ const Layout = ({ pages }) => {
             isOpen ? " lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
           } lg:static w-[60%] z-[2000] lg:z-auto lg:w-60 xl:w-72 flex flex-col gap-3 items-center justify-start py-0 h-full bg-[#181818]`}
         >
-          <Sidebar />
+          <Sidebar isOpen={settingModal} setIsOpen={setSettingModal} />
         </div>
       </div>
 
@@ -130,11 +128,12 @@ const Layout = ({ pages }) => {
           >
             <HiOutlineMenuAlt2 className="text-2xl" />
           </button>
-          <Navbar />
+          <Navbar  />
         </div>
         <div className="">{pages}</div>
         <DropdownList />
         <LogOut />
+        <SettingModal isOpen={settingModal} setIsOpen={setSettingModal} />
       </div>
     </div>
   );
