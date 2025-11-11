@@ -34,6 +34,7 @@ export const MyContextProvider = ({ children }) => {
   const [MessageInfo, setIsMessageInfo] = useState(false);
   const [viewImage, setIviewImage] = useState(false);
   const [token, setToken] = useState("");
+  const [ForgetToken, setForgetToken] = useState("");
   const [sideDraw, setSideDraw] = useState(false);
   const [LookAhedDraw, setLookAhedDraw] = useState(false);
   const [Employee, setEmployee] = useState({});
@@ -150,6 +151,7 @@ export const MyContextProvider = ({ children }) => {
         ChangePassword,
         setIsChangePassword,
         LogOut,
+        setForgetToken,ForgetToken,
         setIsLogOut,
         setIsDropdown,
         IsDropdownOpen,

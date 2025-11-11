@@ -3,7 +3,6 @@ import { useContext, useState } from "react";
 import { MyContext } from "../../context/GlobalContext";
 
 export default function OtpCom() {
-    const [code, setCode] = useState("");
     const {setOtpVal,OtpVal}=useContext(MyContext);
 
     const handleChange = (code) => setOtpVal(code);

@@ -13,20 +13,23 @@ import {
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const { setOtp, setForgetEmail, setOtpVal, setLoader, loader } =
+  const { setOtp, setForgetEmail, setOtpVal, setLoader, loader,setForgetToken } =
     useContext(MyContext);
   const navigate = useNavigate("");
 
   const sendOTP = async (e) => {
     e.preventDefault();
- 
     setLoader(true);
     setOtpVal("");
     setForgetEmail(email);
+
     const toastId = toast.loading("Sending OTP...");
+
+    // Optional: Check if employee exists in Firestore
     const q = query(collection(db, "employee"), where("email", "==", email));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
+      setLoader(false);
       return toast.update(toastId, {
         render: "No employee found with that email.",
         type: "error",
@@ -34,21 +37,27 @@ export default function ForgotPassword() {
         autoClose: 3000,
       });
     }
-    try {   
+
+    try {
       const res = await fetch(
-        `https://nodejsotp-7akwb62w0-zackcoles-projects.vercel.app/sendOtp?email=${email}`,
+        "https://us-central1-jbst-dispatch-app-b62fd.cloudfunctions.net/sendOTP",
         {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
+          body: JSON.stringify({ email }),
         }
       );
 
       const data = await res.json();
-      if (res) {
-        setOtp(data.result.otp);
+
+      if (data.success) {
+        // Save OTP and token from API response
+        setOtp(data.otp); // for your front-end validation (optional)
+        setForgetToken(data.token); // store token for verification
+
         toast.update(toastId, {
           render: "OTP sent successfully!",
           type: "success",
@@ -60,23 +69,23 @@ export default function ForgotPassword() {
       } else {
         setLoader(false);
         toast.update(toastId, {
-          render: "Failed to send OTP.",
+          render: data.error || "Failed to send OTP.",
           type: "error",
           isLoading: false,
           autoClose: 3000,
         });
       }
     } catch (error) {
+      setLoader(false);
       toast.update(toastId, {
         render: "An error occurred.",
         type: "error",
         isLoading: false,
         autoClose: 3000,
       });
-      setLoader(false);
+      console.error(error);
     }
   };
-
 
   return (
     <div className="grid sm:grid-cols-1 h-screen lg:grid-cols-2 px-3  md:py-10 md:px-10 gap-4 flex items-center ">
