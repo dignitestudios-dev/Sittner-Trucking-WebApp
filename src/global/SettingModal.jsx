@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
-import { db, doc, setDoc, getDoc } from "../firbase/FirebaseInit";
+import { db } from "../firbase/FirebaseInit";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 
 export default function SettingModal({ isOpen, setIsOpen }) {
-  const [days, setDays] = useState(7); // default
+  const [days, setDays] = useState(7);
+  const [hours, setHours] = useState(0);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // ✅ Fetch the current reminder setting from Firestore
+  // ✅ Fetch from Firestore when modal opens
   useEffect(() => {
     const fetchSetting = async () => {
       try {
         setFetching(true);
         const ref = doc(db, "settings", "reminder");
         const snap = await getDoc(ref);
-
         if (snap.exists()) {
           const data = snap.data();
           setDays(data.days || 7);
+          setHours(data.hours || 0);
         }
       } catch (err) {
         console.error("Error fetching reminder setting:", err);
@@ -28,21 +30,22 @@ export default function SettingModal({ isOpen, setIsOpen }) {
       }
     };
 
-    if (isOpen) fetchSetting(); // fetch only when modal opens
+    if (isOpen) fetchSetting();
   }, [isOpen]);
 
+  // ✅ Save settings to Firestore
   const handleSave = async () => {
-    try {
-      if (!days || days <= 0) {
-        toast.error("Please enter a valid number of days.");
-        return;
-      }
+    if ((!days && !hours) || (days <= 0 && hours <= 0)) {
+      toast.error("Please enter a valid number of days or hours.");
+      return;
+    }
 
+    try {
       setLoading(true);
 
-      // 🔥 Save in Firestore
       await setDoc(doc(db, "settings", "reminder"), {
-        days: Number(days),
+        days: Number(days) || 0,
+        hours: Number(hours) || 0,
         updatedAt: new Date(),
       });
 
@@ -76,20 +79,39 @@ export default function SettingModal({ isOpen, setIsOpen }) {
             {/* Body */}
             <div className="flex flex-col gap-4">
               <label className="font-medium text-[15px] text-gray-700">
-                Send reminder after how many days?
+                Send reminder after:
               </label>
 
               {fetching ? (
-                <p className="text-gray-500 text-sm">Loading current setting...</p>
+                <p className="text-gray-500 text-sm">
+                  Loading current setting...
+                </p>
               ) : (
-                <input
-                  type="number"
-                  min="1"
-                  value={days}
-                  onChange={(e) => setDays(e.target.value)}
-                  className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  placeholder="Enter number of days"
-                />
+                <div className="flex gap-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600 mb-1">Days</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={days}
+                      onChange={(e) => setDays(e.target.value)}
+                      className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
+                      placeholder="Days"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600 mb-1">Hours</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={hours}
+                      onChange={(e) => setHours(e.target.value)}
+                      className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
+                      placeholder="Hours"
+                    />
+                  </div>
+                </div>
               )}
             </div>
 
@@ -106,6 +128,7 @@ export default function SettingModal({ isOpen, setIsOpen }) {
           </div>
         </div>
       </div>
+
       {/* background overlay */}
       <div className="opacity-25 fixed h-screen inset-0 z-40 bg-black"></div>
     </div>

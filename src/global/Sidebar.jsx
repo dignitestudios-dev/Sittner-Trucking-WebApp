@@ -4,11 +4,10 @@ import { admin_links, links } from "../constants/SideBar";
 import { IoExitOutline } from "react-icons/io5";
 import { MyContext } from "../context/GlobalContext";
 import { CiSettings } from "react-icons/ci";
-export default function Sidebar({setIsOpen}) {
+export default function Sidebar({ setIsOpen }) {
   const pathName = useLocation();
   const { setIsLogOut, Employee } = useContext(MyContext);
   const [user, setUser] = useState("");
-
 
   useEffect(() => {
     if (Employee?.role == "admin") {
@@ -36,7 +35,7 @@ export default function Sidebar({setIsOpen}) {
                     : "text-[#9F9F9F]"
                 } `}
               >
-                <span className="text-[20px]" >{e.img}</span>
+                <span className="text-[20px]">{e.img}</span>
                 <span className="ml-2"> {e.title}</span>
               </NavLink>
             ))}
@@ -52,21 +51,24 @@ export default function Sidebar({setIsOpen}) {
                     : "text-[#9F9F9F]"
                 } `}
               >
-                <span className=""  >{e.img}</span>
+                <span className="">{e.img}</span>
                 <span className="ml-2"> {e.title}</span>
               </NavLink>
             ))}
-          <button
-            className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
-            onClick={() => {
-              setIsOpen(true);
-            }}
-          >
-            <span className="">
-              <CiSettings size={20} />
-            </span>
-            <span className="ml-2">Settings</span>
-          </button>
+          {user && (
+            <button
+              className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
+              onClick={() => {
+                setIsOpen(true);
+              }}
+            >
+              <span className="">
+                <CiSettings size={20} />
+              </span>
+              <span className="ml-2">Settings</span>
+            </button>
+          )}
+
           <button
             className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
             onClick={() => {
@@ -80,7 +82,6 @@ export default function Sidebar({setIsOpen}) {
           </button>
         </nav>
       </div>
-   
     </div>
   );
 }
