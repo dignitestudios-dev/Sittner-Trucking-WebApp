@@ -187,6 +187,7 @@ export default function MessageBox() {
         type: docType,
         UserMsgSeen: [],
         createdAt: new Date(),
+        isReminder: false,
         employeeId: Employee.id,
       });
       setImages([]);
