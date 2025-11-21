@@ -40,6 +40,11 @@ export default function SettingModal({ isOpen, setIsOpen }) {
       return;
     }
 
+    if (days > 30 || hours > 23) {
+      toast.error("Days must be 30 or less, and hours must be 23 or less.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -93,6 +98,7 @@ export default function SettingModal({ isOpen, setIsOpen }) {
                     <input
                       type="number"
                       min="0"
+                      max="30"
                       value={days}
                       onChange={(e) => setDays(e.target.value)}
                       className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
@@ -105,6 +111,7 @@ export default function SettingModal({ isOpen, setIsOpen }) {
                     <input
                       type="number"
                       min="0"
+                      max="23"
                       value={hours}
                       onChange={(e) => setHours(e.target.value)}
                       className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
