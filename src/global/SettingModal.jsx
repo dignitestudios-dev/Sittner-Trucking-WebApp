@@ -19,8 +19,8 @@ export default function SettingModal({ isOpen, setIsOpen }) {
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const data = snap.data();
-          setDays(data.days || 7);
-          setHours(data.hours || 0);
+          setDays(data.days);
+          setHours(data.hours);
         }
       } catch (err) {
         console.error("Error fetching reminder setting:", err);
@@ -100,7 +100,28 @@ export default function SettingModal({ isOpen, setIsOpen }) {
                       min="0"
                       max="30"
                       value={days}
-                      onChange={(e) => setDays(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        // empty allow (backspace ke liye)
+                        if (value === "") {
+                          setDays("");
+                          return;
+                        }
+
+                        const number = Number(value);
+
+                        // sirf 0 se 30 tak allow
+                        if (number >= 0 && number <= 30) {
+                          setDays(number);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // minus key block
+                        if (e.key === "-" || e.key === "e") {
+                          e.preventDefault();
+                        }
+                      }}
                       className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
                       placeholder="Days"
                     />
@@ -113,7 +134,28 @@ export default function SettingModal({ isOpen, setIsOpen }) {
                       min="0"
                       max="23"
                       value={hours}
-                      onChange={(e) => setHours(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        // empty allow (delete/backspace)
+                        if (value === "") {
+                          setHours("");
+                          return;
+                        }
+
+                        const num = Number(value);
+
+                        // sirf 0–23 allow
+                        if (num >= 0 && num <= 23) {
+                          setHours(num);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // minus & e block
+                        if (e.key === "-" || e.key === "e") {
+                          e.preventDefault();
+                        }
+                      }}
                       className="border rounded-lg px-3 py-2 w-[120px] focus:ring-2 focus:ring-green-500 focus:outline-none"
                       placeholder="Hours"
                     />
