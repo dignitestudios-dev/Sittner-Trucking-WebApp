@@ -73,7 +73,7 @@ export default function SettingModal({ isOpen, setIsOpen }) {
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-[600] text-[18px]">
-                Set Reminder Email Setting
+                Set Reminder Text Setting
               </h3>
               <button onClick={() => setIsOpen(false)}>
                 <IoMdClose size={22} />
