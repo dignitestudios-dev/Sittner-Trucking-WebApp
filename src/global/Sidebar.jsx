@@ -55,7 +55,7 @@ export default function Sidebar({ setIsOpen }) {
                 <span className="ml-2"> {e.title}</span>
               </NavLink>
             ))}
-          {user && (
+          {Employee?.role == "admin" && (
             <button
               className={`flex text-sm items-center font-normal mt-3 px-4 py-2  text-[#9F9F9F] `}
               onClick={() => {

@@ -29,7 +29,6 @@ export default function SettingModal({ isOpen, setIsOpen }) {
         setFetching(false);
       }
     };
-
     if (isOpen) fetchSetting();
   }, [isOpen]);
 
